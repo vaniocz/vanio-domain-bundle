@@ -2,12 +2,18 @@
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <parameters>
         <parameter key="vanio_domain.pagination.page_param_converter.class">Vanio\DomainBundle\Pagination\PageParamConverter</parameter>
+        <parameter key="vanio_domain.form.data_mapper_validation_extension.class">Vanio\DomainBundle\Form\DataMapperValidationExtension</parameter>
     </parameters>
 
     <services>
         <service id="vanio_domain.pagination.page_param_converter" class="%vanio_domain.pagination.page_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
             <tag name="request.param_converter" converter="page_param_converter"/>
+        </service>
+
+        <service id="vanio_domain.form.data_mapper_validation_extension" class="%vanio_domain.form.data_mapper_validation_extension.class%">
+            <argument type="service" id="translator"/>
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
         </service>
     </services>
 </container>
