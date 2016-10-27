@@ -40,12 +40,13 @@ class ValidatingDataMapper implements DataMapperInterface
             $this->dataMapper->mapFormsToData($forms, $data);
         } catch (ValidationException $e) {
             $forms = iterator_to_array($forms);
+
             /** @var FormInterface|null $form */
             if (!$form = $forms ? reset($forms)->getParent() : null) {
                 throw $e;
             }
 
-            $message = $this->translator->trans($e->getMessageTemplate(), $e->getMessageParameters(), 'validation');
+            $message = $this->translator->trans($e->getMessageTemplate(), $e->getMessageParameters(), 'validators');
             $form->addError(new FormError($message, $e->getMessageTemplate(), $e->getMessageParameters()));
         }
     }

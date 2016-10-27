@@ -2,6 +2,7 @@
 namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
+use Vanio\DomainBundle\Assert\Validation;
 
 /**
  * @ORM\Embeddable
@@ -17,26 +18,17 @@ class Image extends File
     public function __construct($file)
     {
         parent::__construct($file);
-        $this->loadMetadata();
-    }
-
-    public function metaData(): array
-    {
-        return $this->metaData;
-    }
-
-    private function loadMetadata()
-    {
-        $metadata = @getimagesize($this->file);
-
-        if (!$metadata[0]) {
-            throw new \InvalidArgumentException(sprintf('Unknown image format of file "%s".', $this->file));
-        }
-
+        Validation::supportedImageFile($this->file, 'Unknown photo format.');
+        $metadata = getimagesize($this->file);
         $this->metaData = [
             'width' => $metadata[0],
             'height' => $metadata[1],
             'mime' => $metadata['mime'],
         ];
+    }
+
+    public function metaData(): array
+    {
+        return $this->metaData;
     }
 }

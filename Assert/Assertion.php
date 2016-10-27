@@ -13,7 +13,7 @@ class Assertion extends BaseAssertion
      */
     public static function supportedImageFile($value, string $message = null, string $propertyPath = null)
     {
-        static::file($value);
+        static::file((string) $value);
         static::notEmpty(@getimagesize($value)[0], $message ?: 'Unknown image format.', $propertyPath);
     }
 }

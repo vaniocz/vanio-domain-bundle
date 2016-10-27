@@ -8,6 +8,10 @@
     "authors": [
         {"name": "Marek Štípek", "email": "marek.stipek@vanio.cz"}
     ],
+    "repositories": [{
+        "url": "https://github.com/maryo/JsFormValidatorBundle.git",
+        "type": "git"
+    }],
     "require": {
         "php": "7.0.*",
         "beberlei/assert": "^2.6.5",
@@ -15,6 +19,7 @@
         "happyr/doctrine-specification": "^0.8@dev",
         "sensio/framework-extra-bundle": "^3.0",
         "symfony/form": "^3.0",
+        "symfony/validator": "^3.0",
         "vanio/stdlib": "^0.1@dev",
         "vanio/type-parser": "^0.1@dev",
         "vanio/doctrine-domain-events": "^0.1@dev",
@@ -23,6 +28,7 @@
     "require-dev": {
         "phpunit/phpunit": "^5.5",
         "vich/uploader-bundle": "^1.3.1",
+        "fp/jsformvalidator-bundle": "dev-fork",
         "matthiasnoback/symfony-dependency-injection-test": "^1.0",
         "vanio/coding-standards": "^0.1@dev"
     },

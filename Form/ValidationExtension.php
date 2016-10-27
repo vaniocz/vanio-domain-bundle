@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 use Vanio\Stdlib\Objects;
 
-class DataMapperValidationExtension extends AbstractTypeExtension implements EventSubscriberInterface
+class ValidationExtension extends AbstractTypeExtension implements EventSubscriberInterface
 {
     /** @var TranslatorInterface */
     private $translator;
@@ -33,13 +33,14 @@ class DataMapperValidationExtension extends AbstractTypeExtension implements Eve
 
     public function onPreSetData(FormEvent $formEvent)
     {
-        $form = $formEvent->getForm();
-        $formConfig = $form->getConfig();
+        $formConfig = $formEvent->getForm()->getConfig();
         $dataMapper = $formConfig->getDataMapper();
 
-        if ($dataMapper && !$dataMapper instanceof ValidatingDataMapper && $formConfig instanceof FormConfigBuilder) {
-            $validatingDataMapper = new ValidatingDataMapper($dataMapper, $this->translator);
-            Objects::setPropertyValue($formConfig, 'dataMapper', $validatingDataMapper, FormConfigBuilder::class);
+        if ($formConfig instanceof FormConfigBuilder) {
+            if ($dataMapper && !$dataMapper instanceof ValidatingDataMapper) {
+                $validatingDataMapper = new ValidatingDataMapper($dataMapper, $this->translator);
+                Objects::setPropertyValue($formConfig, 'dataMapper', $validatingDataMapper, FormConfigBuilder::class);
+            }
         }
     }
 
