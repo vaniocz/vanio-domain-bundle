@@ -15,7 +15,7 @@ class FileToUpload extends UploadedFile
     {
         $filesystem = new Filesystem;
         $target = tempnam(sys_get_temp_dir(), '');
-        $filesystem->copy($path, $target);
+        $filesystem->copy($path, $target, true);
 
         return new self($target);
     }

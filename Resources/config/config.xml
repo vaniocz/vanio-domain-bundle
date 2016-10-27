@@ -15,5 +15,10 @@
             <argument type="service" id="translator"/>
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
         </service>
+
+        <service id="vanio_domain.form.data_mapper_validation_extension" class="%vanio_domain.form.data_mapper_validation_extension.class%">
+            <argument type="service" id="translator"/>
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
+        </service>
     </services>
 </container>
