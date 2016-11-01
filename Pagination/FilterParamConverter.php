@@ -5,32 +5,31 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageParamConverter implements ParamConverterInterface
+class FilterParamConverter implements ParamConverterInterface
 {
-    const DEFAULT_OPTIONS = [
-        'page_parameter' => 'page',
-        'records_per_page' => 10,
-    ];
-
     /** @var array */
     private $options;
 
     public function __construct(array $options = [])
     {
-        $this->options = $options + self::DEFAULT_OPTIONS;
+        $this->options = $options + ['dql_alias' => null];
     }
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         $options = $configuration->getOptions() + $this->options;
-        $pageNumber = max($request->query->getInt($options['page_parameter'], 1), 1);
-        $request->attributes->set($configuration->getName(), new Page($pageNumber, $options['records_per_page']));
+        (new OrderByParamConverter($options))->apply($request, $configuration);
+        $orderBy = $request->attributes->get($configuration->getName());
+        (new PageParamConverter($options))->apply($request, $configuration);
+        $page = $request->attributes->get($configuration->getName());
+        $filter = new Filter($orderBy, $page, $options['dql_alias']);
+        $request->attributes->set($configuration->getName(), $filter);
 
         return true;
     }
 
     public function supports(ParamConverter $configuration): bool
     {
-        return $configuration->getClass() === Page::class;
+        return $configuration->getClass() === Filter::class;
     }
 }

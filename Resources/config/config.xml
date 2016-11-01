@@ -3,6 +3,8 @@
     <parameters>
         <parameter key="vanio_domain.filesystem_cache.class">Doctrine\Common\Cache\FilesystemCache</parameter>
         <parameter key="vanio_domain.pagination.page_param_converter.class">Vanio\DomainBundle\Pagination\PageParamConverter</parameter>
+        <parameter key="vanio_domain.pagination.order_by_param_converter.class">Vanio\DomainBundle\Pagination\OrderByParamConverter</parameter>
+        <parameter key="vanio_domain.pagination.filter_param_converter.class">Vanio\DomainBundle\Pagination\FilterParamConverter</parameter>
         <parameter key="vanio_domain.form.validation_token_parser.class">Vanio\DomainBundle\Form\ValidationTokenParser</parameter>
         <parameter key="vanio_domain.form.caching_validation_parser.class">Vanio\DomainBundle\Form\CachingValidationParser</parameter>
         <parameter key="vanio_domain.form.validation_constraints_guesser.class">Vanio\DomainBundle\Form\ValidationConstraintsGuesser</parameter>
@@ -17,6 +19,16 @@
         <service id="vanio_domain.pagination.page_param_converter" class="%vanio_domain.pagination.page_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
             <tag name="request.param_converter" converter="page_param_converter"/>
+        </service>
+
+        <service id="vanio_domain.pagination.order_by_param_converter" class="%vanio_domain.pagination.order_by_param_converter.class%" public="false">
+            <argument>%vanio_domain.pagination_default_options%</argument>
+            <tag name="request.param_converter" converter="order_by_param_converter"/>
+        </service>
+
+        <service id="vanio_domain.pagination.filter_param_converter" class="%vanio_domain.pagination.filter_param_converter.class%" public="false">
+            <argument>%vanio_domain.pagination_default_options%</argument>
+            <tag name="request.param_converter" converter="filter_param_converter"/>
         </service>
 
         <service id="vanio_domain.form.validation_token_parser" class="%vanio_domain.form.validation_token_parser.class%"/>

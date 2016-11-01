@@ -5,11 +5,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageParamConverter implements ParamConverterInterface
+class OrderByParamConverter implements ParamConverterInterface
 {
     const DEFAULT_OPTIONS = [
-        'page_parameter' => 'page',
-        'records_per_page' => 10,
+        'order_parameter' => 'order',
+        'default_order' => 'id',
+        'dql_alias' => null,
     ];
 
     /** @var array */
@@ -23,14 +24,16 @@ class PageParamConverter implements ParamConverterInterface
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         $options = $configuration->getOptions() + $this->options;
-        $pageNumber = max($request->query->getInt($options['page_parameter'], 1), 1);
-        $request->attributes->set($configuration->getName(), new Page($pageNumber, $options['records_per_page']));
+        $order = $request->query->get($options['order_parameter'], $options['default_order']);
+        list($field, $direction) = explode(' ', $order) + [null, 'ASC'];
+        $orderBy = new OrderBy($field, $direction, $options['dql_alias']);
+        $request->attributes->set($configuration->getName(), $orderBy);
 
         return true;
     }
 
     public function supports(ParamConverter $configuration): bool
     {
-        return $configuration->getClass() === Page::class;
+        return $configuration->getClass() === OrderBy::class;
     }
 }
