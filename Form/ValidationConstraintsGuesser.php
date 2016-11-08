@@ -81,11 +81,6 @@ class ValidationConstraintsGuesser
             : $constraint] ?? [];
     }
 
-    /**
-     * @param array $validationRule
-     * @param string|array $constraintMapping
-     * @return Constraint
-     */
     private function createValidationConstraint(array $validationRule, array $constraintMapping): Constraint
     {
         list($constraintClass, $optionsMapping) = $constraintMapping + [null, []];

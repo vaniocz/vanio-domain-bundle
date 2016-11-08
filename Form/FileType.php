@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Vanio\DomainBundle\Model\File;
@@ -86,15 +87,17 @@ class FileType extends AbstractType implements DataMapperInterface, EventSubscri
         $formData = $form->getData();
 
         if ($form->getParent()->getConfig()->getOption('multiple')) {
-            $data = [];
+            $data = array_intersect_key($data, array_filter($formData));
 
             foreach ((array) $formData as $file) {
-                if ($file) {
+                if ($file instanceof UploadedFile) {
                     $data[] = new $class($file);
                 }
             }
-        } elseif ($formData !== null) {
-            $data = new $class($formData);
+        } else {
+            $data = $formData
+                ? new $class($formData)
+                : $data ?: null;
         }
     }
 

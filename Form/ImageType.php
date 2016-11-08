@@ -2,6 +2,8 @@
 namespace Vanio\DomainBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Vanio\DomainBundle\Model\Image;
@@ -14,9 +16,22 @@ class ImageType extends AbstractType
             ->setDefaults([
                 'class' => Image::class,
                 'supported_image_types' => [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_BMP],
+                'thumbnail_attr' => [],
+                'thumbnail_filter' => null,
             ])
             ->setAllowedTypes('supported_image_types', 'array')
+            ->setAllowedTypes('thumbnail_attr', 'array')
+            ->setAllowedTypes('thumbnail_filter', ['string', 'null'])
             ->setNormalizer('options', $this->optionsNormalizer());
+    }
+
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars += [
+            'thumbnail_attr' => $options['thumbnail_attr'],
+            'thumbnail_filter' => $options['thumbnail_filter'],
+            'multiple' => $options['multiple'],
+        ];
     }
 
     public function getParent(): string

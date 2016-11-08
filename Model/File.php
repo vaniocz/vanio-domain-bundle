@@ -43,7 +43,10 @@ class File
         $this->setFile($file instanceof UploadedFile ? $file : FileToUpload::temporaryCopy($file));
     }
 
-    public function file(): FileInfo
+    /**
+     * @return FileInfo
+     */
+    public function file()
     {
         return $this->file;
     }
@@ -74,7 +77,7 @@ class File
     /**
      * @internal
      */
-    public function setFileName(string $fileName)
+    public function setFileName(string $fileName = null)
     {
         $this->fileName = $fileName;
     }
