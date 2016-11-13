@@ -11,7 +11,7 @@ class Image extends File
 {
     /**
      * @var array
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="universal_json")
      */
     private $metaData;
 
