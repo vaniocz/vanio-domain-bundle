@@ -1,6 +1,8 @@
 <?php
 namespace Vanio\DomainBundle\Mapping;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 
 class EmbeddedPropertyMapping extends PropertyMapping
@@ -18,6 +20,36 @@ class EmbeddedPropertyMapping extends PropertyMapping
             "$filePropertyPath.$embeddedFileNamePropertyPath"
         );
         $this->filePropertyName = $filePropertyPath;
+    }
+
+    /**
+     * @param object $object
+     * @return File|null
+     */
+    public function getFile($object)
+    {
+        try {
+            $file = parent::getFile($object);
+        } catch (UnexpectedTypeException $e) {
+            return null;
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param object $object
+     * @return string|null
+     */
+    public function getFileName($object)
+    {
+        try {
+            $fileName = parent::getFileName($object);
+        } catch (UnexpectedTypeException $e) {
+            return null;
+        }
+
+        return $fileName;
     }
 
     public function getFilePropertyName(): string
