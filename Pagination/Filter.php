@@ -1,10 +1,12 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Happyr\DoctrineSpecification\BaseSpecification;
-use Happyr\DoctrineSpecification\Logic\AndX;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
+use Happyr\DoctrineSpecification\Filter\Filter as FilterSpecification;
+use Happyr\DoctrineSpecification\Result\ResultModifier;
 
-class Filter extends BaseSpecification
+class Filter implements FilterSpecification, ResultModifier
 {
     /** @var OrderBy */
     private $orderBy;
@@ -12,11 +14,14 @@ class Filter extends BaseSpecification
     /** @var Page */
     private $page;
 
+    /** @var string|null */
+    private $dqlAlias;
+
     public function __construct(OrderBy $orderBy, Page $page, string $dqlAlias = null)
     {
-        parent::__construct($dqlAlias);
         $this->orderBy = $orderBy;
         $this->page = $page;
+        $this->dqlAlias = $dqlAlias;
     }
 
     public function orderBy(): OrderBy
@@ -29,8 +34,13 @@ class Filter extends BaseSpecification
         return $this->page;
     }
 
-    public function getSpec()
+    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        return new AndX($this->orderBy, $this->page);
+        $this->orderBy()->modify($queryBuilder, $this->dqlAlias ?: $dqlAlias);
+    }
+
+    public function modify(AbstractQuery $query)
+    {
+        $this->page->modify($query);
     }
 }

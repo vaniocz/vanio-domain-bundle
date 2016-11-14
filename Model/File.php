@@ -28,19 +28,35 @@ class File
     protected $fileName;
 
     /**
-     * @param FileInfo|string $file
+     * @var array
+     * @ORM\Column(type="universal_json")
+     */
+    protected $metaData;
+
+    /**
+     * @param FileInfo|self|string $file
      * @throws \InvalidArgumentException
      */
     public function __construct($file)
     {
-        if (!$file instanceof FileInfo && !is_string($file)) {
+        if (!$file instanceof FileInfo && !$file instanceof self && !is_string($file)) {
             throw new \InvalidArgumentException(sprintf(
                 'The file must be an instance of "%s" or a string.',
                 FileInfo::class
             ));
         }
 
-        $this->setFile($file instanceof UploadedFile ? $file : FileToUpload::temporaryCopy($file));
+        if ($file instanceof self) {
+            $this->metaData = $file->metaData;
+            $file = $file->file();
+        }
+
+        $file = $file instanceof UploadedFile ? $file : FileToUpload::temporaryCopy($file);
+        $this->setFile($file);
+        $this->metaData = $this->metaData ?? [
+            'name' => $file instanceof UploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
+            'size' => $file->getSize(),
+        ];
     }
 
     /**
