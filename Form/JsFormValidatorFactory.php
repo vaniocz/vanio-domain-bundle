@@ -32,6 +32,8 @@ class JsFormValidatorFactory extends BaseJsFormValidatorFactory
 
         if (!$parent = $form->getParent()) {
             return $validationData;
+        } elseif (!$parent->getConfig()->getOption('guess_constraints')) {
+            return $validationData;
         } elseif (!$class = $parent->getConfig()->getOption('class', $parent->getConfig()->getDataClass())) {
             return $validationData;
         } elseif (!$constraints = $this->validationConstraintsGuesser->guessValidationConstraints($class)) {

@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Vanio\Stdlib\Objects;
 
@@ -29,6 +30,13 @@ class ValidationExtension extends AbstractTypeExtension implements EventSubscrib
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver
+            ->setDefault('guess_constraints', true)
+            ->setAllowedTypes('guess_constraints', 'bool');
     }
 
     public function onPreSetData(FormEvent $formEvent)
