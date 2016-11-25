@@ -31,6 +31,17 @@ class EntityRepository extends EntitySpecificationRepository
         return $entity;
     }
 
+    public function random()
+    {
+        return $this->createQueryBuilder('e')
+            ->addSelect('RANDOM() as HIDDEN _random')
+            ->orderBy('_random')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
+
     /**
      * @param object $entity
      */
