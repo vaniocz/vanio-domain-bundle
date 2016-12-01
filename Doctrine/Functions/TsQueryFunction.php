@@ -5,7 +5,7 @@ use Doctrine\ORM\Query\SqlWalker;
 
 class TsQueryFunction extends \VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsQueryFunction
 {
-    public function getSql(SqlWalker $sqlWalker)
+    public function getSql(SqlWalker $sqlWalker): string
     {
         $this->findFTSField($sqlWalker);
 

@@ -33,7 +33,7 @@ class TextSearchQuery implements Filter
      * @param string $dqlAlias
      * @return string
      */
-    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias)
+    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias): string
     {
         if (!self::$searchConfigurationSetUp) {
             $this->setUpSearchConfiguration($queryBuilder);
