@@ -48,5 +48,9 @@
             <argument type="service" id="translator"/>
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
         </service>
+
+        <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="VertigoLabs\DoctrineFullTextPostgres\Common\TsVectorSubscriber">
+            <tag name="doctrine.event_subscriber" />
+        </service>
     </services>
 </container>

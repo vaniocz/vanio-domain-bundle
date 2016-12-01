@@ -4,12 +4,14 @@ namespace Vanio\DomainBundle\Doctrine;
 use Assert\Assertion;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Happyr\DoctrineSpecification\EntitySpecificationRepository;
 use Happyr\DoctrineSpecification\Filter\Filter;
 use Happyr\DoctrineSpecification\Logic\AndX;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
+use Vanio\DomainBundle\Specification\TextSearchQuery;
 
 /**
  * @method find($id, int $lockMode = null, int $lockVersion = null)
