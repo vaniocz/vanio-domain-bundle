@@ -1,5 +1,5 @@
 <?php
-namespace Vanio\DomainBundle\Doctrine;
+namespace Vanio\DomainBundle\Doctrine\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
