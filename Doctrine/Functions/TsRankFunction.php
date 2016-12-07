@@ -2,8 +2,9 @@
 namespace Vanio\DomainBundle\Doctrine\Functions;
 
 use Doctrine\ORM\Query\SqlWalker;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankFunction as BaseTsRankFunction;
 
-class TsRankFunction extends \VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankFunction
+class TsRankFunction extends BaseTsRankFunction
 {
     public function getSql(SqlWalker $sqlWalker): string
     {
