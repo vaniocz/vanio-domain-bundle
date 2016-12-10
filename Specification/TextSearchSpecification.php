@@ -16,7 +16,8 @@ abstract class TextSearchSpecification
     protected function processSearchTerm(string $searchTerm): string
     {
         static $firstGroup = [
-            '~[()&\\\:]+~' => '',
+            '~[()&\\\:]+|^!+$|!+$|(?:^|\s+)\*+~' => '',
+            '~!\*|!+\s*~' => '!',
             '~"+~' => '""',
         ];
         $secondGroup = [
@@ -25,10 +26,11 @@ abstract class TextSearchSpecification
             },
         ];
         static $thirdGroup = [
-            '~"|\(\s*\)|(?:^|\s+)\*+~' => '',
+            '~"|\(\s*\)~' => '',
             '~\s*\<([\-0-9]{1,1})\>\s*~' => '<\1>',
-            '~!\s*~' => '!',
             '~([^*]+)\*+~' => '\1:*',
+            '~(\*\)?)([^&|\$])~' => '\1|\2',
+            '~(^|[^&|])!~' => '\1|!',
             '~[\s|]+~' => '|',
         ];
 
