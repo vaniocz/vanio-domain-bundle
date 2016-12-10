@@ -15,16 +15,19 @@ abstract class TextSearchSpecification
      */
     protected function processSearchTerm(string $searchTerm): string
     {
-        static $firstGroup = ['~[()&\\\:]+~' => ''];
+        static $firstGroup = [
+            '~[()&\\\:]+~' => '',
+            '~"+~' => '""',
+        ];
         $secondGroup = [
-            '~"+([^""]+)"+~' => function (array $match): string {
-                return '(' . trim(preg_replace('~\s+~', '&', $match[1]), '&') . ')';
+            '~"([^"]+)"~' => function (array $match): string {
+                return '(' . trim(preg_replace('~\s+~', '&', trim($match[1])), '&') . ')';
             },
         ];
         static $thirdGroup = [
+            '~"|\(\s*\)|(?:^|\s+)\*+~' => '',
             '~\s*\<([\-0-9]{1,1})\>\s*~' => '<\1>',
             '~!\s*~' => '!',
-            '~(?:^|\s+)\*+~' => '',
             '~([^*]+)\*+~' => '\1:*',
             '~[\s|]+~' => '|',
         ];

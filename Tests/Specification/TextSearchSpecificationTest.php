@@ -58,4 +58,9 @@ class TextSearchSpecificationTest extends TestCase
     {
         $this->assertSame('a|b|c', $this->spec->searchTerm('&a:: \\& (b: & c :::)& (\\\)'));
     }
+
+    function test_useless_quotation_marks_are_removed()
+    {
+        $this->assertSame('(a&b)|c|d', $this->spec->searchTerm('"" "a b" " c d'));
+    }
 }
