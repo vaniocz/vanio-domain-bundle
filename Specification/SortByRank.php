@@ -4,7 +4,7 @@ namespace Vanio\DomainBundle\Specification;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
 
-class SortByRank implements QueryModifier
+class SortByRank extends TextSearchSpecification implements QueryModifier
 {
     /** @var string */
     private $searchTerm;
@@ -28,7 +28,7 @@ class SortByRank implements QueryModifier
      */
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        $queryBuilder->setParameter('_rankQuery', preg_replace('~\s+~', ' & ', $this->searchTerm));
+        $queryBuilder->setParameter('_rankQuery', $this->processSearchTerm($this->searchTerm));
         $queryBuilder->addOrderBy(sprintf('tsrank(%s.%s, :_rankQuery)', $dqlAlias, $this->searchDocumentField), 'DESC');
     }
 }

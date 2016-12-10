@@ -4,7 +4,7 @@ namespace Vanio\DomainBundle\Specification;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Filter\Filter;
 
-class TextSearchQuery implements Filter
+class TextSearchQuery extends TextSearchSpecification implements Filter
 {
     /** @var bool */
     private static $searchConfigurationSetUp = false;
@@ -39,7 +39,7 @@ class TextSearchQuery implements Filter
             $this->setUpSearchConfiguration($queryBuilder);
         }
 
-        $queryBuilder->setParameter('_searchQuery', preg_replace('~\s+~', ' & ', $this->searchTerm));
+        $queryBuilder->setParameter('_searchQuery', $this->processSearchTerm($this->searchTerm));
 
         return sprintf(
             'TSQUERY(%s.%s, :_searchQuery) = true',
