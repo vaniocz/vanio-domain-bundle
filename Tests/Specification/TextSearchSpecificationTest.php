@@ -34,7 +34,7 @@ class TextSearchSpecificationTest extends TestCase
         $this->assertSame('a<->b<2>c', $this->spec->searchTerm('a <-> b<2>c'));
     }
 
-    function test_phrases_surrounded_by_quotion_marks_use_and_operators()
+    function test_phrases_surrounded_by_quotation_marks_use_and_operators()
     {
         $this->assertSame('(a&b)', $this->spec->searchTerm('" a b "'));
     }
@@ -54,8 +54,8 @@ class TextSearchSpecificationTest extends TestCase
         $this->assertSame('abc:*', $this->spec->searchTerm('* *abc** **'));
     }
 
-    function test_ampersands_and_parentheses_and_backslashes_are_removed()
+    function test_ampersands_and_parentheses_and_backslashes_and_colons_are_removed()
     {
-        $this->assertSame('a|b|c', $this->spec->searchTerm('&a \\& (b & c)& (\\\)'));
+        $this->assertSame('a|b|c', $this->spec->searchTerm('&a:: \\& (b: & c :::)& (\\\)'));
     }
 }

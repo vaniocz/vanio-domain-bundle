@@ -15,7 +15,7 @@ abstract class TextSearchSpecification
      */
     protected function processSearchTerm(string $searchTerm): string
     {
-        static $firstGroup = ['~[()&\\\]+~' => ''];
+        static $firstGroup = ['~[()&\\\:]+~' => ''];
         $secondGroup = [
             '~"+([^""]+)"+~' => function (array $match): string {
                 return '(' . trim(preg_replace('~\s+~', '&', $match[1]), '&') . ')';
