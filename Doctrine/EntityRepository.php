@@ -2,6 +2,8 @@
 namespace Vanio\DomainBundle\Doctrine;
 
 use Assert\Assertion;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -31,9 +33,15 @@ class EntityRepository extends EntitySpecificationRepository
         return $entity;
     }
 
-    public function random()
+    public function random(Expression $criteria = null)
     {
-        return $this->createQueryBuilder('e')
+        $queryBuilder = $this->createQueryBuilder('e');
+
+        if ($criteria) {
+            $queryBuilder->addCriteria(new Criteria($criteria));
+        }
+
+        return $queryBuilder
             ->addSelect('RANDOM() as HIDDEN _random')
             ->orderBy('_random')
             ->setMaxResults(1)
