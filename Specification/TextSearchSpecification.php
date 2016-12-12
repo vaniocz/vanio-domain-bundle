@@ -16,7 +16,7 @@ abstract class TextSearchSpecification
     protected function processSearchTerm(string $searchTerm): string
     {
         static $firstGroup = [
-            '~[()&\\\:]+|^!+$|!+$|[&|*:]*!+|!+[&|*:]+$|(?:^|\s+)\*+~' => '',
+            '~[()&\\\:]+|^!+$|!+$|[&|*:]+!+|!+[&|*:]+$|(?:^|\s+)\*+~' => '',
             '~!\*|!+\s*~' => '!',
             '~"+\*+|"+~' => '"',
         ];
