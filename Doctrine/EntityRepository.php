@@ -42,7 +42,7 @@ class EntityRepository extends EntitySpecificationRepository
         }
 
         return $queryBuilder
-            ->addSelect('RANDOM() as HIDDEN _random')
+            ->select('RANDOM() as HIDDEN _random')
             ->orderBy('_random')
             ->setMaxResults(1)
             ->getQuery()
