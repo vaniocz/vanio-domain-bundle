@@ -33,6 +33,14 @@ class EntityRepository extends EntitySpecificationRepository
         return $entity;
     }
 
+    /**
+     * @param mixed $id
+     */
+    public function getReference($id)
+    {
+        return $this->_em->getReference($this->_entityName, $id);
+    }
+
     public function random(Expression $criteria = null)
     {
         $queryBuilder = $this->createQueryBuilder('e');
