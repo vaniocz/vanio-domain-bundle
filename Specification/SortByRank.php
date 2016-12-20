@@ -28,7 +28,8 @@ class SortByRank extends TextSearchSpecification implements QueryModifier
      */
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        $queryBuilder->setParameter('_rankQuery', $this->processSearchTerm($this->searchTerm));
-        $queryBuilder->addOrderBy(sprintf('tsrank(%s.%s, :_rankQuery)', $dqlAlias, $this->searchDocumentField), 'DESC');
+        $queryBuilder
+            ->addOrderBy(sprintf('tsrank(%s.%s, :_rankQuery)', $dqlAlias, $this->searchDocumentField), 'DESC')
+            ->setParameter('_rankQuery', $this->processSearchTerm($this->searchTerm));
     }
 }
