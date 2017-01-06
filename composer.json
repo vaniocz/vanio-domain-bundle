@@ -16,7 +16,7 @@
         "type": "git"
     }],
     "require": {
-        "php": "7.0.*",
+        "php": "^7.0",
         "beberlei/assert": "^2.6.5",
         "ramsey/uuid-doctrine": "^1.2",
         "happyr/doctrine-specification": "^0.8@dev",
