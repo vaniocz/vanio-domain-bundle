@@ -21,7 +21,7 @@ abstract class TextSearchSpecification
             '~"+\*+|"+~' => '"',
         ];
         $secondGroup = [
-            '~"([^"]+)"~' => function (array $match): string {
+            '~"(.+)"~' => function (array $match): string {
                 return '(' . trim(preg_replace('~\s+~', '&', trim($match[1])), '&') . ')';
             },
         ];
