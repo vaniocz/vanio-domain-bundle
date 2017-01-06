@@ -80,4 +80,10 @@ class TextSearchSpecificationTest extends TestCase
         $this->assertSame('(a:*&!b:*)', $this->spec->searchTerm('"a* !b*"'));
         $this->assertSame('(!a:*&!b:*)', $this->spec->searchTerm('"!a* !b*"'));
     }
+
+    function test_some_really_weird_combinations()
+    {
+        $this->assertSame('!(!a:*&!b:*)', $this->spec->searchTerm('!"!a* !b*"'));
+        $this->assertSame('!(!a:*&!b:*&de)|!fg:*', $this->spec->searchTerm('!"!a* !b*"* "de" !fg*!***'));
+    }
 }
