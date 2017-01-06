@@ -63,4 +63,21 @@ class TextSearchSpecificationTest extends TestCase
     {
         $this->assertSame('(a&b)|c|d', $this->spec->searchTerm('"" "a b" " c d'));
     }
+
+    function test_asterisk_combined_with_quotation_marks()
+    {
+        $this->assertSame('(a:*&b&c)', $this->spec->searchTerm('"a* b c"'));
+        $this->assertSame('(a&b:*&c)', $this->spec->searchTerm('"a b* c"'));
+        $this->assertSame('(a&b&c:*)', $this->spec->searchTerm('"a b c*"'));
+        $this->assertSame('(a&b&c)', $this->spec->searchTerm('*"a b c"*'));
+    }
+
+    function test_some_no_so_usual_combinations()
+    {
+        $this->assertSame('(a:*&!b)', $this->spec->searchTerm('"a* !b"'));
+        $this->assertSame('(a&!b:*)', $this->spec->searchTerm('"a !b*"'));
+        $this->assertSame('!(a&b)', $this->spec->searchTerm('!"a b"'));
+        $this->assertSame('(a:*&!b:*)', $this->spec->searchTerm('"a* !b*"'));
+        $this->assertSame('(!a:*&!b:*)', $this->spec->searchTerm('"!a* !b*"'));
+    }
 }
