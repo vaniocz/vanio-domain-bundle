@@ -21,8 +21,10 @@ abstract class TextSearchSpecification
             '~"+\*+|"+~' => '"',
         ];
         $secondGroup = [
-            '~"(.+)"~' => function (array $match): string {
-                return '(' . trim(preg_replace('~\s+~', '&', trim($match[1])), '&') . ')';
+            '~([^!|&\s]*)"(.+)"([^!|&\s]*)~' => function (array $match): string {
+                return trim(
+                    $match[1] . ' (' . trim(preg_replace('~\s+~', '&', trim($match[2])), '&') . ') ' . $match[3]
+                );
             },
         ];
         static $thirdGroup = [
@@ -34,7 +36,7 @@ abstract class TextSearchSpecification
 
         $result = preg_replace(array_keys($firstGroup), $firstGroup, trim($searchTerm));
         $result = preg_replace_callback_array($secondGroup, $result);
-        $result = trim(preg_replace(array_keys($thirdGroup), $thirdGroup, $result), '|');
+        $result = trim(preg_replace(array_keys($thirdGroup), $thirdGroup, $result), '&|');
 
         return $result;
     }
