@@ -4,9 +4,8 @@ namespace Vanio\DomainBundle\Pagination;
 use Assert\Assertion;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
-use Happyr\DoctrineSpecification\Result\ResultModifier;
 
-class Page implements ResultModifier
+class Page implements PageSpecification
 {
     /** @var int */
     private $pageNumber;
@@ -16,13 +15,13 @@ class Page implements ResultModifier
 
     public function __construct(int $pageNumber, int $recordsPerPage)
     {
-        $this->pageNumber = $pageNumber;
-        $this->recordsPerPage = $recordsPerPage;
+        $this->pageNumber = max($pageNumber, 1);
+        $this->recordsPerPage = max($recordsPerPage, 1);
     }
 
-    public function recordsPerPage(): int
+    public static function create(string $value, int $recordsPerPage): PageSpecification
     {
-        return $this->recordsPerPage;
+        return new self(ctype_digit($value) ? max((int) $value, 1) : 1, $recordsPerPage);
     }
 
     public function pageNumber(): int
@@ -30,20 +29,29 @@ class Page implements ResultModifier
         return $this->pageNumber;
     }
 
-    public function maxRecords(): int
+    public function recordsPerPage(): int
+    {
+        return $this->recordsPerPage;
+    }
+
+    public function firstRecord(): int
+    {
+        return $this->lastRecord() - $this->recordsPerPage;
+    }
+
+    public function lastRecord(): int
     {
         return $this->pageNumber * $this->recordsPerPage;
     }
 
     /**
-     * {@inheritDoc}
      * @param Query $query
      */
     public function modify(AbstractQuery $query)
     {
         Assertion::isInstanceOf($query, Query::class);
         $query
-            ->setFirstResult($this->maxRecords() - $this->recordsPerPage)
+            ->setFirstResult($this->firstRecord())
             ->setMaxResults($this->recordsPerPage);
     }
 }

@@ -23,14 +23,15 @@ class PageParamConverter implements ParamConverterInterface
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         $options = $configuration->getOptions() + $this->options;
-        $pageNumber = max($request->query->getInt($options['page_parameter'], 1), 1);
-        $request->attributes->set($configuration->getName(), new Page($pageNumber, $options['records_per_page']));
+        $class = $configuration->getClass();
+        $page = $class::{'create'}($request->query->get($options['page_parameter'], '1'), $options['records_per_page']);
+        $request->attributes->set($configuration->getName(), $page);
 
         return true;
     }
 
     public function supports(ParamConverter $configuration): bool
     {
-        return $configuration->getClass() === Page::class;
+        return is_a($configuration->getClass(), PageSpecification::class, true);
     }
 }

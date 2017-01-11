@@ -11,13 +11,13 @@ class Filter implements FilterSpecification, ResultModifier
     /** @var OrderBy */
     private $orderBy;
 
-    /** @var Page */
+    /** @var PageSpecification */
     private $page;
 
     /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(OrderBy $orderBy, Page $page, string $dqlAlias = null)
+    public function __construct(OrderBy $orderBy, PageSpecification $page, string $dqlAlias = null)
     {
         $this->orderBy = $orderBy;
         $this->page = $page;
@@ -29,7 +29,7 @@ class Filter implements FilterSpecification, ResultModifier
         return $this->orderBy;
     }
 
-    public function page(): Page
+    public function page(): PageSpecification
     {
         return $this->page;
     }

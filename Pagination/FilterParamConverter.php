@@ -12,12 +12,16 @@ class FilterParamConverter implements ParamConverterInterface
 
     public function __construct(array $options = [])
     {
-        $this->options = $options + ['dql_alias' => null];
+        $this->options = $options + [
+            'dql_alias' => null,
+            'page_class' => PageRange::class,
+        ];
     }
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         $options = $configuration->getOptions() + $this->options;
+        $configuration->setClass($options['page_class']);
         (new OrderByParamConverter($options))->apply($request, $configuration);
         $orderBy = $request->attributes->get($configuration->getName());
         (new PageParamConverter($options))->apply($request, $configuration);
