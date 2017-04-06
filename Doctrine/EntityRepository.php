@@ -3,10 +3,13 @@ namespace Vanio\DomainBundle\Doctrine;
 
 use Assert\Assertion;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Expr\Expression;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\UnitOfWork;
 use Happyr\DoctrineSpecification\EntitySpecificationRepository;
 use Happyr\DoctrineSpecification\Filter\Filter;
 use Happyr\DoctrineSpecification\Logic\AndX;
@@ -33,28 +36,58 @@ class EntityRepository extends EntitySpecificationRepository
         return $entity;
     }
 
+    public function exists($id): bool
+    {
+        return $this->existsBy($this->normalizeId($id));
+    }
+
     /**
-     * @param mixed $id
+     * @param array|Criteria $criteria
+     * @return bool
      */
+    public function existsBy($criteria): bool
+    {
+        $entityPersister = $this->_em->getUnitOfWork()->getEntityPersister($this->_class->name);
+        $sql = str_replace('SELECT COUNT(*)', 'SELECT 1', $entityPersister->getCountSQL($criteria));
+        list($parameters, $types) = $entityPersister->expandParameters($criteria);
+
+        return (bool) $this->_em->getConnection()->executeQuery($sql, $parameters, $types)->fetchColumn();
+    }
+
     public function getReference($id)
     {
         return $this->_em->getReference($this->_entityName, $id);
     }
 
-    public function random(Expression $criteria = null)
+
+    /**
+     * @param array|Criteria $criteria
+     * @param int $limit
+     * @param int|null $lockMode
+     * @return mixed
+     */
+    public function random($criteria = [], int $limit = 1, int $lockMode = null)
     {
-        $queryBuilder = $this->createQueryBuilder('e');
+        $entityPersister = $this->_em->getUnitOfWork()->getEntityPersister($this->_class->name);
+        $sql = $entityPersister->getSelectSQL($criteria, null, $lockMode, $limit);
+        $limitSql = sprintf('LIMIT %d', $limit);
+        $sql = substr_replace(
+            $sql,
+            sprintf('ORDER BY RANDOM() %s', $limitSql),
+            strrpos($sql, $limitSql),
+            strlen($limitSql)
+        );
 
-        if ($criteria) {
-            $queryBuilder->addCriteria(new Criteria($criteria));
-        }
+        list($parameters, $types) = $entityPersister->expandParameters($criteria);
+        $statement = $this->_em->getConnection()->executeQuery($sql, $parameters, $types);
+        $hydrator = $this->_em->newHydrator(Query::HYDRATE_OBJECT);
+        $entities = $hydrator->hydrateAll(
+            $statement,
+            $entityPersister->getResultSetMapping(),
+            [UnitOfWork::HINT_DEFEREAGERLOAD => true]
+        );
 
-        return $queryBuilder
-            ->addSelect('RANDOM() as HIDDEN _random')
-            ->orderBy('_random')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getSingleResult();
+        return $entities ? $entities[0] : null;
     }
 
 
@@ -116,6 +149,44 @@ class EntityRepository extends EntitySpecificationRepository
         }
 
         return [$and, $modifier];
+    }
+
+    public function normalizeId($id): array
+    {
+        if (!is_array($id)) {
+            if ($this->_class->isIdentifierComposite) {
+                throw ORMInvalidArgumentException::invalidCompositeIdentifier();
+            }
+
+            $id = [$this->_class->identifier[0] => $id];
+        }
+
+        foreach ($id as &$value) {
+            if (is_object($value) && $this->_em->getMetadataFactory()->hasMetadataFor(ClassUtils::getClass($value))) {
+                $value = $this->_em->getUnitOfWork()->getSingleIdentifierValue($value);
+
+                if ($value === null) {
+                    throw ORMInvalidArgumentException::invalidIdentifierBindingEntity();
+                }
+            }
+        }
+
+        $normalizedId = $id;
+
+        foreach ($this->_class->identifier as $property) {
+            if (!isset($id[$property])) {
+                throw ORMException::missingIdentifierField($this->_class->name, $property);
+            }
+
+            $normalizedId[$property] = $id[$property];
+            unset($id[$property]);
+        }
+
+        if ($id) {
+            throw ORMException::unrecognizedIdentifierFields($this->_class->name, array_keys($id));
+        }
+
+        return $normalizedId;
     }
 
     /**
