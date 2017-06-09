@@ -31,6 +31,7 @@ class ValidationConstraintsGuesser
         'min' => [GreaterThanOrEqual::class, ['minValue' => 'value'], ['min' => 'compared_value']],
         'max' => [LessThanOrEqual::class, ['maxValue' => 'value'], ['max' => 'compared_value']],
         'greaterThan' => [GreaterThan::class, ['limit' => 'value']],
+        'nullOrGreaterThan' => [GreaterThan::class, ['limit' => 'value']],
         'lessThan' => [LessThan::class, ['limit' => 'value']],
         'email' => [Email::class],
         'supportedImageFile' => [Image::class, ['message' => 'mimeTypesMessage']],

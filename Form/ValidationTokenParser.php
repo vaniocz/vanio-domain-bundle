@@ -65,7 +65,10 @@ class ValidationTokenParser implements ValidationParser
             return null;
         }
 
-        $reflectionMethod = new \ReflectionMethod($class, $method);
+        $reflectionMethod = new \ReflectionMethod(
+            $class,
+            Strings::startsWith($method, 'nullOr') ? substr($method, 6) : $method
+        );
         $arguments = $this->parseFunctionArguments();
         $validationRule = ['class' => $class, 'method' => $method];
 
@@ -82,14 +85,14 @@ class ValidationTokenParser implements ValidationParser
                     $validationRule['property_path'] = $this->resolveScalarToken($argument);
                     break;
                 case 'value':
-                    $validationRule['property_path'] = $this->resolveVariableNameToken($argument);
-                    break;
                 case 'value1':
                     $validationRule['property_path'] = $this->resolveVariableNameToken($argument);
-                    // no break
+                    break;
                 default:
-                    if ($value = $this->resolveScalarToken($argument)) {
-                        $validationRule[$parameter->name] = $value;
+                    try {
+                        $validationRule[$parameter->name] = $this->resolveScalarToken($argument);
+                    } catch (\UnexpectedValueException $e) {
+                        return null;
                     }
             }
         }
@@ -139,7 +142,8 @@ class ValidationTokenParser implements ValidationParser
 
     /**
      * @param array $tokens
-     * @return string|null
+     * @return mixed
+     * @throws \UnexpectedValueException
      */
     private function resolveScalarToken(array $tokens)
     {
@@ -166,7 +170,7 @@ class ValidationTokenParser implements ValidationParser
                 case T_END_HEREDOC:
                     return PhpStringTokenParser::parseDocString($hereDoc, $value);
                 default:
-                    break 2;
+                    throw new \UnexpectedValueException(sprintf('Unexpected token %s.', token_name($token[0])));
             }
         }
 
