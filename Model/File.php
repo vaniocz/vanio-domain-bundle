@@ -2,8 +2,8 @@
 namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File as FileInfo;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 /**
  * @ORM\Embeddable
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class File
 {
     /**
-     * @var FileInfo
+     * @var SymfonyFile
      */
     protected $file;
 
@@ -34,15 +34,15 @@ class File
     protected $metaData;
 
     /**
-     * @param FileInfo|self|string $file
+     * @param SymfonyFile|self|string $file
      * @throws \InvalidArgumentException
      */
     public function __construct($file)
     {
-        if (!$file instanceof FileInfo && !$file instanceof self && !is_string($file)) {
+        if (!$file instanceof SymfonyFile && !$file instanceof self && !is_string($file)) {
             throw new \InvalidArgumentException(sprintf(
                 'The file must be an instance of "%s" or a string.',
-                FileInfo::class
+                SymfonyFile::class
             ));
         }
 
@@ -51,18 +51,15 @@ class File
             $file = $file->file();
         }
 
-        $file = $file instanceof UploadedFile ? $file : FileToUpload::temporaryCopy($file);
+        $file = $file instanceof SymfonyUploadedFile ? $file : FileToUpload::temporaryCopy($file);
         $this->setFile($file);
         $this->metaData = $this->metaData ?? [
-            'name' => $file instanceof UploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
+            'name' => $file instanceof SymfonyUploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
             'size' => $file->getSize(),
         ];
     }
 
-    /**
-     * @return FileInfo
-     */
-    public function file()
+    public function file(): SymfonyFile
     {
         return $this->file;
     }
@@ -75,7 +72,7 @@ class File
     /**
      * @internal
      */
-    public function setFile(FileInfo $file = null)
+    public function setFile(SymfonyFile $file = null)
     {
         $this->file = $file;
         $this->uploadedAt = new \DateTimeImmutable;

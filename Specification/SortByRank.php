@@ -25,6 +25,7 @@ class SortByRank extends TextSearchSpecification implements QueryModifier
     /**
      * @param QueryBuilder $queryBuilder
      * @param string $dqlAlias
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
      */
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {

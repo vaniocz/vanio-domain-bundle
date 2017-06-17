@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Mapping;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 
 class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
@@ -15,7 +16,13 @@ class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
         $this->entityManager = $entityManager;
     }
 
-    protected function createMapping($object, $property, array $mappingData)
+    /**
+     * @param object $object
+     * @param string $property
+     * @param array $mappingData
+     * @return PropertyMapping|EmbeddedPropertyMapping
+     */
+    protected function createMapping($object, $property, array $mappingData): PropertyMapping
     {
         $class = ClassUtils::getClass($object);
         $mapping = parent::createMapping($object, $property, $mappingData);

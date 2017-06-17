@@ -13,6 +13,7 @@ class DateTimeImmutableType extends Type
      * @param \DateTimeInterface|null $value
      * @param AbstractPlatform $platform
      * @return string|null
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
@@ -24,6 +25,7 @@ class DateTimeImmutableType extends Type
      * @param AbstractPlatform $platform
      * @return \DateTimeImmutable|null
      * @throws ConversionException
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {

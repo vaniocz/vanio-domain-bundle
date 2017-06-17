@@ -2,6 +2,7 @@
 namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Vanio\DomainBundle\Assert\Validation;
 
 /**
@@ -9,6 +10,9 @@ use Vanio\DomainBundle\Assert\Validation;
  */
 class Image extends File
 {
+    /**
+     * @param SymfonyFile|File|string $file
+     */
     public function __construct($file)
     {
         parent::__construct($file);

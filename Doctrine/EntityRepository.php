@@ -25,6 +25,7 @@ class EntityRepository extends EntitySpecificationRepository
      * @param mixed $id
      * @param int|null $lockMode
      * @param int|null $lockVersion
+     * @return mixed
      * @throws EntityNotFoundException
      */
     public function get($id, int $lockMode = null, int $lockVersion = null)
@@ -36,13 +37,17 @@ class EntityRepository extends EntitySpecificationRepository
         return $entity;
     }
 
+    /**
+     * @param mixed $id
+     * @return bool
+     */
     public function exists($id): bool
     {
         return $this->existsBy($this->normalizeId($id));
     }
 
     /**
-     * @param array|Criteria $criteria
+     * @param Criteria|array $criteria
      * @return bool
      */
     public function existsBy($criteria): bool
@@ -54,6 +59,10 @@ class EntityRepository extends EntitySpecificationRepository
         return (bool) $this->_em->getConnection()->executeQuery($sql, $parameters, $types)->fetchColumn();
     }
 
+    /**
+     * @param mixed $id
+     * @return mixed
+     */
     public function getReference($id)
     {
         return $this->_em->getReference($this->_entityName, $id);
@@ -111,6 +120,11 @@ class EntityRepository extends EntitySpecificationRepository
         $this->_em->remove($entity);
     }
 
+    /**
+     * @param mixed $specifications
+     * @param ResultModifier|null $modifier
+     * @return Query
+     */
     public function getQuery($specifications, ResultModifier $modifier = null): Query
     {
         list($specification, $modifier) = $this->mergeSpecifications($specifications, $modifier);
@@ -118,6 +132,11 @@ class EntityRepository extends EntitySpecificationRepository
         return parent::getQuery($specification, $modifier);
     }
 
+    /**
+     * @param mixed $specifications
+     * @param bool $fetchJoinCollection
+     * @return Paginator
+     */
     public function paginate($specifications, bool $fetchJoinCollection = true): Paginator
     {
         return new Paginator($this->getQuery($specifications), $fetchJoinCollection);
@@ -151,6 +170,11 @@ class EntityRepository extends EntitySpecificationRepository
         return [$and, $modifier];
     }
 
+    /**
+     * @param mixed $id
+     * @return array
+     * @throws ORMException
+     */
     public function normalizeId($id): array
     {
         if (!is_array($id)) {

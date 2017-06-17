@@ -32,6 +32,10 @@ class ReadOnlyCollection implements Collection, Selectable
         $this->invalidAccess('clear');
     }
 
+    /**
+     * @param mixed $element
+     * @return bool
+     */
     public function contains($element): bool
     {
         return $this->collection->contains($element);
@@ -103,11 +107,17 @@ class ReadOnlyCollection implements Collection, Selectable
         return $this->collection->toArray();
     }
 
+    /**
+     * @return mixed
+     */
     public function first()
     {
         return $this->collection->first();
     }
 
+    /**
+     * @return mixed
+     */
     public function last()
     {
         return $this->collection->last();
@@ -121,11 +131,17 @@ class ReadOnlyCollection implements Collection, Selectable
         return $this->collection->key();
     }
 
+    /**
+     * @return mixed
+     */
     public function current()
     {
         return $this->collection->current();
     }
 
+    /**
+     * @return mixed
+     */
     public function next()
     {
         return $this->collection->next();
@@ -168,8 +184,10 @@ class ReadOnlyCollection implements Collection, Selectable
     /**
      * @param int $offset
      * @param int|null $length
+     * @return array
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
      */
-    public function slice($offset, $length = null)
+    public function slice($offset, $length = null): array
     {
         return $this->collection->slice($offset, $length);
     }
@@ -179,11 +197,19 @@ class ReadOnlyCollection implements Collection, Selectable
         return $this->collection->getIterator();
     }
 
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
     public function offsetExists($offset): bool
     {
         return $this->collection->offsetExists($offset);
     }
 
+    /**
+     * @param mixed $offset
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
         return $this->collection->offsetGet($offset);

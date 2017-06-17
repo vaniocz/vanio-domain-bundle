@@ -21,7 +21,7 @@ class ValidationException extends InvalidArgumentException
     public function __construct(
         string $messageTemplate,
         int $code = 0,
-        $propertyPath = null,
+        string $propertyPath = null,
         $value,
         array $constraints = []
     ) {

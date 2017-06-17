@@ -34,6 +34,11 @@ class Filter implements FilterSpecification, ResultModifier
         return $this->page;
     }
 
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $dqlAlias
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+     */
     public function getFilter(QueryBuilder $queryBuilder, $dqlAlias)
     {
         $this->orderBy()->modify($queryBuilder, $this->dqlAlias ?: $dqlAlias);

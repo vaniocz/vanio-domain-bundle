@@ -29,6 +29,7 @@ class TextSearchQuery extends TextSearchSpecification implements Filter
      * @param QueryBuilder $queryBuilder
      * @param string $dqlAlias
      * @return string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
      */
     public function getFilter(QueryBuilder $queryBuilder, $dqlAlias): string
     {

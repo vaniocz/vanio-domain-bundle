@@ -122,7 +122,7 @@ class SynchronizationListener implements EventSubscriber
         $targetEntityClass = $this->resolveTargetEntityClass($sourceEntity);
         $targetEntity = new $targetEntityClass;
 
-        return $this->updateTargetEntityBySourceEntity($targetEntity, $sourceEntity);
+        $this->updateTargetEntityBySourceEntity($targetEntity, $sourceEntity);
     }
 
     /**

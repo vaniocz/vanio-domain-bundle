@@ -5,6 +5,10 @@ use Vanio\DomainBundle\Assert\Validation;
 
 class Foo
 {
+    /**
+     * @param mixed $foo
+     * @param mixed $bar
+     */
     public function __construct($foo, $bar)
     {
         Validation::notBlank($foo, 'not_blank_message');
@@ -12,6 +16,7 @@ class Foo
         Validation::same($bar, 'value', 'same_message', 'property_path');
         Validation::greaterThan($bar, 10, 'greater_than_message');
         Validation::lessThan($bar, 100.0, 'less_than_message');
+        Validation::nullOrGreaterThan($foo, $bar, 'null_or_greater_than_message');
     }
 }
 
