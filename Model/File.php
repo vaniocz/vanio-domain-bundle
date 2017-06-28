@@ -53,10 +53,13 @@ class File
 
         $file = $file instanceof SymfonyUploadedFile ? $file : FileToUpload::temporaryCopy($file);
         $this->setFile($file);
-        $this->metaData = $this->metaData ?? [
-            'name' => $file instanceof SymfonyUploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
-            'size' => $file->getSize(),
-        ];
+
+        if (!$this->metaData) {
+            $this->metaData = [
+                'name' => $file instanceof SymfonyUploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
+                'size' => $file->getSize(),
+            ];
+        }
     }
 
     public function file(): SymfonyFile

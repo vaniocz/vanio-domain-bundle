@@ -18,7 +18,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
     public function load(array $configs, ContainerBuilder $container)
     {
         $config = $this->processConfiguration(new Configuration, $configs);
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(sprintf('%s/../Resources', __DIR__)));
         $loader->load('config.xml');
         $container->setParameter('vanio_domain', $config);
 
@@ -29,7 +29,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
 
     public function prepend(ContainerBuilder $container)
     {
-        $doctrineConfig = [
+        $container->prependExtensionConfig('doctrine', [
             'dbal' => [
                 'types' => [
                     'tsvector' => TsVector::class,
@@ -51,8 +51,6 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                     ],
                 ],
             ],
-        ];
-
-        $container->prependExtensionConfig('doctrine', $doctrineConfig);
+        ]);
     }
 }

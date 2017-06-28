@@ -19,14 +19,13 @@
         "php": "^7.0",
         "beberlei/assert": "^2.6.5",
         "ramsey/uuid-doctrine": "^1.2",
-        "happyr/doctrine-specification": "^0.8@dev",
+        "happyr/doctrine-specification": "^0.8",
         "sensio/framework-extra-bundle": "^3.0",
         "symfony/form": "^3.0",
         "symfony/validator": "^3.0",
-        "vanio/stdlib": "^0.1@dev",
-        "vanio/type-parser": "^0.1@dev",
-        "vanio/doctrine-domain-events": "^0.1@dev",
-        "vanio/doctrine-generic-types": "^0.1@dev",
+        "vanio/stdlib": "^0.1",
+        "vanio/doctrine-domain-events": "^0.1",
+        "vanio/doctrine-generic-types": "^0.1",
         "vertigolabs/doctrine-full-text-postgres": "dev-master#75e767c660fcbc85fa29db40946242f5172a5721"
     },
     "require-dev": {
@@ -50,9 +49,11 @@
         "lint": "\"vendor/bin/phpcs\" --standard=ruleset.xml --extensions=php --encoding=utf-8 --ignore=vendor .",
         "fix": "\"vendor/bin/phpcbf\" --standard=ruleset.xml --extensions=php --encoding=utf-8 --no-patch --ignore=vendor ."
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "0.1.x-dev"
+            "dev-master": "0.2.x-dev"
         }
     }
 }

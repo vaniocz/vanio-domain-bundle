@@ -1,21 +1,14 @@
 <?xml version="1.0"?>
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <parameters>
-        <parameter key="vanio_domain.filesystem_cache.class">Doctrine\Common\Cache\FilesystemCache</parameter>
         <parameter key="vanio_domain.pagination.page_param_converter.class">Vanio\DomainBundle\Pagination\PageParamConverter</parameter>
         <parameter key="vanio_domain.pagination.order_by_param_converter.class">Vanio\DomainBundle\Pagination\OrderByParamConverter</parameter>
         <parameter key="vanio_domain.pagination.filter_param_converter.class">Vanio\DomainBundle\Pagination\FilterParamConverter</parameter>
-        <parameter key="vanio_domain.form.validation_token_parser.class">Vanio\DomainBundle\Form\ValidationTokenParser</parameter>
-        <parameter key="vanio_domain.form.caching_validation_parser.class">Vanio\DomainBundle\Form\CachingValidationParser</parameter>
-        <parameter key="vanio_domain.form.validation_constraints_guesser.class">Vanio\DomainBundle\Form\ValidationConstraintsGuesser</parameter>
+        <parameter key="vanio_domain.form.required_extension.class">Vanio\DomainBundle\Form\RequiredExtension</parameter>
         <parameter key="vanio_domain.form.validation_extension.class">Vanio\DomainBundle\Form\ValidationExtension</parameter>
     </parameters>
 
     <services>
-        <service id="vanio_domain.filesystem_cache" class="%vanio_domain.filesystem_cache.class%" public="false">
-            <argument>%kernel.cache_dir%/vanio_domain</argument>
-        </service>
-
         <service id="vanio_domain.pagination.page_param_converter" class="%vanio_domain.pagination.page_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
             <tag name="request.param_converter" converter="page_param_converter"/>
@@ -31,17 +24,8 @@
             <tag name="request.param_converter" converter="filter_param_converter"/>
         </service>
 
-        <service id="vanio_domain.form.validation_token_parser" class="%vanio_domain.form.validation_token_parser.class%"/>
-
-        <service id="vanio_domain.form.caching_validation_parser" class="%vanio_domain.form.caching_validation_parser.class%">
-            <argument type="service" id="vanio_domain.form.validation_token_parser"/>
-            <argument type="service" id="vanio_domain.filesystem_cache"/>
-        </service>
-
-        <service id="vanio_domain.form.validation_parser" alias="vanio_domain.form.caching_validation_parser" public="false"/>
-
-        <service id="vanio_domain.form.validation_constraints_guesser" class="%vanio_domain.form.validation_constraints_guesser.class%" public="false">
-            <argument type="service" id="vanio_domain.form.validation_parser"/>
+        <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
         </service>
 
         <service id="vanio_domain.form.validation_extension" class="%vanio_domain.form.validation_extension.class%">
