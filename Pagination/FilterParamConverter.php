@@ -14,7 +14,7 @@ class FilterParamConverter implements ParamConverterInterface
     {
         $this->options = $options + [
             'dql_alias' => null,
-            'page_class' => PageRange::class,
+            'page_class' => Page::class,
         ];
     }
 
