@@ -1,21 +1,13 @@
 <?php
 namespace Vanio\DomainBundle\Mapping;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 
 class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
 {
-    /** @var EntityManager */
-    private $entityManager;
-
-    public function setEntityManager(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     /**
      * @param object $object
      * @param string $property
@@ -26,10 +18,11 @@ class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
     {
         $class = ClassUtils::getClass($object);
         $mapping = parent::createMapping($object, $property, $mappingData);
+        $entityManager = $this->doctrine()->getManagerForClass($class);
 
         if (
-            !$this->entityManager->getMetadataFactory()->hasMetadataFor($class)
-            || !isset($this->entityManager->getClassMetadata($class)->embeddedClasses[$property])
+            !$entityManager->getMetadataFactory()->hasMetadataFor($class)
+            || !isset($entityManager->getClassMetadata($class)->embeddedClasses[$property])
         ) {
             return $mapping;
         }
@@ -47,5 +40,10 @@ class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
         }
 
         return $embeddedMapping;
+    }
+
+    private function doctrine(): ManagerRegistry
+    {
+        return $this->container->get('doctrine');
     }
 }
