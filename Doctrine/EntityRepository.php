@@ -17,7 +17,7 @@ use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
 
 /**
- * @method find($id, int $lockMode = null, int $lockVersion = null)
+ * @method find($id = null, int $lockMode = null, int $lockVersion = null)
  */
 class EntityRepository extends EntitySpecificationRepository
 {
@@ -28,9 +28,16 @@ class EntityRepository extends EntitySpecificationRepository
      * @return mixed
      * @throws EntityNotFoundException
      */
-    public function get($id, int $lockMode = null, int $lockVersion = null)
+    public function get($id = null, int $lockMode = null, int $lockVersion = null)
     {
-        if (!$entity = $this->find($id, $lockMode, $lockVersion)) {
+        if ($id === null) {
+            $persister = $this->_em->getUnitOfWork()->getEntityPersister($this->_entityName);
+            $entity = $persister->load([], null, null, [], $lockMode, $lockVersion);
+        } else {
+            $entity = $this->find($id, $lockMode, $lockVersion);
+        }
+
+        if (!$entity) {
             throw new EntityNotFoundException;
         }
 
