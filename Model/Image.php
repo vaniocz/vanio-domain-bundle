@@ -24,9 +24,4 @@ class Image extends File
             'mime' => $metadata['mime'],
         ];
     }
-
-    public function metaData(): array
-    {
-        return $this->metaData;
-    }
 }
