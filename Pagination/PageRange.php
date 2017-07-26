@@ -39,7 +39,7 @@ class PageRange implements PageSpecification
 
     public function toPage(): int
     {
-        return $this->fromPage;
+        return $this->toPage;
     }
 
     public function recordsPerPage(): int
