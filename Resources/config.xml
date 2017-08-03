@@ -34,7 +34,7 @@
         </service>
 
         <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="VertigoLabs\DoctrineFullTextPostgres\Common\TsVectorSubscriber">
-            <tag name="doctrine.event_subscriber" />
+            <tag name="doctrine.event_subscriber"/>
         </service>
     </services>
 </container>
