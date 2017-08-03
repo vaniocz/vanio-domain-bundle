@@ -2,6 +2,7 @@
 namespace Vanio\DomainBundle\Validator;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -50,8 +51,10 @@ class UniqueValidator extends ConstraintValidator
             return;
         }
 
+        $accessor = PropertyAccess::createPropertyAccessor();
         $id = $constraint->id;
-        if (!is_null($id) && count($result) === 1 && $repository->find($object->$id()) === current($result)) {
+        if (!is_null($id) && count($result) === 1 &&
+            $repository->find($accessor->getValue($object, $id)) === current($result)) {
             return;
         }
 
