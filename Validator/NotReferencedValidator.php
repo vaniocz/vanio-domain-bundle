@@ -38,11 +38,18 @@ class NotReferencedValidator extends ConstraintValidator
         $relatedField = $constraint->relatedField ? $constraint->relatedField : $constraint->field;
         $relatedValue = $accessor->getValue($object, $constraint->field);
 
-        $result = $repository->findBy([
-            $relatedField => $relatedValue,
-        ]);
+        if (is_callable([ $repository, 'existsBy' ])) {
+            $result = $repository->existsBy([
+                $relatedField => $relatedValue,
+            ]);
+        }
+        else {
+            $result = $repository->findBy([
+                $relatedField => $relatedValue,
+            ]);
+        }
 
-        if (count($result)) {
+        if ($result) {
             $this->context->buildViolation($constraint->message)
                 ->setCode(NotReferenced::IS_REFERENCED_ERROR)
                 ->addViolation();
