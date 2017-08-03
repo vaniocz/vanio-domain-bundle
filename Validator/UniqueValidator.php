@@ -58,7 +58,7 @@ class UniqueValidator extends ConstraintValidator
 
         $id = $constraint->id;
         if (!is_null($id) && count($result) === 1 &&
-            $repository->find($accessor->getValue($object, $id)) === current($result)) {
+            $em->getReference($constraint->class, $accessor->getValue($object, $id)) === current($result)) {
             return;
         }
 
