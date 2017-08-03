@@ -38,7 +38,7 @@
         </service>
 
         <service id="vanio_domain.validator.unique" class="Vanio\DomainBundle\Validator\UniqueValidator">
-            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="doctrine" />
             <tag name="validator.constraint_validator" alias="vanio_domain.validator.unique" />
         </service>
     </services>

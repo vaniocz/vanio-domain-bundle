@@ -8,18 +8,23 @@ use Symfony\Component\Validator\Constraint;
  */
 class Unique extends Constraint
 {
-    const NOT_UNIQUE_ERROR = '';
+    const NOT_UNIQUE_ERROR = 'ee3151d8-cf49-4120-87cb-32847382cbfc';
 
-    protected static $errorNames = array(
+    /** @var array */
+    protected static $errorNames = [
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
-    );
+    ];
 
+    /** @var array*/
     public $fields;
 
+    /** @var string */
     public $class;
 
-    public $id = false;
+    /** @var string|null */
+    public $id = null;
 
+    /** @var string */
     public $message = 'This value is already used.';
 
     public function getRequiredOptions()
