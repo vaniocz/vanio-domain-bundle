@@ -41,5 +41,10 @@
             <argument type="service" id="doctrine" />
             <tag name="validator.constraint_validator" alias="vanio_domain.validator.unique" />
         </service>
+
+        <service id="vanio_domain.validator.not_referenced" class="Vanio\DomainBundle\Validator\NotReferencedValidator">
+            <argument type="service" id="doctrine" />
+            <tag name="validator.constraint_validator" alias="vanio_domain.validator.not_referenced" />
+        </service>
     </services>
 </container>
