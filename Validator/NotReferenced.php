@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class NotReferenced extends Constraint
 {
-    const IS_REFERENCED_ERROR = '';
+    const IS_REFERENCED_ERROR = '0d52565f-bc0f-41ee-9261-4dc68d29548c';
 
     /** @var array */
     protected static $errorNames = [
@@ -24,6 +24,7 @@ class NotReferenced extends Constraint
     /** @var string|null */
     public $relatedField = null;
 
+    /** @var string */
     public $message = 'The entity is referenced by another entity.';
 
     public function getRequiredOptions(): array
