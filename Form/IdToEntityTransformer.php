@@ -3,11 +3,12 @@ namespace Vanio\DomainBundle\Form;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class IdToEntityTransformer implements DataTransformerInterface
 {
-    /** @var ObjectManager */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
     /** @var string */
@@ -16,7 +17,7 @@ class IdToEntityTransformer implements DataTransformerInterface
     /** @var bool */
     private $isMultiple;
 
-    public function __construct(EntityManager $entityManager, string $class, bool $isMultiple = false)
+    public function __construct(EntityManagerInterface $entityManager, string $class, bool $isMultiple = false)
     {
         $this->entityManager = $entityManager;
         $this->class = $class;
