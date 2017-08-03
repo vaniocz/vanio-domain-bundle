@@ -27,17 +27,17 @@ class Unique extends Constraint
     /** @var string */
     public $message = 'This value is already used.';
 
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return [ 'fields', 'class' ];
     }
 
-    public function getTargets()
+    public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'vanio_domain.validator.unique';
     }

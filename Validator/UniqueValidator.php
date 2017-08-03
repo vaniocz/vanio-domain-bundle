@@ -17,10 +17,14 @@ class UniqueValidator extends ConstraintValidator
         $this->registry = $registry;
     }
 
+    /**
+     * @param mixed $object
+     * @param Constraint $constraint
+     */
     public function validate($object, Constraint $constraint)
     {
         if (!$constraint instanceof Unique) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Unique');
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\Unique');
         }
 
         $fields = $constraint->fields;
