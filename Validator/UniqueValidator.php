@@ -33,9 +33,14 @@ class UniqueValidator extends ConstraintValidator
             $fields = [ $fields ];
         }
 
+        $accessor = PropertyAccess::createPropertyAccessor();
+
         $criteria = [];
         foreach ($fields as $objectField => $entityField) {
-            $criteria[$entityField] = is_numeric($objectField) ? $object->$entityField() : $object->$objectField();
+            $criteria[$entityField] = $accessor->getValue(
+                $object,
+                is_numeric($objectField) ? $entityField : $objectField
+            );
         }
 
         $em = $this->registry->getManagerForClass($constraint->class);
@@ -44,14 +49,13 @@ class UniqueValidator extends ConstraintValidator
         }
 
         $repository = $em->getRepository($constraint->class);
-
         $result = $repository->findBy($criteria);
 
         if (count($result) === 0) {
             return;
         }
 
-        $accessor = PropertyAccess::createPropertyAccessor();
+
         $id = $constraint->id;
         if (!is_null($id) && count($result) === 1 &&
             $repository->find($accessor->getValue($object, $id)) === current($result)) {
