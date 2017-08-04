@@ -34,7 +34,17 @@
         </service>
 
         <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="VertigoLabs\DoctrineFullTextPostgres\Common\TsVectorSubscriber">
-            <tag name="doctrine.event_subscriber" />
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+
+        <service id="vanio_domain.validator.unique" class="Vanio\DomainBundle\Validator\UniqueValidator">
+            <argument type="service" id="doctrine" />
+            <tag name="validator.constraint_validator" alias="vanio_domain.validator.unique" />
+        </service>
+
+        <service id="vanio_domain.validator.not_referenced" class="Vanio\DomainBundle\Validator\NotReferencedValidator">
+            <argument type="service" id="doctrine" />
+            <tag name="validator.constraint_validator" alias="vanio_domain.validator.not_referenced" />
         </service>
     </services>
 </container>
