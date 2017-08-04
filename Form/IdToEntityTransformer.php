@@ -1,8 +1,6 @@
 <?php
 namespace Vanio\DomainBundle\Form;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 
