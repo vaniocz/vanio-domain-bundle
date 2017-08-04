@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="cs" datatype="plaintext" original="file.ext">
+        <header>
+            <tool tool-id="symfony" tool-name="Symfony"/>
+        </header>
+
+        <body>
+            <trans-unit id="ecaafec9dc0f94ecab52ba8666d0c7bc" resname="Unknown photo format.">
+                <source>Unknown photo format.</source>
+                <target>Neznámý formát obrázku.</target>
+            </trans-unit>
+
+            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Address must not be blank.">
+                <source>Address must not be blank.</source>
+                <target>Vyplňte alespoň přibližnou adresu.</target>
+            </trans-unit>
+
+            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Address must not be longer than {{ max_length }} characters.">
+                <source>Address must not be longer than {{ max_length }} characters.</source>
+                <target>Adresa nesmí být delší než {{ max_length }} znaků.</target>
+            </trans-unit>
+
+            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Latitude must be between {{ min }} and {{ max }} degrees.">
+                <source>Latitude must be between {{ min }} and {{ max }} degrees.</source>
+                <target>Zeměpisná šířka musí být mezi {{ min }} a {{ max }} stupni.</target>
+            </trans-unit>
+
+            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Longitude must be between {{ min }} and {{ max }} degrees.">
+                <source>Longitude must be between {{ min }} and {{ max }} degrees.</source>
+                <target>Zeměpisná délka musí být mezi {{ min }} a {{ max }} stupni.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
