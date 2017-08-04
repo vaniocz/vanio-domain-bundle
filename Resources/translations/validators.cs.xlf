@@ -11,22 +11,22 @@
                 <target>Neznámý formát obrázku.</target>
             </trans-unit>
 
-            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Address must not be blank.">
+            <trans-unit id="6ec30f6920d9fb8bf5ab1ce005adecf9" resname="Address must not be blank.">
                 <source>Address must not be blank.</source>
                 <target>Vyplňte alespoň přibližnou adresu.</target>
             </trans-unit>
 
-            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Address must not be longer than {{ max_length }} characters.">
+            <trans-unit id="8700afb896a5c0ef1737b7c416d2002f" resname="Address must not be longer than {{ max_length }} characters.">
                 <source>Address must not be longer than {{ max_length }} characters.</source>
                 <target>Adresa nesmí být delší než {{ max_length }} znaků.</target>
             </trans-unit>
 
-            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Latitude must be between {{ min }} and {{ max }} degrees.">
+            <trans-unit id="7a28911169b0284ea45817e9dcf17125" resname="Latitude must be between {{ min }} and {{ max }} degrees.">
                 <source>Latitude must be between {{ min }} and {{ max }} degrees.</source>
                 <target>Zeměpisná šířka musí být mezi {{ min }} a {{ max }} stupni.</target>
             </trans-unit>
 
-            <trans-unit id="8a5d91054f23f56dbd883dfac4ccb786" resname="Longitude must be between {{ min }} and {{ max }} degrees.">
+            <trans-unit id="6b661900029be61c0e2a2a7e61d167e2" resname="Longitude must be between {{ min }} and {{ max }} degrees.">
                 <source>Longitude must be between {{ min }} and {{ max }} degrees.</source>
                 <target>Zeměpisná délka musí být mezi {{ min }} a {{ max }} stupni.</target>
             </trans-unit>
