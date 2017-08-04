@@ -38,7 +38,25 @@ class EntityRepository extends EntitySpecificationRepository
         }
 
         if (!$entity) {
-            throw new EntityNotFoundException;
+            throw EntityNotFoundException::fromClassNameAndIdentifier(
+                $this->_entityName,
+                is_array($id) ? $id : [$id] ?? []
+            );
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param array $criteria
+     * @param array|null $orderBy
+     * @return mixed
+     * @throws EntityNotFoundException
+     */
+    public function getOneBy(array $criteria, array $orderBy = null)
+    {
+        if (!$entity = $this->findOneBy($criteria)) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier($this->_entityName, $criteria);
         }
 
         return $entity;
