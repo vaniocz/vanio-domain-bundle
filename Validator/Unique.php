@@ -15,7 +15,7 @@ class Unique extends Constraint
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
     ];
 
-    /** @var array*/
+    /** @var array */
     public $fields;
 
     /** @var string */
