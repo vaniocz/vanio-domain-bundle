@@ -39,6 +39,7 @@ class ValidatingDataMapper implements DataMapperInterface
         try {
             $this->dataMapper->mapFormsToData($forms, $data);
         } catch (ValidationException $e) {
+            $data = null;
             $forms = iterator_to_array($forms);
 
             /** @var FormInterface|null $form */
