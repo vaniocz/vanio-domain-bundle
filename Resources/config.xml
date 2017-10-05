@@ -11,17 +11,17 @@
     <services>
         <service id="vanio_domain.pagination.page_param_converter" class="%vanio_domain.pagination.page_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
-            <tag name="request.param_converter" converter="page_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="page_param_converter"/>
         </service>
 
         <service id="vanio_domain.pagination.order_by_param_converter" class="%vanio_domain.pagination.order_by_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
-            <tag name="request.param_converter" converter="order_by_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="order_by_param_converter"/>
         </service>
 
         <service id="vanio_domain.pagination.filter_param_converter" class="%vanio_domain.pagination.filter_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
-            <tag name="request.param_converter" converter="filter_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="filter_param_converter"/>
         </service>
 
         <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">
