@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Form;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
@@ -84,15 +85,15 @@ class RequiredExtension extends AbstractTypeExtension
 
     /**
      * @param FormInterface $form
-     * @return string|string[]|null
+     * @return string[]
      */
-    private function resolveValidationGroups(FormInterface $form)
+    private function resolveValidationGroups(FormInterface $form): array
     {
-        do {
-            $validationGroups = $form->getConfig()->getOption('validation_groups');
-            $form = $form->getParent();
-        } while ($form && $validationGroups === null);
+        $resolveValidationGroups = function () use ($form) {
+            return FormValidator::{'getValidationGroups'}($form);
+        };
+        $resolveValidationGroups = $resolveValidationGroups->bindTo(null, FormValidator::class);
 
-        return $validationGroups;
+        return $resolveValidationGroups();
     }
 }
