@@ -1,5 +1,5 @@
 <?php
-namespace Vanio\DomainBundle\Traits;
+namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
