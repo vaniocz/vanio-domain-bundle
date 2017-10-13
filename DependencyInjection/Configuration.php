@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
                         ->integerNode('records_per_page')->end()
                     ->end()
                 ->end()
+                ->booleanNode('convert_get_post_parameters')->defaultTrue()->end()
             ->end();
 
         return $treeBuilder;

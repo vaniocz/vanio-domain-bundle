@@ -25,6 +25,13 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
         foreach ($config as $key => $value) {
             $container->setParameter("vanio_domain.$key", $value);
         }
+
+        if ($config['convert_get_post_parameters']) {
+            $container
+                ->getDefinition('vanio_domain.request.get_post_param_converter')
+                ->setAbstract(false)
+                ->addTag('request.param_converter', ['priority' => 1, 'converter' => 'get_post_param_converter']);
+        }
     }
 
     public function prepend(ContainerBuilder $container)
