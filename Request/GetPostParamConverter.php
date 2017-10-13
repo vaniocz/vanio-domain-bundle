@@ -1,5 +1,5 @@
 <?php
-namespace AdminBundle\Request\ParamConverter;
+namespace Vanio\DomainBundle\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
