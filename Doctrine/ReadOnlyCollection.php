@@ -239,11 +239,14 @@ class ReadOnlyCollection implements Collection, Selectable
         return $this->collection->count();
     }
 
+    /**
+     * @throws \LogicException
+     */
     public function matching(Criteria $criteria): Collection
     {
         if (!$this->collection instanceof Selectable) {
             throw new \LogicException(sprintf(
-                'Collection %s does not implement "%s" so you cannot call ->matching() on it.',
+                'Collection of class "%s" does not implement interface "%s" so you cannot call method "matching" on it.',
                 get_class($this->collection),
                 Selectable::class
             ));
