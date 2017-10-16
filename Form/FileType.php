@@ -114,6 +114,9 @@ class FileType extends AbstractType implements DataMapperInterface, EventSubscri
         ];
     }
 
+    /**
+     * @internal
+     */
     public function onPreSetData(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
@@ -131,6 +134,9 @@ class FileType extends AbstractType implements DataMapperInterface, EventSubscri
         Objects::setPropertyValue($fileForm->getConfig(), 'options', $options, FormConfigBuilder::class);
     }
 
+    /**
+     * @internal
+     */
     public function onPreSubmit(FormEvent $formEvent)
     {
         $data = $formEvent->getData();

@@ -1,11 +1,11 @@
 <?php
-namespace Vanio\DomainBundle\Model\Translatable;
+namespace Vanio\DomainBundle\Translatable;
 
 use Doctrine\Common\Util\ClassUtils;
 
 trait TranslationTrait
 {
-    /** @var mixed */
+    /** @var int|null */
     private $id;
 
     /** @var Translatable */
@@ -15,7 +15,15 @@ trait TranslationTrait
     private $locale;
 
     /**
-     * @return string|null
+     * @return int|null
+     */
+    public function id()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return Translatable|null
      */
     public function translatable()
     {
@@ -76,5 +84,10 @@ trait TranslationTrait
         }
 
         return true;
+    }
+
+    public static function translatableClass(): string
+    {
+        return substr(__CLASS__, 0, -11);
     }
 }

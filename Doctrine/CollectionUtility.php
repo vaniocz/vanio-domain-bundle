@@ -12,11 +12,9 @@ class CollectionUtility
      */
     public static function replace(Collection $collection, $elements)
     {
-        $unwrappedCollection = self::unwrapDecoratedCollection($collection);
-
-        if ($unwrappedCollection instanceof PersistentCollection) {
-            self::replacePersistentCollection($unwrappedCollection, $elements);
-            $collection = $unwrappedCollection;
+        if ($collection instanceof PersistentCollection) {
+            self::replacePersistentCollection($collection, $elements);
+            $collection = $collection->unwrap();
         }
 
         $collection->clear();
@@ -24,20 +22,6 @@ class CollectionUtility
         foreach ($elements as $key => $element) {
             $collection[$key] = $element;
         }
-    }
-
-    /**
-     * @param Collection $collection
-     * @return Collection|null
-     */
-    public static function unwrapDecoratedCollection(Collection $collection)
-    {
-        while ($collection instanceof CollectionDecorator) {
-            /** @noinspection PhpInternalEntityUsedInspection */
-            $collection = $collection->unwrap();
-        }
-
-        return $collection;
     }
 
     /**
