@@ -7,6 +7,12 @@
         <parameter key="vanio_domain.request.get_post_param_converter.class">Vanio\DomainBundle\Request\GetPostParamConverter</parameter>
         <parameter key="vanio_domain.form.required_extension.class">Vanio\DomainBundle\Form\RequiredExtension</parameter>
         <parameter key="vanio_domain.form.validation_extension.class">Vanio\DomainBundle\Form\ValidationExtension</parameter>
+        <parameter key="vanio_domain.validator.unique_validator.class">Vanio\DomainBundle\Validator\UniqueValidator</parameter>
+        <parameter key="vanio_domain.validator.not_referenced_validator.class">Vanio\DomainBundle\Validator\NotReferencedValidator</parameter>
+        <parameter key="vanio_domain.translatable.translatable_listener.class">Vanio\DomainBundle\Translatable\TranslatableListener</parameter>
+        <parameter key="vanio_domain.translatable.current_locale_callable.class">Vanio\DomainBundle\Translatable\CurrentLocaleCallable</parameter>
+        <parameter key="vanio_domain.translatable.default_locale_callable.class">Vanio\DomainBundle\Translatable\DefaultLocaleCallable</parameter>
+        <parameter key="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber.class">VertigoLabs\DoctrineFullTextPostgres\Common\TsVectorSubscriber</parameter>
     </parameters>
 
     <services>
@@ -25,7 +31,7 @@
             <tag name="request.param_converter" priority="1" converter="filter_param_converter"/>
         </service>
 
-        <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false" />
+        <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false"/>
 
         <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
@@ -36,18 +42,30 @@
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
         </service>
 
-        <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="VertigoLabs\DoctrineFullTextPostgres\Common\TsVectorSubscriber">
+        <service id="vanio_domain.validator.unique_validator" class="%vanio_domain.validator.unique_validator.class%">
+            <argument type="service" id="doctrine"/>
+            <tag name="validator.constraint_validator" alias="vanio_domain.validator.unique"/>
+        </service>
+
+        <service id="vanio_domain.validator.not_referenced_validator" class="%vanio_domain.validator.not_referenced_validator.class%">
+            <argument type="service" id="doctrine"/>
+            <tag name="validator.constraint_validator" alias="vanio_domain.validator.not_referenced"/>
+        </service>
+
+        <service id="vanio_domain.translatable.translatable_listener" class="%vanio_domain.translatable.translatable_listener.class%" public="false">
+            <argument type="service" id="vanio_domain.translatable.current_locale_callable"/>
+            <argument type="service" id="vanio_domain.translatable.default_locale_callable"/>
             <tag name="doctrine.event_subscriber"/>
         </service>
 
-        <service id="vanio_domain.validator.unique" class="Vanio\DomainBundle\Validator\UniqueValidator">
-            <argument type="service" id="doctrine" />
-            <tag name="validator.constraint_validator" alias="vanio_domain.validator.unique" />
+        <service id="vanio_domain.translatable.current_locale_callable" class="%vanio_domain.translatable.current_locale_callable.class%" public="false">
+            <argument type="service" id="request_stack"/>
         </service>
 
-        <service id="vanio_domain.validator.not_referenced" class="Vanio\DomainBundle\Validator\NotReferencedValidator">
-            <argument type="service" id="doctrine" />
-            <tag name="validator.constraint_validator" alias="vanio_domain.validator.not_referenced" />
+        <service id="vanio_domain.translatable.default_locale_callable" class="%vanio_domain.translatable.default_locale_callable.class%" public="false"/>
+
+        <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="%vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber.class%">
+            <tag name="doctrine.event_subscriber"/>
         </service>
     </services>
 </container>
