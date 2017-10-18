@@ -13,6 +13,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->root('vanio_domain')
             ->children()
                 ->booleanNode('convert_get_post_parameters')->defaultTrue()->end()
+                ->booleanNode('convert_locale_specification')->defaultTrue()->end()
                 ->arrayNode('pagination_default_options')
                 ->addDefaultsIfNotSet()
                     ->children()
