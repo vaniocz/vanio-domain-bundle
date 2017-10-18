@@ -6,7 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInte
 use Symfony\Component\HttpFoundation\Request;
 use Vanio\DomainBundle\Specification\Locale;
 
-class LocaleSpecificationParamConverter implements ParamConverterInterface
+class LocaleParamConverter implements ParamConverterInterface
 {
     public function supports(ParamConverter $configuration)
     {
