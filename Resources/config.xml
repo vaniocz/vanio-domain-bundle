@@ -34,7 +34,9 @@
 
         <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false"/>
 
-        <service id="vanio_domain.request.locale_specification_param_converter" class="%vanio_domain.request.locale_specification_param_converter.class%" public="false"/>
+        <service id="vanio_domain.request.locale_specification_param_converter" class="%vanio_domain.request.locale_specification_param_converter.class%" public="false">
+            <tag name="request.param_converter" priority="1" converter="locale_specification_param_converter"/>
+        </service>
 
         <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>

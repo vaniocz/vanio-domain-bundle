@@ -32,12 +32,6 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                 ->setAbstract(false)
                 ->addTag('request.param_converter', ['priority' => 1, 'converter' => 'get_post_param_converter']);
         }
-        if ($config['convert_locale_specification']) {
-            $container
-                ->getDefinition('vanio_domain.request.locale_specification_param_converter')
-                ->setAbstract(false)
-                ->addTag('request.param_converter', ['priority' => 1, 'converter' => 'locale_specification_param_converter']);
-        }
     }
 
     public function prepend(ContainerBuilder $container)
