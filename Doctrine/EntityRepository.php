@@ -17,7 +17,10 @@ use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
 
 /**
- * @method find($id = null, int $lockMode = null, int $lockVersion = null)
+ * @method mixed find($id = null, int $lockMode = null, int $lockVersion = null)
+ * @method array match(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
+ * @method mixed matchSingleResult(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
+ * @method mixed matchOneOrNullResult(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
  */
 class EntityRepository extends EntitySpecificationRepository
 {
