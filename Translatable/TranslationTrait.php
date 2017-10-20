@@ -79,7 +79,7 @@ trait TranslationTrait
     {
         foreach (get_object_vars($this) as $property => $value) {
             if ($value !== null && $value !== '' && !in_array($property, ['id', 'translatable', 'locale'])) {
-                return false;
+                return $property === 'isTranslated' ? !$value : false;
             }
         }
 

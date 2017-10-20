@@ -28,13 +28,23 @@ trait TranslatableTrait
         return $this->translations;
     }
 
-    /**
-     * @param string|null $locale
-     * @return Translation|null
-     */
-    public function getTranslation(string $locale = null)
+    public function getTranslation(string $locale = null, bool $fallbackToDefaultLocale = null): Translation
     {
-        foreach ([$locale, $this->currentLocale, $this->defaultLocale] as $locale) {
+        if ($locale === null) {
+            $locale = $this->currentLocale;
+        }
+
+        $locales = [$locale];
+
+        if ($locale !== null) {
+            $locales[] = $this->resolveFallbackLocale($locale);
+        }
+
+        if ($fallbackToDefaultLocale ?? $this->shouldFallbackToDefaultLocale()) {
+            $locales[] = $this->defaultLocale;
+        }
+
+        foreach ($locales as $locale) {
             if ($locale === null) {
                 continue;
             }
@@ -46,7 +56,7 @@ trait TranslatableTrait
             }
         }
 
-        return null;
+        return $this->createTranslation();
     }
 
     /**
@@ -149,7 +159,7 @@ trait TranslatableTrait
      * @param array $arguments
      * @return mixed
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): Translation
     {
         return $this->proxyCurrentLocaleTranslation($method, $arguments);
     }
@@ -159,7 +169,12 @@ trait TranslatableTrait
         return __CLASS__ . 'Translation';
     }
 
-    protected function proxyCurrentLocaleTranslation(string $method, array $arguments = [])
+    protected function shouldFallbackToDefaultLocale(): bool
+    {
+        return false;
+    }
+
+    protected function proxyCurrentLocaleTranslation(string $method, array $arguments = []): Translation
     {
         return $this->getTranslation()->$method(...$arguments);
     }
