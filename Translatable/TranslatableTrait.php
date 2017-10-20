@@ -159,7 +159,7 @@ trait TranslatableTrait
      * @param array $arguments
      * @return mixed
      */
-    public function __call(string $method, array $arguments): Translation
+    public function __call(string $method, array $arguments)
     {
         return $this->proxyCurrentLocaleTranslation($method, $arguments);
     }
@@ -174,7 +174,12 @@ trait TranslatableTrait
         return false;
     }
 
-    protected function proxyCurrentLocaleTranslation(string $method, array $arguments = []): Translation
+    /**
+     * @param string $method
+     * @param array $arguments
+     * @return mixed
+     */
+    protected function proxyCurrentLocaleTranslation(string $method, array $arguments = [])
     {
         return $this->getTranslation()->$method(...$arguments);
     }
