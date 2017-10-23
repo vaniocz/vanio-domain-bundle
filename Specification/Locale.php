@@ -1,29 +1,45 @@
 <?php
 namespace Vanio\DomainBundle\Specification;
 
-use Happyr\DoctrineSpecification\BaseSpecification;
-use Happyr\DoctrineSpecification\Filter\Equals;
-use Happyr\DoctrineSpecification\Logic\AndX;
-use Happyr\DoctrineSpecification\Query\Join;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Happyr\DoctrineSpecification\Query\QueryModifier;
 
-class Locale extends BaseSpecification
+class Locale implements QueryModifier
 {
     /**
      * @var string
      */
     private $locale;
 
-    public function __construct(string $locale, $dqlAlias = null)
+    /**
+     * @var bool
+     */
+    private $withUntranslated;
+
+    /**
+     * @var string|null
+     */
+    private $dqlAlias;
+
+    public function __construct(string $locale, bool $withUntranslated = false, $dqlAlias = null)
     {
-        parent::__construct($dqlAlias);
         $this->locale = $locale;
+        $this->withUntranslated = $withUntranslated;
+        $this->dqlAlias = $dqlAlias;
     }
 
-    public function getSpec(): AndX
+    public function withUntranslated()
     {
-        return new AndX(
-            new Join('translations', 't'),
-            new Equals('locale', $this->locale, 't')
-        );
+        return new self($this->locale, true, $this->dqlAlias);
+    }
+
+    public function modify(QueryBuilder $qb, $dqlAlias)
+    {
+        $qb->leftJoin(sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, 'translations'), 't', Expr\Join::WITH, 't.locale = :locale')
+            ->setParameter('locale', $this->locale);
+        if (!$this->withUntranslated) {
+            $qb->where('t.locale IS NOT NULL');
+        }
     }
 }
