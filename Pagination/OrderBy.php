@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\From;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
@@ -65,11 +66,10 @@ class OrderBy implements QueryModifier
 
     private function joinAssociations(
         QueryBuilder $queryBuilder,
-        string $parentAlias,
+        string $alias,
         ClassMetadataInfo &$classMetadata,
         array &$propertyPath
     ): string {
-        $alias = $parentAlias;
         $count = count($propertyPath) - 1;
 
         for ($i = 0; $i < $count; $i++) {
@@ -78,18 +78,22 @@ class OrderBy implements QueryModifier
             }
 
             $property = array_shift($propertyPath);
-            $alias = sprintf('%s_%s', $parentAlias, $property);
+            $relation = sprintf('%s.%s', $alias, $property);
 
-            if ($i === 0) {
-                $alias = sprintf('__%s', $alias);
+            if ($join = $this->getJoin($queryBuilder, $relation)) {
+                $alias = $join->getAlias();
+            } else {
+                $alias = sprintf('%s_%s', $alias, $property);
+
+                if ($i === 0) {
+                    $alias = sprintf('__%s', $alias);
+                }
+
+                $queryBuilder->leftJoin($relation, $alias);
             }
 
-            if (array_search($alias, $queryBuilder->getAllAliases()) === false) {
-                $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $property), $alias);
-            }
-
-            $targetClass = $classMetadata->getAssociationTargetClass($property);
-            $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($targetClass);
+            $class = $classMetadata->getAssociationTargetClass($property);
+            $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($class);
         }
 
         return $alias;
@@ -129,6 +133,25 @@ class OrderBy implements QueryModifier
         }
 
         throw new \InvalidArgumentException('QueryBuilder does not contain FROM clause with "%s" alias.', $alias);
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $join
+     * @return Join|null
+     */
+    private function getJoin(QueryBuilder $queryBuilder, string $join)
+    {
+        foreach ($queryBuilder->getDQLPart('join') as $joins) {
+            foreach ($joins as $dqlPart) {
+                /** @var Join $dqlPart */
+                if ($dqlPart->getJoin() === $join) {
+                    return $dqlPart;
+                }
+            }
+        }
+
+        return null;
     }
 
     private function isFieldOfJsonType(
