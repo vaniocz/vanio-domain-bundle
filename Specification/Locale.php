@@ -1,7 +1,6 @@
 <?php
 namespace Vanio\DomainBundle\Specification;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
 
@@ -39,12 +38,14 @@ class Locale implements QueryModifier
         return new self($this->locale, true, $this->dqlAlias);
     }
 
-    public function modify(QueryBuilder $qb, $dqlAlias)
+    public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        $qb->leftJoin(sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, 'translations'), 't', Expr\Join::WITH, 't.locale = :locale')
-            ->setParameter('locale', $this->locale);
+        $queryBuilder
+            ->leftJoin(sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, 'translations'), '__t', 'with', '__t.locale = :locale')
+            ->setParameter('locale', $this->locale)
+            ->addSelect('__t');
         if (!$this->withUntranslated) {
-            $qb->where('t.locale IS NOT NULL');
+            $queryBuilder->where('__t.locale IS NOT NULL');
         }
     }
 }
