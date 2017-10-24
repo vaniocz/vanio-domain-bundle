@@ -16,8 +16,11 @@ class LocaleParamConverter implements ParamConverterInterface
     public function apply(Request $request, ParamConverter $configuration)
     {
         $name = $configuration->getName();
-        $entityLocale = $request->get('entityLocale') ?? $request->getLocale();
-        $specification = new Locale($entityLocale);
+        $locale = $request->getLocale();
+        if ($name != 'locale') {
+            $locale = $request->attributes->get($name) ?? $request->query->get($name) ?? $locale;
+        }
+        $specification = new Locale($locale);
 
         $request->attributes->set($name, $specification);
     }
