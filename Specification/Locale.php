@@ -29,7 +29,12 @@ class Locale implements QueryModifier
         $this->dqlAlias = $dqlAlias;
     }
 
-    public function withUntranslated()
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function withUntranslated(): self
     {
         return new self($this->locale, true, $this->dqlAlias);
     }
