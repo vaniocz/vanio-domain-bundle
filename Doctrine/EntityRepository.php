@@ -39,37 +39,7 @@ class EntityRepository extends EntitySpecificationRepository
         $identifierDiscriminatorField = $this->_class->identifierDiscriminatorField ?? null;
 
         if ($identifierDiscriminatorField !== null && (!is_array($id) || !isset($id[$identifierDiscriminatorField]))) {
-            $identifierFields = array_diff($this->_class->identifier, [$identifierDiscriminatorField]);
-
-            if (!is_array($id) && count($identifierFields) === 1) {
-                $id = [current($identifierFields) => $id];
-            } else {
-                unset($id[$identifierDiscriminatorField]);
-            }
-
-            $persister = $this->_em->getUnitOfWork()->getEntityPersister($this->_entityName);
-
-            switch (true) {
-                case $lockMode === LockMode::OPTIMISTIC:
-                    if (!$this->_class->isVersioned) {
-                        throw OptimisticLockException::notVersioned($this->_entityName);
-                    }
-
-                    $entity = $persister->load($id);
-                    $this->_em->lock($entity, $lockMode, $lockVersion);
-
-                    return $entity;
-                case $lockMode === LockMode::NONE:
-                case $lockMode === LockMode::PESSIMISTIC_READ:
-                case $lockMode === LockMode::PESSIMISTIC_WRITE:
-                    if (!$this->_em->getConnection()->isTransactionActive()) {
-                        throw TransactionRequiredException::transactionRequired();
-                    }
-
-                    return $persister->load($id, null, null, [], $lockMode);
-            }
-
-            return $this->getOneBy($id);
+            return $this->loadEntity($this->normalizeId($id), $lockMode, $lockVersion);
         }
 
         return parent::find($id, $lockMode, $lockVersion);
@@ -84,17 +54,14 @@ class EntityRepository extends EntitySpecificationRepository
      */
     public function get($id = null, int $lockMode = null, int $lockVersion = null)
     {
-        if ($id === null) {
-            $persister = $this->_em->getUnitOfWork()->getEntityPersister($this->_entityName);
-            $entity = $persister->load([], null, null, [], $lockMode, $lockVersion);
-        } else {
-            $entity = $this->find($id, $lockMode, $lockVersion);
-        }
+        $entity = $id === null
+            ? $this->loadEntity([], $lockMode, $lockVersion)
+            : $this->find($id, $lockMode, $lockVersion);
 
         if (!$entity) {
             throw EntityNotFoundException::fromClassNameAndIdentifier(
                 $this->_entityName,
-                is_array($id) ? $id : [$id] ?? []
+                is_array($id) ? $id : [$id]
             );
         }
 
@@ -109,7 +76,7 @@ class EntityRepository extends EntitySpecificationRepository
      */
     public function getOneBy(array $criteria, array $orderBy = null)
     {
-        if (!$entity = $this->findOneBy($criteria)) {
+        if (!$entity = $this->findOneBy($criteria, $orderBy)) {
             throw EntityNotFoundException::fromClassNameAndIdentifier($this->_entityName, $criteria);
         }
 
@@ -222,10 +189,45 @@ class EntityRepository extends EntitySpecificationRepository
     }
 
     /**
+     * @param array $criteria
+     * @param int|null $lockMode
+     * @param int|null $lockVersion
+     * @return mixed
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
+     */
+    private function loadEntity(array $criteria, int $lockMode = null, int $lockVersion = null)
+    {
+        $persister = $this->_em->getUnitOfWork()->getEntityPersister($this->_entityName);
+
+        switch (true) {
+            case $lockMode === LockMode::OPTIMISTIC:
+                if (!$this->_class->isVersioned) {
+                    throw OptimisticLockException::notVersioned($this->_entityName);
+                }
+
+                if ($entity = $persister->load($criteria)) {
+                    $this->_em->lock($entity, $lockMode, $lockVersion);
+                }
+
+                return $entity;
+            case $lockMode === LockMode::NONE:
+            case $lockMode === LockMode::PESSIMISTIC_READ:
+            case $lockMode === LockMode::PESSIMISTIC_WRITE:
+                if (!$this->_em->getConnection()->isTransactionActive()) {
+                    throw TransactionRequiredException::transactionRequired();
+                }
+
+                return $persister->load($criteria, null, null, [], $lockMode);
+        }
+
+        return $this->findOneBy($criteria);
+    }
+
+    /**
      * @param mixed $specifications
      * @param ResultModifier|null $modifier
      * @return array
-     * @throws \InvalidArgumentException
      */
     private function mergeSpecifications($specifications, ResultModifier $modifier = null): array
     {
@@ -238,10 +240,7 @@ class EntityRepository extends EntitySpecificationRepository
             }
 
             if ($specification instanceof ResultModifier) {
-                if ($modifier) {
-                    throw new \InvalidArgumentException('Only one result modifier can be passed at once.');
-                }
-
+                Assertion::null($modifier, 'Only one result modifier can be passed at once.');
                 $modifier = $specification;
             }
         }
@@ -256,12 +255,18 @@ class EntityRepository extends EntitySpecificationRepository
      */
     public function normalizeId($id): array
     {
+        $identifierDiscriminatorField = $this->_class->identifierDiscriminatorField ?? null;
+
         if (!is_array($id)) {
-            if ($this->_class->isIdentifierComposite) {
+            if (
+                $this->_class->isIdentifierComposite
+                && ($identifierDiscriminatorField === null || count($this->_class->identifier) > 2)
+            ) {
                 throw ORMInvalidArgumentException::invalidCompositeIdentifier();
             }
 
-            $id = [$this->_class->identifier[0] => $id];
+            $i = $identifierDiscriminatorField === $this->_class->identifier[0] ? 1 : 0;
+            $id = [$this->_class->identifier[$i] => $id];
         }
 
         foreach ($id as &$value) {
@@ -277,12 +282,12 @@ class EntityRepository extends EntitySpecificationRepository
         $normalizedId = $id;
 
         foreach ($this->_class->identifier as $property) {
-            if (!isset($id[$property])) {
+            if (isset($id[$property])) {
+                $normalizedId[$property] = $id[$property];
+                unset($id[$property]);
+            } elseif ($property !== $identifierDiscriminatorField) {
                 throw ORMException::missingIdentifierField($this->_class->name, $property);
             }
-
-            $normalizedId[$property] = $id[$property];
-            unset($id[$property]);
         }
 
         if ($id) {
