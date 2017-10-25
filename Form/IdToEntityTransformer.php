@@ -68,6 +68,15 @@ class IdToEntityTransformer implements DataTransformerInterface
      */
     public function transformIdToEntity($id)
     {
+        $classMetadata = $this->entityManager->getClassMetadata($this->class);
+
+        if (
+            isset($classMetadata->identifierDiscriminatorField)
+            && (!is_array($id) || !isset($id[$classMetadata->identifierDiscriminatorField]))
+        ) {
+            return $this->entityManager->getRepository($this->class)->find($id);
+        }
+
         return $this->entityManager->getReference($this->class, $id);
     }
 
@@ -79,6 +88,14 @@ class IdToEntityTransformer implements DataTransformerInterface
     {
         $classMetadata = $this->entityManager->getClassMetadata($this->class);
         $id = $classMetadata->getIdentifierValues($entity);
+
+        if (isset($classMetadata->identifierDiscriminatorField)) {
+            unset($id[$classMetadata->identifierDiscriminatorField]);
+
+            if (count($id) === 1) {
+                return current($id);
+            }
+        }
 
         return $classMetadata->isIdentifierComposite ? $id : current($id);
     }

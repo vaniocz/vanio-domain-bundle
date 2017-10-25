@@ -37,7 +37,9 @@ abstract class SharedFixture implements SharedFixtureInterface
      */
     public function setReference(string $name, $object)
     {
-        $this->referenceRepository->setReference($this->resolveReferenceName($object, $name), $object);
+        foreach ($this->resolveReferenceNames($object, $name) as $referenceName) {
+            $this->referenceRepository->setReference($referenceName, $object);
+        }
 
         return $this;
     }
@@ -49,9 +51,23 @@ abstract class SharedFixture implements SharedFixtureInterface
      */
     public function addReference(string $name, $object)
     {
-        $this->referenceRepository->addReference($this->resolveReferenceName($object, $name), $object);
+        foreach ($this->resolveReferenceNames($object, $name) as $referenceName) {
+            $this->referenceRepository->addReference($referenceName, $object);
+        }
 
         return $this;
+    }
+
+    private function resolveReferenceNames($object, string $name): array
+    {
+        $referenceNames = [$this->resolveReferenceName($object, $name)];
+        $reflectionClass = new \ReflectionClass(ClassUtils::getClass($object));
+
+        while ($reflectionClass = $reflectionClass->getParentClass()) {
+            $referenceNames[] = $this->resolveReferenceName($reflectionClass->name, $name);
+        }
+
+        return $referenceNames;
     }
 
     /**

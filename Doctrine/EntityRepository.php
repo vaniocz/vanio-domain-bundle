@@ -4,11 +4,14 @@ namespace Vanio\DomainBundle\Doctrine;
 use Assert\Assertion;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\ORM\UnitOfWork;
 use Happyr\DoctrineSpecification\EntitySpecificationRepository;
 use Happyr\DoctrineSpecification\Filter\Filter;
@@ -17,13 +20,61 @@ use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
 
 /**
- * @method mixed find($id = null, int $lockMode = null, int $lockVersion = null)
  * @method array match(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
  * @method mixed matchSingleResult(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
  * @method mixed matchOneOrNullResult(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
  */
 class EntityRepository extends EntitySpecificationRepository
 {
+    /**
+     * @param mixed $id
+     * @param int|null $lockMode
+     * @param int|null $lockVersion
+     * @return mixed
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
+     */
+    public function find($id, $lockMode = null, $lockVersion = null)
+    {
+        $identifierDiscriminatorField = $this->_class->identifierDiscriminatorField ?? null;
+
+        if ($identifierDiscriminatorField !== null && (!is_array($id) || !isset($id[$identifierDiscriminatorField]))) {
+            $identifierFields = array_diff($this->_class->identifier, [$identifierDiscriminatorField]);
+
+            if (!is_array($id) && count($identifierFields) === 1) {
+                $id = [current($identifierFields) => $id];
+            } else {
+                unset($id[$identifierDiscriminatorField]);
+            }
+
+            $persister = $this->_em->getUnitOfWork()->getEntityPersister($this->_entityName);
+
+            switch (true) {
+                case $lockMode === LockMode::OPTIMISTIC:
+                    if (!$this->_class->isVersioned) {
+                        throw OptimisticLockException::notVersioned($this->_entityName);
+                    }
+
+                    $entity = $persister->load($id);
+                    $this->_em->lock($entity, $lockMode, $lockVersion);
+
+                    return $entity;
+                case $lockMode === LockMode::NONE:
+                case $lockMode === LockMode::PESSIMISTIC_READ:
+                case $lockMode === LockMode::PESSIMISTIC_WRITE:
+                    if (!$this->_em->getConnection()->isTransactionActive()) {
+                        throw TransactionRequiredException::transactionRequired();
+                    }
+
+                    return $persister->load($id, null, null, [], $lockMode);
+            }
+
+            return $this->getOneBy($id);
+        }
+
+        return parent::find($id, $lockMode, $lockVersion);
+    }
+
     /**
      * @param mixed $id
      * @param int|null $lockMode
