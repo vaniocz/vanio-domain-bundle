@@ -48,4 +48,9 @@ class Locale implements QueryModifier
             $queryBuilder->where('__t.locale IS NOT NULL');
         }
     }
+
+    public function __toString(): string
+    {
+        return $this->getLocale();
+    }
 }
