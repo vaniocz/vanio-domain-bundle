@@ -10,9 +10,7 @@ class MultilingualFilterParamConverter implements ParamConverterInterface
 {
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $options = $configuration->getOptions();
-
-        (new FilterParamConverter($options))->apply($request, $configuration);
+        (new FilterParamConverter($configuration->getOptions()))->apply($request, $configuration);
         $filter = $request->attributes->get($configuration->getName());
 
         (new LocaleParamConverter('filterLocale'))->apply($request, $configuration);

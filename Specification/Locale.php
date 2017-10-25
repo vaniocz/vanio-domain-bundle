@@ -49,7 +49,7 @@ class Locale implements QueryModifier
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLocale();
     }

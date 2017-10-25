@@ -53,6 +53,6 @@ class MultilingualFilter implements FilterSpecification, ResultModifier
 
     public function modify(AbstractQuery $query)
     {
-        $this->page()->modify($query);
+        $this->filter()->modify($query);
     }
 }
