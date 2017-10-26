@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
@@ -258,15 +259,13 @@ class EntityRepository extends EntitySpecificationRepository
         $identifierDiscriminatorField = $this->_class->identifierDiscriminatorField ?? null;
 
         if (!is_array($id)) {
-            if (
-                $this->_class->isIdentifierComposite
-                && ($identifierDiscriminatorField === null || count($this->_class->identifier) > 2)
-            ) {
+            try {
+                $field = $this->_class->getSingleIdentifierFieldName();
+            } catch (MappingException $e) {
                 throw ORMInvalidArgumentException::invalidCompositeIdentifier();
             }
 
-            $i = $identifierDiscriminatorField === $this->_class->identifier[0] ? 1 : 0;
-            $id = [$this->_class->identifier[$i] => $id];
+            $id = [$field => $id];
         }
 
         foreach ($id as &$value) {

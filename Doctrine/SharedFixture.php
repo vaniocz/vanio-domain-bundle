@@ -60,12 +60,12 @@ abstract class SharedFixture implements SharedFixtureInterface
 
     private function resolveReferenceNames($object, string $name): array
     {
-        $referenceNames = [$this->resolveReferenceName($object, $name)];
+        $referenceNames = [];
         $reflectionClass = new \ReflectionClass(ClassUtils::getClass($object));
 
-        while ($reflectionClass = $reflectionClass->getParentClass()) {
+        do {
             $referenceNames[] = $this->resolveReferenceName($reflectionClass->name, $name);
-        }
+        } while ($reflectionClass = $reflectionClass->getParentClass());
 
         return $referenceNames;
     }

@@ -25,10 +25,10 @@ class RequiredExtension extends AbstractTypeExtension
     {
         $resolver
             ->setDefaults([
-                'validate_required' => false,
+                'validate_required' => null,
                 'required_message' => 'This value should not be blank.',
             ])
-            ->setAllowedTypes('validate_required', 'bool')
+            ->setAllowedTypes('validate_required', ['bool', 'null'])
             ->setAllowedTypes('required_message', 'string');
     }
 
@@ -74,11 +74,13 @@ class RequiredExtension extends AbstractTypeExtension
             }
         }
 
-        while ($form = $form->getParent()) {
-            if ($form->getConfig()->getOption('validate_required')) {
-                return true;
+        do {
+            $validateRequired = $form->getConfig()->getOption('validate_required');
+
+            if ($validateRequired !== null) {
+                return $validateRequired;
             }
-        }
+        } while ($form = $form->getParent());
 
         return false;
     }
