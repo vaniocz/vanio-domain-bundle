@@ -25,29 +25,21 @@ class NotReferencedValidator extends ConstraintValidator
     public function validate($object, Constraint $constraint)
     {
         if (!$constraint instanceof NotReferenced) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\Unique');
+            throw new UnexpectedTypeException($constraint, NotReferenced::class);
+        } elseif (!$entityManager = $this->registry->getManagerForClass($constraint->relatedEntity)) {
+            throw new ConstraintDefinitionException(sprintf(
+                'Unable to find the object manager associated with an entity of class "%s".',
+                $constraint->relatedEntity
+            ));
         }
 
-        $em = $this->registry->getManagerForClass($constraint->relatedEntity);
-        if (!$em) {
-            throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', $constraint->relatedEntity));
-        }
-        $repository = $em->getRepository($constraint->relatedEntity);
-
+        $repository = $entityManager->getRepository($constraint->relatedEntity);
         $accessor = PropertyAccess::createPropertyAccessor();
         $relatedField = $constraint->relatedField ? $constraint->relatedField : $constraint->field;
-        $relatedValue = $accessor->getValue($object, $constraint->field);
-
-        if (is_callable([ $repository, 'existsBy' ])) {
-            $result = $repository->existsBy([
-                $relatedField => $relatedValue,
-            ]);
-        }
-        else {
-            $result = $repository->findBy([
-                $relatedField => $relatedValue,
-            ]);
-        }
+        $criteria = [$relatedField => $accessor->getValue($object, $constraint->field)];
+        $result = is_callable([$repository, 'existsBy'])
+            ? $repository->existsBy($criteria)
+            : $repository->findBy($criteria);
 
         if ($result) {
             $this->context->buildViolation($constraint->message)

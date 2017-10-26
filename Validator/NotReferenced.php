@@ -29,7 +29,7 @@ class NotReferenced extends Constraint
 
     public function getRequiredOptions(): array
     {
-        return [ 'field', 'relatedEntity' ];
+        return ['field', 'relatedEntity'];
     }
 
     public function getTargets(): string

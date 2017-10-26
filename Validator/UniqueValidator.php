@@ -25,39 +25,36 @@ class UniqueValidator extends ConstraintValidator
     public function validate($object, Constraint $constraint)
     {
         if (!$constraint instanceof Unique) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\Unique');
+            throw new UnexpectedTypeException($constraint, Unique::class);
         }
 
-        $fields = $constraint->fields;
-        if (!is_array($fields)) {
-            $fields = [ $fields ];
-        }
-
+        $class = $constraint->class;
+        $id = $constraint->id;
+        $fields = (array) $constraint->fields;
         $accessor = PropertyAccess::createPropertyAccessor();
-
         $criteria = [];
+
         foreach ($fields as $objectField => $entityField) {
-            $criteria[$entityField] = $accessor->getValue(
-                $object,
-                is_numeric($objectField) ? $entityField : $objectField
-            );
+            $field = is_numeric($objectField) ? $entityField : $objectField;
+            $criteria[$entityField] = $accessor->getValue($object, $field);
         }
 
-        $em = $this->registry->getManagerForClass($constraint->class);
-        if (!$em) {
-            throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', $constraint->class));
+        if (!$entityManager = $this->registry->getManagerForClass($class)) {
+            throw new ConstraintDefinitionException(sprintf(
+                'Unable to find the object manager associated with an entity of class "%s".',
+                $class
+            ));
         }
 
-        $repository = $em->getRepository($constraint->class);
-        $result = $repository->findBy($criteria);
-
-        if (count($result) === 0) {
+        if (!$entities = $entityManager->getRepository($class)->findBy($criteria)) {
             return;
         }
 
-        $id = $constraint->id;
-        if (!is_null($id) && count($result) === 1 &&
-            $em->getReference($constraint->class, $accessor->getValue($object, $id)) === current($result)) {
+        if (
+            $id !== null
+            && count($entities) === 1
+            && $entityManager->getReference($class, $accessor->getValue($object, $id)) === current($entities)
+        ) {
             return;
         }
 

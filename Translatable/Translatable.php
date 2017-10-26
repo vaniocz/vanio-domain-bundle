@@ -11,6 +11,13 @@ interface Translatable
     public function translations(): Collection;
 
     /**
+     * @param string|null $locale
+     * @param bool|null $fallbackToDefaultLocale
+     * @return Translation
+     */
+    public function getTranslation(string $locale = null, bool $fallbackToDefaultLocale = null);
+
+    /**
      * @param Translation $translation
      * @return $this
      */
@@ -24,7 +31,7 @@ interface Translatable
 
     /**
      * @param string $locale
-     * @return object
+     * @return Translation
      */
     public function translate(string $locale);
 

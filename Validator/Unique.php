@@ -29,7 +29,7 @@ class Unique extends Constraint
 
     public function getRequiredOptions(): array
     {
-        return [ 'fields', 'class' ];
+        return ['fields', 'class'];
     }
 
     public function getTargets(): string
