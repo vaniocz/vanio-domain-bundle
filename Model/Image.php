@@ -16,7 +16,7 @@ class Image extends File
     public function __construct($file)
     {
         parent::__construct($file);
-        Validation::supportedImageFile($this->file, 'Unknown photo format.');
+        Validation::supportedImageFile($this->file, 'Unknown image format.');
         $metadata = getimagesize($this->file);
         $this->metaData += [
             'width' => $metadata[0],
