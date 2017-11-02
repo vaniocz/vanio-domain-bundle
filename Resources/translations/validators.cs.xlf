@@ -6,8 +6,28 @@
         </header>
 
         <body>
-            <trans-unit id="ecaafec9dc0f94ecab52ba8666d0c7bc" resname="Unknown photo format.">
-                <source>Unknown photo format.</source>
+            <trans-unit id="79339272322ba39268be011fa3930b4f" resname="The entity is used.">
+                <source>The entity is used.</source>
+                <target>Tato entita se používá.</target>
+            </trans-unit>
+
+            <trans-unit id="3b6302f3202aae61cd30e5fb07a0ec02" resname="This value must be unique.">
+                <source>This value must be unique.</source>
+                <target>Tato hodnota musí být unikátní.</target>
+            </trans-unit>
+
+            <trans-unit id="e61734f7d0fe805eb98cf789d89647bb" resname="File must not be blank.">
+                <source>File must not be blank.</source>
+                <target>Vyberte soubor.</target>
+            </trans-unit>
+
+            <trans-unit id="b5aa70f3d4dda1d95bcc030307172a6c" resname="Image must not be blank.">
+                <source>Image must not be blank.</source>
+                <target>Vyberte obrázek.</target>
+            </trans-unit>
+
+            <trans-unit id="02bdc443ab545d2205dcb8482d2e9745" resname="Unknown image format.">
+                <source>Unknown image format.</source>
                 <target>Neznámý formát obrázku.</target>
             </trans-unit>
 

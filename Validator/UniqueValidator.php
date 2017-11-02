@@ -30,11 +30,10 @@ class UniqueValidator extends ConstraintValidator
 
         $class = $constraint->class;
         $id = $constraint->id;
-        $fields = (array) $constraint->fields;
         $accessor = PropertyAccess::createPropertyAccessor();
         $criteria = [];
 
-        foreach ($fields as $objectField => $entityField) {
+        foreach ((array) $constraint->fields as $objectField => $entityField) {
             $field = is_numeric($objectField) ? $entityField : $objectField;
             $criteria[$entityField] = $accessor->getValue($object, $field);
         }

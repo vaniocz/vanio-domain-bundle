@@ -10,7 +10,7 @@ class NotReferenced extends Constraint
 {
     const IS_REFERENCED_ERROR = '0d52565f-bc0f-41ee-9261-4dc68d29548c';
 
-    /** @var array */
+    /** @var string[] */
     protected static $errorNames = [
         self::IS_REFERENCED_ERROR => 'IS_REFERENCED_ERROR',
     ];
@@ -25,8 +25,11 @@ class NotReferenced extends Constraint
     public $relatedField = null;
 
     /** @var string */
-    public $message = 'The entity is referenced by another entity.';
+    public $message = 'The entity is used.';
 
+    /**
+     * @return string[]
+     */
     public function getRequiredOptions(): array
     {
         return ['field', 'relatedEntity'];

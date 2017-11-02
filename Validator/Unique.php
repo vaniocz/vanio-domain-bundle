@@ -10,12 +10,12 @@ class Unique extends Constraint
 {
     const NOT_UNIQUE_ERROR = 'ee3151d8-cf49-4120-87cb-32847382cbfc';
 
-    /** @var array */
+    /** @var string[] */
     protected static $errorNames = [
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
     ];
 
-    /** @var array */
+    /** @var string[] */
     public $fields;
 
     /** @var string */
@@ -27,6 +27,9 @@ class Unique extends Constraint
     /** @var string */
     public $message = 'This value is already used.';
 
+    /**
+     * @return string[]
+     */
     public function getRequiredOptions(): array
     {
         return ['fields', 'class'];

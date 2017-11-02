@@ -5,6 +5,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Vanio\DomainBundle\Assert\Validation;
 
 /**
  * @ORM\Embeddable
@@ -40,6 +41,8 @@ class File
      */
     public function __construct($file)
     {
+        Validation::notBlank($file, 'File must not be blank.');
+
         if (!$file instanceof SymfonyFile && !$file instanceof self && !is_string($file)) {
             throw new \InvalidArgumentException(sprintf(
                 'The file must be an instance of "%s" or a string.',

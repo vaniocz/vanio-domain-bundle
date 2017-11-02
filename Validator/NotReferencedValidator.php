@@ -34,9 +34,8 @@ class NotReferencedValidator extends ConstraintValidator
         }
 
         $repository = $entityManager->getRepository($constraint->relatedEntity);
-        $accessor = PropertyAccess::createPropertyAccessor();
         $relatedField = $constraint->relatedField ? $constraint->relatedField : $constraint->field;
-        $criteria = [$relatedField => $accessor->getValue($object, $constraint->field)];
+        $criteria = [$relatedField => PropertyAccess::createPropertyAccessor()->getValue($object, $constraint->field)];
         $result = is_callable([$repository, 'existsBy'])
             ? $repository->existsBy($criteria)
             : $repository->findBy($criteria);

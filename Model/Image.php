@@ -15,6 +15,7 @@ class Image extends File
      */
     public function __construct($file)
     {
+        Validation::notBlank($file, 'Image must not be blank.');
         parent::__construct($file);
         Validation::supportedImageFile($this->file, 'Unknown image format.');
         $metadata = getimagesize($this->file);

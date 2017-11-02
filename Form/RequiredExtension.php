@@ -40,9 +40,9 @@ class RequiredExtension extends AbstractTypeExtension
     /**
      * @internal
      */
-    public function onPreSetData(FormEvent $formEvent)
+    public function onPreSetData(FormEvent $event)
     {
-        $form = $formEvent->getForm();
+        $form = $event->getForm();
 
         if (!$this->shouldValidateRequired($form) || !$form->getConfig() instanceof FormConfigBuilder) {
             return;
