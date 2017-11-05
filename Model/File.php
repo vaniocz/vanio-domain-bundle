@@ -35,6 +35,9 @@ class File
      */
     protected $metaData;
 
+    /** @var bool */
+    private $isImage = false;
+
     /**
      * @param SymfonyFile|self|string $file
      * @throws \InvalidArgumentException
@@ -55,16 +58,8 @@ class File
             $file = $file->file();
         }
 
-        $file = $file instanceof SymfonyUploadedFile ? $file : new FileToUpload($file);
-        $this->setFile($file);
-
-        if (!$this->metaData) {
-            $this->metaData = [
-                'name' => $file instanceof SymfonyUploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
-                'size' => $file->getSize(),
-                'mimeType' => MimeTypeGuesser::getInstance()->guess($file->getPathname()),
-            ];
-        }
+        $this->setFile($file instanceof SymfonyUploadedFile ? $file : new FileToUpload($file));
+        $this->loadMetadata();
     }
 
     public function file(): SymfonyFile
@@ -80,6 +75,11 @@ class File
     public function metaData(): array
     {
         return $this->metaData;
+    }
+
+    public function isImage(): bool
+    {
+        return $this->isImage;
     }
 
     /**
@@ -106,5 +106,31 @@ class File
     public function setFileName(string $fileName = null)
     {
         $this->fileName = $fileName;
+    }
+
+    protected function loadMetadata()
+    {
+        if ($this->metaData) {
+            return;
+        } elseif ($metadata = getimagesize($this->file)) {
+            $this->isImage = true;
+            $this->metaData = [
+                'width' => $metadata[0],
+                'height' => $metadata[1],
+                'mimeType' => $metadata['mime'],
+            ];
+        }
+
+        $name = $this->file instanceof SymfonyUploadedFile
+            ? $this->file->getClientOriginalName()
+            : $this->file->getBasename();
+        $this->metaData += [
+            'name' => $name,
+            'size' => $this->file->getSize(),
+        ];
+
+        if (!$this->metaData['mimeType']) {
+            $this->metaData['mimeType'] = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+        }
     }
 }

@@ -18,11 +18,10 @@ class Image extends File
         Validation::notBlank($file, 'Image must not be blank.');
         parent::__construct($file);
         Validation::supportedImageFile($this->file, 'Unknown image format.');
-        $metadata = getimagesize($this->file);
-        $this->metaData += [
-            'width' => $metadata[0],
-            'height' => $metadata[1],
-            'mimeType' => $metadata['mime'],
-        ];
+    }
+
+    public function isImage(): bool
+    {
+        return true;
     }
 }
