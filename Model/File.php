@@ -31,7 +31,7 @@ class File
 
     /**
      * @var array
-     * @ORM\Column(type="universal_json")
+     * @ORM\Column(type="json")
      */
     protected $metaData;
 
@@ -55,14 +55,14 @@ class File
             $file = $file->file();
         }
 
-        $file = $file instanceof SymfonyUploadedFile ? $file : FileToUpload::temporaryCopy($file);
+        $file = $file instanceof SymfonyUploadedFile ? $file : new FileToUpload($file);
         $this->setFile($file);
 
         if (!$this->metaData) {
             $this->metaData = [
                 'name' => $file instanceof SymfonyUploadedFile ? $file->getClientOriginalName() : $file->getBasename(),
-                'mime' => MimeTypeGuesser::getInstance()->guess($file->getPathname()),
                 'size' => $file->getSize(),
+                'mimeType' => MimeTypeGuesser::getInstance()->guess($file->getPathname()),
             ];
         }
     }

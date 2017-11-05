@@ -22,7 +22,7 @@ class Image extends File
         $this->metaData += [
             'width' => $metadata[0],
             'height' => $metadata[1],
-            'mime' => $metadata['mime'],
+            'mimeType' => $metadata['mime'],
         ];
     }
 }

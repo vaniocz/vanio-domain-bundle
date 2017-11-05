@@ -25,7 +25,9 @@ class UniqueCollectionValidator extends ConstraintValidator
             if ($constraint->propertyPath !== null) {
                 $value = $accessor->getValue($value, $constraint->propertyPath);
 
-                if (isset($uniqueValues[$value])) {
+                if ($value === null && $constraint->ignoreNull) {
+                    continue;
+                } elseif (isset($uniqueValues[$value])) {
                     $this->context->buildViolation($constraint->message)
                         ->atPath(sprintf('[%s]%s', $index, $constraint->errorPath ?? $constraint->propertyPath))
                         ->setParameter('{{ value }}', $value)
