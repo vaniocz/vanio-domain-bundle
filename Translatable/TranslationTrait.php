@@ -1,8 +1,6 @@
 <?php
 namespace Vanio\DomainBundle\Translatable;
 
-use Doctrine\Common\Util\ClassUtils;
-
 trait TranslationTrait
 {
     /** @var int|null */
@@ -31,17 +29,13 @@ trait TranslationTrait
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws TranslationException
      * @internal
      */
     public function setTranslatable(Translatable $translatable): self
     {
         if ($this->translatable !== null && $this->translatable !== $translatable) {
-            throw new \InvalidArgumentException(sprintf(
-                'Trying to assign translation of class "%s" to a different translatable of class "%s". Reassigning translations is forbidden.',
-                ClassUtils::getClass($this),
-                ClassUtils::getClass($this->translatable)
-            ));
+            TranslationException::cannotReassign($this);
         }
 
         $this->translatable = $translatable;
@@ -58,16 +52,12 @@ trait TranslationTrait
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws TranslationException
      */
     public function setLocale(string $locale): self
     {
         if ($this->translatable && $this->locale !== null && $this->locale !== $locale) {
-            throw new \InvalidArgumentException(sprintf(
-                'Trying to overwrite locale "%s" with locale "%s". Overwriting locales of already assigned translations is forbidden.',
-                $this->locale,
-                $locale
-            ));
+            throw TranslationException::cannotOverwriteLocale($this, $locale);
         }
 
         $this->locale = $locale;

@@ -3,7 +3,6 @@ namespace Vanio\DomainBundle\Translatable;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
 
 trait TranslatableTrait
 {
@@ -62,34 +61,22 @@ trait TranslatableTrait
     /**
      * @param Translation $translation
      * @return $this
-     * @throws \InvalidArgumentException
+     * @throws TranslationException
      */
     public function addTranslation(Translation $translation): self
     {
         $translationClass = static::translationClass();
 
         if (!$translation instanceof $translationClass) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid translation class "%s". Class "%s" must contain only translations of class "%s".',
-                ClassUtils::getClass($translation),
-                ClassUtils::getClass($this),
-                $translationClass
-            ));
+            throw TranslationException::invalidClass($translation, $this);
         } elseif ($translation->locale() === null) {
-            throw new \InvalidArgumentException(sprintf(
-                'Cannot append translation of class "%s" with empty locale.',
-                ClassUtils::getClass($translation)
-            ));
+            throw TranslationException::emptyLocale($translation);
         }
 
         $existingTranslation = $this->translations()[$translation->locale()];
 
         if ($existingTranslation && $existingTranslation !== $translation) {
-            throw new \InvalidArgumentException(sprintf(
-                'Cannot replace existing "%s" translation of class "%s".',
-                $translation->locale(),
-                ClassUtils::getClass($translation)
-            ));
+            throw TranslationException::duplicate($translation);
         }
 
         /** @noinspection PhpInternalEntityUsedInspection */
