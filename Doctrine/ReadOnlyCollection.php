@@ -1,6 +1,7 @@
 <?php
 namespace Vanio\DomainBundle\Doctrine;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
@@ -253,6 +254,11 @@ class ReadOnlyCollection implements Collection, Selectable
         }
 
         return $this->collection->matching($criteria);
+    }
+
+    public function toArrayCollection(): ArrayCollection
+    {
+        return new ArrayCollection($this->toArray());
     }
 
     /**
