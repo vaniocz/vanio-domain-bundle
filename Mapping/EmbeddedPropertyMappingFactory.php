@@ -2,31 +2,43 @@
 namespace Vanio\DomainBundle\Mapping;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 
 class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
 {
     /**
-     * @param object $object
-     * @param string $property
-     * @param array $mappingData
-     * @return PropertyMapping|EmbeddedPropertyMapping
+     * @param object|array $object
+     * @param string $field
+     * @param string|null $class
+     * @return PropertyMapping|EmbeddedPropertyMapping|null
      */
-    protected function createMapping($object, $property, array $mappingData): PropertyMapping
+    public function fromField($object, $field, $class = null)
     {
-        $class = ClassUtils::getClass($object);
-        $mapping = parent::createMapping($object, $property, $mappingData);
+        if (!$mapping = parent::fromField($object, $field, $class)) {
+            return null;
+        }
+
+        $class = $this->getClassName($object, $class);
         $entityManager = $this->doctrine()->getManagerForClass($class);
 
         if (
             !$entityManager->getMetadataFactory()->hasMetadataFor($class)
-            || !isset($entityManager->getClassMetadata($class)->embeddedClasses[$property])
+            || !isset($entityManager->getClassMetadata($class)->embeddedClasses[$field])
         ) {
             return $mapping;
         }
 
+        return $this->createEmbeddedMapping($mapping, $this->metadata->getUploadableField($class, $field));
+    }
+
+    /**
+     * @param PropertyMapping $mapping
+     * @param array $mappingData
+     * @return EmbeddedPropertyMapping
+     */
+    private function createEmbeddedMapping(PropertyMapping $mapping, array $mappingData): EmbeddedPropertyMapping
+    {
         $embeddedMapping = new EmbeddedPropertyMapping($mapping->getFilePropertyName());
         $embeddedMapping->setMappingName($mapping->getMappingName());
         $embeddedMapping->setMapping($this->mappings[$mappingData['mapping']]);

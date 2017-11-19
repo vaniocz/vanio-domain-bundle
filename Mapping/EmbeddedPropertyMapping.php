@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Mapping;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+use Vanio\Stdlib\Strings;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 
 class EmbeddedPropertyMapping extends PropertyMapping
@@ -13,7 +14,7 @@ class EmbeddedPropertyMapping extends PropertyMapping
     public function __construct(
         string $filePropertyPath,
         string $embeddedFilePropertyPath = 'file',
-        string $embeddedFileNamePropertyPath = 'file_name'
+        string $embeddedFileNamePropertyPath = 'fileName'
     ) {
         parent::__construct(
             "$filePropertyPath.$embeddedFilePropertyPath",
@@ -23,7 +24,7 @@ class EmbeddedPropertyMapping extends PropertyMapping
     }
 
     /**
-     * @param object $object
+     * @param object|array $object
      * @return File|null
      */
     public function getFile($object)
@@ -38,7 +39,7 @@ class EmbeddedPropertyMapping extends PropertyMapping
     }
 
     /**
-     * @param object $object
+     * @param object|array $object
      * @return string|null
      */
     public function getFileName($object)
@@ -55,5 +56,23 @@ class EmbeddedPropertyMapping extends PropertyMapping
     public function getFilePropertyName(): string
     {
         return $this->filePropertyName;
+    }
+
+
+    /**
+     * @param object|array $object
+     * @param string $propertyPath
+     * @return string
+     */
+    protected function fixPropertyPath($object, $propertyPath): string
+    {
+        if (!is_array($object) || Strings::startsWith($propertyPath, '[')) {
+            return $propertyPath;
+        }
+
+        $properties = explode('.', $propertyPath);
+        $properties[0] = sprintf('[%s]', $properties[0]);
+
+        return implode('.', $properties);
     }
 }
