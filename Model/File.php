@@ -33,7 +33,7 @@ class File
      * @var array
      * @ORM\Column(type="json")
      */
-    protected $metaData;
+    protected $metaData = [];
 
     /** @var bool */
     private $isImage = false;
@@ -129,7 +129,7 @@ class File
             'size' => $this->file->getSize(),
         ];
 
-        if (!$this->metaData['mimeType']) {
+        if (!isset($this->metaData['mimeType'])) {
             $this->metaData['mimeType'] = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
         }
     }
