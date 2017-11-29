@@ -17,7 +17,7 @@ class Image extends File
     {
         Validation::notBlank($file, 'Image must not be blank.');
         parent::__construct($file);
-        Validation::supportedImageFile($this->file, 'Unknown image format.');
+        Validation::true($this->isImage(), sprintf('Unknown image format of file "%s".', $this->metaData['name']));
     }
 
     public function isImage(): bool

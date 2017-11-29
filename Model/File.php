@@ -6,15 +6,14 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Vanio\DomainBundle\Assert\Validation;
+use Vanio\Stdlib\Strings;
 
 /**
  * @ORM\Embeddable
  */
 class File
 {
-    /**
-     * @var SymfonyFile
-     */
+    /** @var SymfonyFile */
     protected $file;
 
     /**
@@ -33,7 +32,7 @@ class File
      * @var array
      * @ORM\Column(type="json")
      */
-    protected $metaData;
+    protected $metaData = [];
 
     /** @var bool */
     private $isImage = false;
@@ -112,25 +111,26 @@ class File
     {
         if ($this->metaData) {
             return;
-        } elseif ($metadata = getimagesize($this->file)) {
-            $this->isImage = true;
-            $this->metaData = [
-                'width' => $metadata[0],
-                'height' => $metadata[1],
-                'mimeType' => $metadata['mime'],
-            ];
         }
 
         $name = $this->file instanceof SymfonyUploadedFile
             ? $this->file->getClientOriginalName()
             : $this->file->getBasename();
-        $this->metaData += [
+        $this->metaData = [
             'name' => $name,
+            'mimeType' => MimeTypeGuesser::getInstance()->guess($this->file->getPathname()),
             'size' => $this->file->getSize(),
         ];
 
-        if (!$this->metaData['mimeType']) {
-            $this->metaData['mimeType'] = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+        if (Strings::startsWith($this->metaData['mimeType'], 'image/')) {
+            if ($this->metaData['mimeType'] === 'image/svg+xml') {
+                $this->isImage = true;
+            } elseif ($metadata = @getimagesize($this->file)) {
+                $this->isImage = true;
+                $this->metaData['mimeType'] = $metadata['mime'];
+                $this->metaData['width'] = $metadata[0];
+                $this->metaData['height'] = $metadata[1];
+            }
         }
     }
 }
