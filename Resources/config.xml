@@ -65,7 +65,7 @@
         <service id="vanio_domain.translatable.translatable_listener" class="%vanio_domain.translatable.translatable_listener.class%" public="false">
             <argument type="service" id="vanio_domain.translatable.current_locale_callable"/>
             <argument type="service" id="vanio_domain.translatable.default_locale_callable"/>
-            <tag name="doctrine.event_subscriber"/>
+            <tag name="doctrine.event_subscriber" priority="100"/>
         </service>
 
         <service id="vanio_domain.translatable.current_locale_callable" class="%vanio_domain.translatable.current_locale_callable.class%" public="false">
