@@ -7,6 +7,7 @@
         <parameter key="vanio_domain.pagination.multilingual_filter_param_converter.class">Vanio\DomainBundle\Pagination\MultilingualFilterParamConverter</parameter>
         <parameter key="vanio_domain.request.get_post_param_converter.class">Vanio\DomainBundle\Request\GetPostParamConverter</parameter>
         <parameter key="vanio_domain.request.locale_param_converter.class">Vanio\DomainBundle\Request\LocaleParamConverter</parameter>
+        <parameter key="vanio_domain.request.sluggable_param_converter.class">Vanio\DomainBundle\Request\SluggableParamConverter</parameter>
         <parameter key="vanio_domain.form.required_extension.class">Vanio\DomainBundle\Form\RequiredExtension</parameter>
         <parameter key="vanio_domain.form.validation_extension.class">Vanio\DomainBundle\Form\ValidationExtension</parameter>
         <parameter key="vanio_domain.validator.unique_validator.class">Vanio\DomainBundle\Validator\UniqueValidator</parameter>
@@ -20,27 +21,32 @@
     <services>
         <service id="vanio_domain.pagination.page_param_converter" class="%vanio_domain.pagination.page_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
-            <tag name="request.param_converter" priority="1" converter="page_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="page"/>
         </service>
 
         <service id="vanio_domain.pagination.order_by_param_converter" class="%vanio_domain.pagination.order_by_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
-            <tag name="request.param_converter" priority="1" converter="order_by_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="order_by"/>
         </service>
 
         <service id="vanio_domain.pagination.filter_param_converter" class="%vanio_domain.pagination.filter_param_converter.class%" public="false">
             <argument>%vanio_domain.pagination_default_options%</argument>
-            <tag name="request.param_converter" priority="1" converter="filter_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="filter"/>
         </service>
 
         <service id="vanio_domain.pagination.multilingual_filter_param_converter" class="%vanio_domain.pagination.multilingual_filter_param_converter.class%" public="false">
-            <tag name="request.param_converter" priority="1" converter="multilingual_filter_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="multilingual_filter"/>
         </service>
 
         <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false"/>
 
         <service id="vanio_domain.request.locale_param_converter" class="%vanio_domain.request.locale_param_converter.class%" public="false">
-            <tag name="request.param_converter" priority="1" converter="locale_param_converter"/>
+            <tag name="request.param_converter" priority="1" converter="locale"/>
+        </service>
+
+        <service id="vanio_domain.request.sluggable_param_converter" class="%vanio_domain.request.sluggable_param_converter.class%" public="false">
+            <argument type="service" id="doctrine" on-invalid="null"/>
+            <tag name="request.param_converter" converter="sluggable"/>
         </service>
 
         <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">

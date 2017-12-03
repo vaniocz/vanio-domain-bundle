@@ -18,10 +18,10 @@ class LocaleParamConverter implements ParamConverterInterface
 
     public function supports(ParamConverter $configuration)
     {
-        return ($configuration->getClass() == Locale::class);
+        return $configuration->getClass() === Locale::class;
     }
 
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): bool
     {
         $localeParameter = $this->localeParameter ?? $configuration->getName();
 
@@ -32,5 +32,7 @@ class LocaleParamConverter implements ParamConverterInterface
         }
 
         $request->attributes->set($configuration->getName(), new Locale($locale ?? $request->getLocale()));
+
+        return true;
     }
 }
