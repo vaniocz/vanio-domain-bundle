@@ -69,6 +69,11 @@ class EntityRepository extends EntitySpecificationRepository
         return $entity;
     }
 
+    public function findAll(array $orderBy = null): array
+    {
+        return $this->findBy([], $orderBy);
+    }
+
     /**
      * @param array $criteria
      * @param array|null $orderBy
