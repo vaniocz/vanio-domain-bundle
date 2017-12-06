@@ -2,10 +2,16 @@
 namespace Vanio\DomainBundle\Form;
 
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Vanio\DomainBundle\Assert\Validation;
 use Vanio\DomainBundle\Assert\ValidationException;
+use Vanio\Stdlib\Objects;
+use Vanio\Stdlib\Strings;
 
 class ValidatingDataMapper implements DataMapperInterface
 {
@@ -48,7 +54,41 @@ class ValidatingDataMapper implements DataMapperInterface
             }
 
             $message = $this->translator->trans($e->getMessageTemplate(), $e->getMessageParameters(), 'validators');
+
+            if ($e->getPropertyPath() !== null) {
+                $form = PropertyAccess::createPropertyAccessor()->getValue(
+                    $form,
+                    $this->normalizePropertyPath($e->getPropertyPath())
+                );
+            }
+
+            if ($e->getCode() === Validation::INVALID_NOT_BLANK) {
+                $this->removeNotBlankConstraints($form);
+            }
+
             $form->addError(new FormError($message, $e->getMessageTemplate(), $e->getMessageParameters()));
         }
+    }
+
+    private function normalizePropertyPath(string $propertyPath): string
+    {
+        return Strings::startsWith($propertyPath, '[')
+            ? $propertyPath
+            : sprintf('[%s]', str_replace('.', '][', $propertyPath));
+    }
+
+    private function removeNotBlankConstraints(FormInterface $form): void
+    {
+        $formConfig = $form->getConfig();
+        $options = $formConfig->getOptions();
+        $options['constraints'] = [];
+
+        foreach ($formConfig->getOption('constraints') as $constraint) {
+            if (!$constraint instanceof NotBlank) {
+                $options['constraints'][] = $constraint;
+            }
+        }
+
+        Objects::setPropertyValue($formConfig, 'options', $options, FormConfigBuilder::class);
     }
 }
