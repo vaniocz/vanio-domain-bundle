@@ -11,6 +11,13 @@ interface Translatable
     public function translations(): Collection;
 
     /**
+     * @return string|null
+     */
+    public function currentLocale();
+
+    public function defaultLocale(): string;
+
+    /**
      * @param string|null $locale
      * @param bool|null $fallbackToDefaultLocale
      * @return Translation
