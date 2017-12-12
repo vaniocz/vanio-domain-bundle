@@ -9,23 +9,24 @@ use Happyr\DoctrineSpecification\ValueConverter;
 class ILike extends Like
 {
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilder $queryBuilder
      * @param string|null $dqlAlias
      * @return string
      */
-    public function getFilter(QueryBuilder $qb, $dqlAlias)
+    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias): string
     {
         if ($this->dqlAlias !== null) {
             $dqlAlias = $this->dqlAlias;
         }
 
-        $paramName = $this->getParameterName($qb);
-        $qb->setParameter($paramName, ValueConverter::convertToDatabaseValue($this->value, $qb));
+        $parameter = $this->getParameterName($queryBuilder);
+        $value = mb_strtolower(ValueConverter::convertToDatabaseValue($this->value, $queryBuilder));
+        $queryBuilder->setParameter($parameter, $value);
 
         return (string) new Comparison(
             sprintf('LOWER(%s.%s)', $dqlAlias, $this->field),
             'LIKE',
-            sprintf(':%s', mb_strtolower($paramName))
+            sprintf(':%s', $parameter)
         );
     }
 }
