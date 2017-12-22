@@ -18,7 +18,7 @@ trait Sortable
         return $this->position;
     }
 
-    public function move(int $position): void
+    public function move(int $position)
     {
         $this->position = $position;
     }

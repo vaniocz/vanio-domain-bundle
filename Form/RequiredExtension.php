@@ -2,6 +2,7 @@
 namespace Vanio\DomainBundle\Form;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -63,6 +64,7 @@ class RequiredExtension extends AbstractTypeExtension
         if (
             !$form->isRequired()
             || $form->getConfig()->getCompound()
+            || $parent && $parent->getConfig()->getType()->getInnerType() instanceof ChoiceType
             || $parent && $parent->getConfig()->getType()->getInnerType() instanceof ScalarObjectType
         ) {
             return false;
