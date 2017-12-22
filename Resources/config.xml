@@ -39,7 +39,10 @@
             <tag name="request.param_converter" priority="1" converter="multilingual_filter"/>
         </service>
 
-        <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false"/>
+        <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false">
+            <argument type="service" id="router"/>
+            <tag name="request.param_converter" priority="1024" converter="get_post"/>
+        </service>
 
         <service id="vanio_domain.request.locale_param_converter" class="%vanio_domain.request.locale_param_converter.class%" public="false">
             <tag name="request.param_converter" priority="1" converter="locale"/>
