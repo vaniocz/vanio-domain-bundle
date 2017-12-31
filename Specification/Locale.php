@@ -28,7 +28,7 @@ class Locale implements QueryModifier
         $this->dqlAlias = $dqlAlias;
     }
 
-    public function getLocale(): string
+    public function locale(): string
     {
         return $this->locale;
     }
@@ -51,6 +51,6 @@ class Locale implements QueryModifier
 
     public function __toString(): string
     {
-        return $this->getLocale();
+        return $this->locale();
     }
 }

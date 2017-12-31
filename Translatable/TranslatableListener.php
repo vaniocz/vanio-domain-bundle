@@ -63,17 +63,17 @@ class TranslatableListener implements EventSubscriber
         $this->injectLocales($event);
     }
 
+    public function getSubscribedEvents(): array
+    {
+        return [Events::loadClassMetadata, Events::postLoad, Events::prePersist];
+    }
+
     /**
      * @internal
      */
     public function prePersist(LifecycleEventArgs $event)
     {
         $this->injectLocales($event);
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [Events::loadClassMetadata, Events::postLoad, Events::prePersist];
     }
 
     private function mapTranslatable(ClassMetadata $metadata)
@@ -85,7 +85,9 @@ class TranslatableListener implements EventSubscriber
                 'mappedBy' => 'translatable',
                 'indexBy' => 'locale',
                 'cascade' => ['persist', 'merge', 'remove'],
-                'fetch' => $this->translatableFetchMode,
+                'fetch' => $metadata->reflClass->hasMethod('translatableFetchMode')
+                    ? $metadata->reflClass->getMethod('translatableFetchMode')->invoke(null)
+                    : $this->translatableFetchMode,
                 'orphanRemoval' => true,
             ]);
         }
@@ -101,7 +103,9 @@ class TranslatableListener implements EventSubscriber
                 'targetEntity' => $metadata->getReflectionClass()->getMethod('translatableClass')->invoke(null),
                 'inversedBy' => 'translations',
                 'cascade' => ['persist', 'merge'],
-                'fetch' => $this->translationFetchMode,
+                'fetch' => $metadata->reflClass->hasMethod('translationFetchMode')
+                    ? $metadata->reflClass->getMethod('translationFetchMode')->invoke(null)
+                    : $this->translationFetchMode,
                 'joinColumns' => [['onDelete' => 'CASCADE']],
             ]);
         }
@@ -142,7 +146,7 @@ class TranslatableListener implements EventSubscriber
      */
     private function normalizeFetchMode($fetchMode): int
     {
-        switch ($fetchMode) {
+        switch (strtoupper($fetchMode)) {
             case ClassMetadata::FETCH_EAGER:
             case 'EAGER':
                 return ClassMetadata::FETCH_EAGER;

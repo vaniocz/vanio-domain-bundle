@@ -76,10 +76,11 @@
             <tag name="validator.constraint_validator" alias="vanio_domain.validator.not_referenced"/>
         </service>
 
-        <service id="vanio_domain.translatable.translatable_listener" class="%vanio_domain.translatable.translatable_listener.class%" public="false">
+        <service id="vanio_domain.translatable.translatable_listener" class="%vanio_domain.translatable.translatable_listener.class%" public="false" abstract="true">
             <argument type="service" id="vanio_domain.translatable.current_locale_callable"/>
             <argument type="service" id="vanio_domain.translatable.default_locale_callable"/>
-            <tag name="doctrine.event_subscriber" priority="100"/>
+            <argument>%vanio_domain.translatable.translatable_fetch_mode%</argument>
+            <argument>%vanio_domain.translatable.translation_fetch_mode%</argument>
         </service>
 
         <service id="vanio_domain.translatable.current_locale_callable" class="%vanio_domain.translatable.current_locale_callable.class%" public="false">

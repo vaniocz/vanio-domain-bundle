@@ -26,11 +26,22 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
             $container->setParameter("vanio_domain.$key", $value);
         }
 
+        foreach ($config['translatable'] as $key => $value) {
+            $container->setParameter("vanio_domain.translatable.$key", $value);
+        }
+
         if ($config['convert_get_post_parameters']) {
             $container
                 ->getDefinition('vanio_domain.request.get_post_param_converter')
                 ->setAbstract(false)
                 ->addTag('request.param_converter', ['priority' => 1, 'converter' => 'get_post_param_converter']);
+        }
+
+        if ($config['translatable']['enabled']) {
+            $container
+                ->getDefinition('vanio_domain.translatable.translatable_listener')
+                ->setAbstract(false)
+                ->addTag('doctrine.event_subscriber', ['priority' => 100]);
         }
     }
 
