@@ -42,6 +42,34 @@ class TranslatableListener implements EventSubscriber
         $this->translationFetchMode = $this->normalizeFetchMode($translationFetchMode);
     }
 
+    /**
+     * @return string|null
+     */
+    public function resolveCurrentLocale()
+    {
+        $currentLocaleCallable = $this->currentLocaleCallable;
+
+        return $currentLocaleCallable ? $currentLocaleCallable() : null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function resolveDefaultLocale()
+    {
+        $defaultLocaleCallable = $this->defaultLocaleCallable;
+
+        return $defaultLocaleCallable ? $defaultLocaleCallable() : null;
+    }
+
+    public function getSubscribedEvents(): array
+    {
+        return [Events::loadClassMetadata, Events::postLoad, Events::prePersist];
+    }
+
+    /**
+     * @internal
+     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
         $metadata = $event->getClassMetadata();
@@ -61,11 +89,6 @@ class TranslatableListener implements EventSubscriber
     public function postLoad(LifecycleEventArgs $event)
     {
         $this->injectLocales($event);
-    }
-
-    public function getSubscribedEvents(): array
-    {
-        return [Events::loadClassMetadata, Events::postLoad, Events::prePersist];
     }
 
     /**
@@ -199,25 +222,5 @@ class TranslatableListener implements EventSubscriber
                 $entity->setDefaultLocale($locale);
             }
         }
-    }
-
-    /**
-     * @return string|null
-     */
-    private function resolveCurrentLocale()
-    {
-        $currentLocaleCallable = $this->currentLocaleCallable;
-
-        return $currentLocaleCallable ? $currentLocaleCallable() : null;
-    }
-
-    /**
-     * @return string|null
-     */
-    private function resolveDefaultLocale()
-    {
-        $defaultLocaleCallable = $this->defaultLocaleCallable;
-
-        return $defaultLocaleCallable ? $defaultLocaleCallable() : null;
     }
 }

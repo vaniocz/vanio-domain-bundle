@@ -40,10 +40,15 @@ class Locale implements QueryModifier
 
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
+        if ($this->dqlAlias !== null) {
+            $this->dqlAlias = $dqlAlias;
+        }
+
         $queryBuilder
-            ->leftJoin(sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, 'translations'), '__t', 'with', '__t.locale = :locale')
+            ->leftJoin("$dqlAlias.translations", '__t', 'WITH', '__t.locale = :locale')
             ->setParameter('locale', $this->locale)
             ->addSelect('__t');
+
         if (!$this->withUntranslated) {
             $queryBuilder->where('__t.locale IS NOT NULL');
         }
