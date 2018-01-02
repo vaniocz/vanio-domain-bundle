@@ -74,7 +74,7 @@ class TranslatableWalker extends TreeWalkerAdapter
             return;
         }
 
-        $translationsDqlAlias = "{$dqlAlias}_translations";
+        $translationsDqlAlias = sprintf('%s_translations', $dqlAlias);
         $from->joins[] = $this->createTranslationsJoin($dqlAlias, $translationsDqlAlias);
         $select->selectClause->selectExpressions[] = new SelectExpression($translationsDqlAlias, null, false);
         $translationClass = $classMetadata->getAssociationTargetClass('translations');
