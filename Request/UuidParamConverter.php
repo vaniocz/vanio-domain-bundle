@@ -5,6 +5,7 @@ use Ramsey\Uuid\Uuid;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class UuidParamConverter implements ParamConverterInterface
 {
@@ -18,7 +19,10 @@ class UuidParamConverter implements ParamConverterInterface
         $name = $configuration->getName();
         $parameter = $request->get($name);
 
-        if ($parameter && is_string($parameter) && Uuid::isValid($parameter)) {
+        if ($parameter && is_string($parameter)) {
+            if (!Uuid::isValid($parameter)) {
+                throw new BadRequestHttpException(sprintf('Invalid UUID "%s".', $parameter));
+            }
             $request->attributes->set($name, Uuid::fromString($parameter));
         }
 
