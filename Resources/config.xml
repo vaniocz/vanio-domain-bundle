@@ -8,6 +8,7 @@
         <parameter key="vanio_domain.request.get_post_param_converter.class">Vanio\DomainBundle\Request\GetPostParamConverter</parameter>
         <parameter key="vanio_domain.request.locale_param_converter.class">Vanio\DomainBundle\Request\LocaleParamConverter</parameter>
         <parameter key="vanio_domain.request.sluggable_param_converter.class">Vanio\DomainBundle\Request\SluggableParamConverter</parameter>
+        <parameter key="vanio_domain.request.uuid_param_converter.class">Vanio\DomainBundle\Request\UuidParamConverter</parameter>
         <parameter key="vanio_domain.unexpected_response.unexpected_response_listener.class">Vanio\DomainBundle\UnexpectedResponse\UnexpectedResponseListener</parameter>
         <parameter key="vanio_domain.form.required_extension.class">Vanio\DomainBundle\Form\RequiredExtension</parameter>
         <parameter key="vanio_domain.form.validation_extension.class">Vanio\DomainBundle\Form\ValidationExtension</parameter>
@@ -51,6 +52,10 @@
         <service id="vanio_domain.request.sluggable_param_converter" class="%vanio_domain.request.sluggable_param_converter.class%" public="false">
             <argument type="service" id="doctrine" on-invalid="null"/>
             <tag name="request.param_converter" converter="sluggable"/>
+        </service>
+
+        <service id="vanio_domain.request.uuid_param_converter" class="%vanio_domain.request.uuid_param_converter.class%" public="false">
+            <tag name="request.param_converter" priority="1" converter="uuid"/>
         </service>
 
         <service id="vanio_domain.unexpected_response.unexpected_response_listener" class="%vanio_domain.unexpected_response.unexpected_response_listener.class%">
