@@ -5,8 +5,12 @@ use Assert\Assertion;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\EntityRepository as BaseEntityRepository;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\NonUniqueResultException as DoctrineNonUniqueResultException;
+use Doctrine\ORM\NoResultException as DoctrineNoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
@@ -14,19 +18,19 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\ORM\UnitOfWork;
-use Happyr\DoctrineSpecification\EntitySpecificationRepository;
+use Happyr\DoctrineSpecification\EntitySpecificationRepositoryInterface;
+use Happyr\DoctrineSpecification\Exception\NonUniqueResultException;
+use Happyr\DoctrineSpecification\Exception\NoResultException;
 use Happyr\DoctrineSpecification\Filter\Filter;
 use Happyr\DoctrineSpecification\Logic\AndX;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
 
-/**
- * @method array match(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
- * @method mixed matchSingleResult(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
- * @method mixed matchOneOrNullResult(Filter|QueryModifier|array $specification, ResultModifier $modifier = null)
- */
-class EntityRepository extends EntitySpecificationRepository
+class EntityRepository extends BaseEntityRepository implements EntitySpecificationRepositoryInterface
 {
+    /** @var string */
+    private $alias = 'e';
+
     /**
      * @param mixed $id
      * @param int|null $lockMode
@@ -172,16 +176,132 @@ class EntityRepository extends EntitySpecificationRepository
         $this->_em->remove($entity);
     }
 
+    public function getAlias(): string
+    {
+        return $this->alias;
+    }
+
+    public function setAlias(string $alias): self
+    {
+        $this->alias = $alias;
+
+        return $this;
+    }
+
     /**
-     * @param mixed $specifications
-     * @param ResultModifier|null $modifier
+     * @param mixed $specification
+     * @param ResultModifier $resultModifier
+     * @return mixed
+     */
+    public function match($specification, ResultModifier $resultModifier = null)
+    {
+        list($specification, $resultModifier, $resultTransformers) = $this->mergeSpecifications(
+            $specification,
+            $resultModifier
+        );
+        $query = $this->getQuery($specification, $resultModifier);
+
+        return $this->transformResult($query, $query->execute(), $resultTransformers);
+    }
+
+    /**
+     * @param mixed $specification
+     * @param ResultModifier $resultModifier
+     * @return mixed
+     */
+    public function matchSingleResult($specification, ResultModifier $resultModifier = null)
+    {
+        list($specification, $resultModifier, $resultTransformers) = $this->mergeSpecifications(
+            $specification,
+            $resultModifier
+        );
+        $query = $this->getQuery($specification, $resultModifier);
+
+        try {
+            $result = $query->getSingleResult();
+        } catch (DoctrineNonUniqueResultException $e) {
+            throw new NonUniqueResultException($e->getMessage(), $e->getCode(), $e);
+        } catch (DoctrineNoResultException $e) {
+            throw new NoResultException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        $transformedResult = $this->transformResult($query, [$result], $resultTransformers);
+
+        if ($transformedResult !== null) {
+            $result = $transformedResult;
+            $count = $result instanceof \Iterator || $result instanceof \IteratorAggregate
+                ? iterator_count($result)
+                : count($result);
+
+            if (!$count) {
+                throw new NoResultException('Transformed result is empty.');
+            } elseif ($count > 1) {
+                throw new NonUniqueResultException('Transformed result is not unique.');
+            }
+        }
+
+        return current($result);
+    }
+
+    /**
+     * @param mixed $specification
+     * @param ResultModifier $resultModifier
+     * @return mixed
+     */
+    public function matchOneOrNullResult($specification, ResultModifier $resultModifier = null)
+    {
+        try {
+            return $this->matchSingleResult($specification, $resultModifier);
+        } catch (NoResultException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param AbstractQuery $query
+     * @param mixed $result
+     * @param ResultTransformer[] $resultTransformers
+     * @return mixed
+     */
+    private function transformResult(AbstractQuery $query, $result, array $resultTransformers)
+    {
+        foreach ($resultTransformers as $resultTransformer) {
+            $transformedResult = $resultTransformer->transformResult($query, $result);
+
+            if ($transformedResult !== null) {
+                $result = $transformedResult;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Filter[]|QueryModifier[] $specification
+     * @param ResultModifier|null $resultModifier
      * @return Query
      */
-    public function getQuery($specifications, ResultModifier $modifier = null): Query
+    public function getQuery($specification, ResultModifier $resultModifier = null): Query
     {
-        list($specification, $modifier) = $this->mergeSpecifications($specifications, $modifier);
+        $queryBuilder = $this->createQueryBuilder($this->getAlias());
 
-        return parent::getQuery($specification, $modifier);
+        if ($specification instanceof QueryModifier) {
+            $specification->modify($queryBuilder, $this->getAlias());
+        }
+
+        if ($specification instanceof Filter) {
+            if ($filter = (string) $specification->getFilter($queryBuilder, $this->getAlias())) {
+                $queryBuilder->andWhere($filter);
+            }
+        }
+
+        $query = $queryBuilder->getQuery();
+
+        if ($resultModifier) {
+            $resultModifier->modify($query);
+        }
+
+        return $query;
     }
 
     /**
@@ -239,6 +359,8 @@ class EntityRepository extends EntitySpecificationRepository
     {
         $specifications = is_array($specifications) ? $specifications : [$specifications];
         $and = new AndX;
+        $resultModifiers = [];
+        $resultTransformers = [];
 
         foreach ($specifications as $specification) {
             if ($specification instanceof Filter || $specification instanceof QueryModifier) {
@@ -246,12 +368,23 @@ class EntityRepository extends EntitySpecificationRepository
             }
 
             if ($specification instanceof ResultModifier) {
-                Assertion::null($modifier, 'Only one result modifier can be passed at once.');
-                $modifier = $specification;
+                $resultModifiers[] = $specification;
+            }
+
+            if ($specification instanceof ResultTransformer) {
+                $resultTransformers[] = $specification;
             }
         }
 
-        return [$and, $modifier];
+        if ($modifier instanceof ResultModifier) {
+            $resultModifiers[] = $modifier;
+        }
+
+        if ($modifier instanceof ResultTransformer) {
+            $resultTransformers[] = $modifier;
+        }
+
+        return [$and, new ResultModifierChain($resultModifiers), $resultTransformers];
     }
 
     /**
