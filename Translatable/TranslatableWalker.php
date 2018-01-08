@@ -23,6 +23,7 @@ class TranslatableWalker extends TreeWalkerAdapter
     const HINT_LOCALE = 'vanio.translatable_walker.locale';
     const HINT_FALLBACK_LOCALE = 'vanio.translatable_walker.fallback_locale';
     const HINT_INNER_JOIN = 'vanio.translatable_walker.inner_join';
+    const HINT_CLASSES = 'vanio.translatable_walker.classes';
 
     /** @var string|bool */
     private $locale;
@@ -32,6 +33,9 @@ class TranslatableWalker extends TreeWalkerAdapter
 
     /** @var bool */
     private $innerJoin;
+
+    /** @var string[] */
+    private $classes;
 
     /** @var TranslatableListener|null */
     private $translatableListener;
@@ -48,6 +52,7 @@ class TranslatableWalker extends TreeWalkerAdapter
         $this->locale = $hints[self::HINT_LOCALE] ?? true;
         $this->fallbackLocale = $hints[self::HINT_FALLBACK_LOCALE] ?? false;
         $this->innerJoin = $hints[self::HINT_INNER_JOIN] ?? false;
+        $this->classes = $hints[self::HINT_CLASSES] ?? [Translatable::class];
     }
 
     public function walkSelectStatement(SelectStatement $select)
@@ -70,7 +75,7 @@ class TranslatableWalker extends TreeWalkerAdapter
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $queryComponent['metadata'];
 
-        if (!$classMetadata->reflClass->implementsInterface(Translatable::class)) {
+        if (!$this->shouldTranslate($classMetadata->reflClass->name)) {
             return;
         }
 
@@ -86,6 +91,17 @@ class TranslatableWalker extends TreeWalkerAdapter
             'nestingLevel' => $queryComponent['nestingLevel'],
             'token' => null,
         ]);
+    }
+
+    private function shouldTranslate(string $class): bool
+    {
+        foreach ($this->classes as $c) {
+            if (is_a($class, $c, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function createTranslationsJoin(string $dqlAlias, string $translationsDqlAlias): Join

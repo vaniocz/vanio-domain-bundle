@@ -8,6 +8,9 @@ use Vanio\DomainBundle\Translatable\TranslatableWalker;
 
 class JoinTranslations implements ResultModifier
 {
+    /** @var string[]|null */
+    private $classes;
+
     /** @var string|bool */
     private $locale;
 
@@ -18,12 +21,14 @@ class JoinTranslations implements ResultModifier
     private $innerJoin;
 
     /**
+     * @param string[]|null $types
      * @param string|bool $locale
      * @param string|bool $fallbackLocale
      * @param bool $innerJoin
      */
-    public function __construct($locale = true, $fallbackLocale = false, bool $innerJoin = false)
+    public function __construct(array $types = null, $locale = true, $fallbackLocale = false, bool $innerJoin = false)
     {
+        $this->classes = $types;
         $this->locale = $locale;
         $this->fallbackLocale = $fallbackLocale;
         $this->innerJoin = $innerJoin;
@@ -37,6 +42,7 @@ class JoinTranslations implements ResultModifier
             ->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $treeWalkers)
             ->setHint(TranslatableWalker::HINT_LOCALE, $this->locale)
             ->setHint(TranslatableWalker::HINT_FALLBACK_LOCALE, $this->fallbackLocale)
-            ->setHint(TranslatableWalker::HINT_INNER_JOIN, $this->innerJoin);
+            ->setHint(TranslatableWalker::HINT_INNER_JOIN, $this->innerJoin)
+            ->setHint(TranslatableWalker::HINT_CLASSES, $this->classes);
     }
 }
