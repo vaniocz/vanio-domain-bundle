@@ -16,12 +16,12 @@ class GetPostParamConverter implements ParamConverterInterface
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function supports(ParamConverter $configuration)
+    public function supports(ParamConverter $configuration): bool
     {
         return true;
     }
 
-    public function apply(Request $request, ParamConverter $configuration)
+    public function apply(Request $request, ParamConverter $configuration): void
     {
         $name = $configuration->getName();
 

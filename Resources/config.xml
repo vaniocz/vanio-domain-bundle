@@ -5,6 +5,7 @@
         <parameter key="vanio_domain.pagination.order_by_param_converter.class">Vanio\DomainBundle\Pagination\OrderByParamConverter</parameter>
         <parameter key="vanio_domain.pagination.filter_param_converter.class">Vanio\DomainBundle\Pagination\FilterParamConverter</parameter>
         <parameter key="vanio_domain.pagination.multilingual_filter_param_converter.class">Vanio\DomainBundle\Pagination\MultilingualFilterParamConverter</parameter>
+        <parameter key="vanio_domain.request.format_param_converter.class">Vanio\DomainBundle\Request\FormatParamConverter</parameter>
         <parameter key="vanio_domain.request.get_post_param_converter.class">Vanio\DomainBundle\Request\GetPostParamConverter</parameter>
         <parameter key="vanio_domain.request.locale_param_converter.class">Vanio\DomainBundle\Request\LocaleParamConverter</parameter>
         <parameter key="vanio_domain.request.sluggable_param_converter.class">Vanio\DomainBundle\Request\SluggableParamConverter</parameter>
@@ -40,9 +41,12 @@
             <tag name="request.param_converter" priority="1" converter="multilingual_filter"/>
         </service>
 
-        <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" public="false">
+        <service id="vanio_domain.request.format_param_converter" class="%vanio_domain.request.format_param_converter.class%" abstract="true" public="false">
+            <argument>%vanio_domain.default_accepted_formats%</argument>
+        </service>
+
+        <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" abstract="true" public="false">
             <argument type="service" id="router"/>
-            <tag name="request.param_converter" priority="1024" converter="get_post"/>
         </service>
 
         <service id="vanio_domain.request.locale_param_converter" class="%vanio_domain.request.locale_param_converter.class%" public="false">
@@ -81,7 +85,7 @@
             <tag name="validator.constraint_validator" alias="vanio_domain.validator.not_referenced"/>
         </service>
 
-        <service id="vanio_domain.translatable.translatable_listener" class="%vanio_domain.translatable.translatable_listener.class%" public="false" abstract="true">
+        <service id="vanio_domain.translatable.translatable_listener" class="%vanio_domain.translatable.translatable_listener.class%" abstract="true" public="false">
             <argument type="service" id="vanio_domain.translatable.current_locale_callable"/>
             <argument type="service" id="vanio_domain.translatable.default_locale_callable"/>
             <argument>%vanio_domain.translatable.translatable_fetch_mode%</argument>
