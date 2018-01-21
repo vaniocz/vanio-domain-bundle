@@ -44,13 +44,13 @@ class IdToEntityTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param object|object[] $entities
+     * @param object|object[]|null $entities
      * @return mixed
      */
     public function reverseTransform($entities)
     {
         if (!$this->isMultiple) {
-            return $this->transformEntityToId($entities);
+            return $entities === null ? null : $this->transformEntityToId($entities);
         }
 
         $ids = [];
