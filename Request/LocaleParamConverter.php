@@ -27,7 +27,7 @@ class LocaleParamConverter implements ParamConverterInterface
 
         if ($request->attributes->has($localeParameter)) {
             $locale = $request->attributes->get($localeParameter);
-        } else if ($localeParameter !== 'locale') {
+        } elseif ($localeParameter !== 'locale') {
             $locale = $request->query->get($localeParameter);
         }
 

@@ -16,14 +16,14 @@ class UuidParamConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $name = $configuration->getName();
-        $parameter = $request->get($name);
+        $parameter = $request->get($configuration->getName());
 
         if ($parameter && is_string($parameter)) {
             if (!Uuid::isValid($parameter)) {
                 throw new NotFoundHttpException(sprintf('Invalid UUID "%s".', $parameter));
             }
-            $request->attributes->set($name, Uuid::fromString($parameter));
+
+            $request->attributes->set($configuration->getName(), Uuid::fromString($parameter));
         }
 
         return true;
