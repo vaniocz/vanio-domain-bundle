@@ -121,15 +121,20 @@ class TranslatableListener implements EventSubscriber
         $this->mapId($metadata, $entityManager);
 
         if (!$metadata->hasAssociation('translatable')) {
+            $translatableClass = $metadata->getReflectionClass()->getMethod('translatableClass')->invoke(null);
+            $translatableMetadata = $entityManager->getClassMetadata($translatableClass);
             $metadata->mapManyToOne([
                 'fieldName' => 'translatable',
-                'targetEntity' => $metadata->getReflectionClass()->getMethod('translatableClass')->invoke(null),
+                'targetEntity' => $translatableClass,
                 'inversedBy' => 'translations',
                 'cascade' => ['persist', 'merge'],
                 'fetch' => $metadata->reflClass->hasMethod('translationFetchMode')
                     ? $metadata->reflClass->getMethod('translationFetchMode')->invoke(null)
                     : $this->translationFetchMode,
-                'joinColumns' => [['onDelete' => 'CASCADE']],
+                'joinColumns' => [[
+                    'referencedColumnName' => $translatableMetadata->getSingleIdentifierFieldName(),
+                    'onDelete' => 'CASCADE',
+                ]],
             ]);
         }
 
