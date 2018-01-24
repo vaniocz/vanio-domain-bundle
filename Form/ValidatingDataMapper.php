@@ -5,6 +5,7 @@ use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Vanio\DomainBundle\Assert\LazyValidationException;
 use Vanio\DomainBundle\Assert\ValidationException;
 
 class ValidatingDataMapper implements DataMapperInterface
@@ -38,17 +39,46 @@ class ValidatingDataMapper implements DataMapperInterface
     {
         try {
             $this->dataMapper->mapFormsToData($forms, $data);
+        } catch (LazyValidationException $e) {
+            $this->addValidationErrors($forms, $e->getErrorExceptions());
         } catch (ValidationException $e) {
-            $data = null;
-            $forms = iterator_to_array($forms);
+            $this->addValidationErrors($forms, [$e]);
+        }
+    }
 
-            /** @var FormInterface|null $form */
-            if (!$form = $forms ? reset($forms)->getParent() : null) {
-                throw $e;
+    /**
+     * @param \Iterator|FormInterface[] $forms
+     * @param ValidationException[] $validationErrors
+     */
+    private function addValidationErrors($forms, array $validationErrors)
+    {
+        /** @var FormInterface[] $forms */
+        $forms = iterator_to_array($forms);
+        $parent = current($forms)->getParent();
+
+        foreach ($validationErrors as $error) {
+            $form = $parent;
+            $propertyPath = $error->getPropertyPath();
+
+            if ($propertyPath !== null) {
+                foreach ($forms as $child) {
+                    if ((string) $child->getPropertyPath() === $propertyPath) {
+                        $form = $child;
+                        break;
+                    }
+                }
             }
 
-            $message = $this->translator->trans($e->getMessageTemplate(), $e->getMessageParameters(), 'validators');
-            $form->addError(new FormError($message, $e->getMessageTemplate(), $e->getMessageParameters()));
+            if (!$form) {
+                throw $error;
+            }
+
+            $message = $this->translator->trans(
+                $error->getMessageTemplate(),
+                $error->getMessageParameters(),
+                'validators'
+            );
+            $form->addError(new FormError($message, $error->getMessageTemplate(), $error->getMessageParameters()));
         }
     }
 }
