@@ -26,6 +26,9 @@ use Happyr\DoctrineSpecification\Logic\AndX;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
 
+/**
+ * @method mixed findOneBy(array $criteria, array $orderBy = null)
+ */
 class EntityRepository extends BaseEntityRepository implements EntitySpecificationRepositoryInterface
 {
     /** @var string */
