@@ -52,9 +52,9 @@ class ValidatingDataMapper implements DataMapperInterface
      */
     private function addValidationErrors($forms, array $validationErrors)
     {
-        /** @var FormInterface[] $forms */
         $forms = iterator_to_array($forms);
         $parent = current($forms)->getParent();
+        /** @var FormInterface[] $forms */
 
         foreach ($validationErrors as $error) {
             $form = $parent;
@@ -62,7 +62,7 @@ class ValidatingDataMapper implements DataMapperInterface
 
             if ($propertyPath !== null) {
                 foreach ($forms as $child) {
-                    if ((string) $child->getPropertyPath() === $propertyPath) {
+                    if ($propertyPath === str_replace(['][', '[', ']'], ['.', '', ''], $child->getPropertyPath())) {
                         $form = $child;
                         break;
                     }
