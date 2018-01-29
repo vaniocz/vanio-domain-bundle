@@ -38,6 +38,9 @@ class JoinTranslations implements ResultModifier
         $this->innerJoin = $innerJoin;
     }
 
+    /**
+     * @param AbstractQuery|Query $query
+     */
     public function modify(AbstractQuery $query)
     {
         $treeWalkers = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS) ?: [];
@@ -47,6 +50,7 @@ class JoinTranslations implements ResultModifier
             ->setHint(TranslatableWalker::HINT_DQL_ALIASES, $this->dqlAliases)
             ->setHint(TranslatableWalker::HINT_LOCALE, $this->locale)
             ->setHint(TranslatableWalker::HINT_FALLBACK_LOCALE, $this->fallbackLocale)
-            ->setHint(TranslatableWalker::HINT_INNER_JOIN, $this->innerJoin);
+            ->setHint(TranslatableWalker::HINT_INNER_JOIN, $this->innerJoin)
+            ->useQueryCache(false);
     }
 }
