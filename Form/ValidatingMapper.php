@@ -8,7 +8,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Vanio\DomainBundle\Assert\LazyValidationException;
 use Vanio\DomainBundle\Assert\ValidationException;
 
-class ValidatingDataMapper implements DataMapperInterface
+class ValidatingMapper implements DataMapperInterface
 {
     /** @var DataMapperInterface */
     private $dataMapper;

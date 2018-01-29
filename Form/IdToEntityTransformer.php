@@ -71,8 +71,10 @@ class IdToEntityTransformer implements DataTransformerInterface
         $classMetadata = $this->entityManager->getClassMetadata($this->class);
 
         if (
-            isset($classMetadata->identifierDiscriminatorField)
-            && (!is_array($id) || !isset($id[$classMetadata->identifierDiscriminatorField]))
+            !$this->isMultiple || (
+                isset($classMetadata->identifierDiscriminatorField)
+                && (!is_array($id) || !isset($id[$classMetadata->identifierDiscriminatorField]))
+            )
         ) {
             return $this->entityManager->getRepository($this->class)->find($id);
         }

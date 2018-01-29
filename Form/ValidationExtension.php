@@ -37,9 +37,9 @@ class ValidationExtension extends AbstractTypeExtension implements EventSubscrib
         $dataMapper = $formConfig->getDataMapper();
 
         if ($formConfig instanceof FormConfigBuilder) {
-            if ($dataMapper && !$dataMapper instanceof ValidatingDataMapper) {
-                $validatingDataMapper = new ValidatingDataMapper($dataMapper, $this->translator);
-                Objects::setPropertyValue($formConfig, 'dataMapper', $validatingDataMapper, FormConfigBuilder::class);
+            if ($dataMapper && !$dataMapper instanceof ValidatingMapper) {
+                $ValidatingMapper = new ValidatingMapper($dataMapper, $this->translator);
+                Objects::setPropertyValue($formConfig, 'dataMapper', $ValidatingMapper, FormConfigBuilder::class);
             }
         }
     }
