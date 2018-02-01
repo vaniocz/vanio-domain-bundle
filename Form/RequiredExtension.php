@@ -19,7 +19,7 @@ class RequiredExtension extends AbstractTypeExtension
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
+        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPostSetData']);
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -41,7 +41,7 @@ class RequiredExtension extends AbstractTypeExtension
     /**
      * @internal
      */
-    public function onPreSetData(FormEvent $event)
+    public function onPostSetData(FormEvent $event)
     {
         $form = $event->getForm();
 
