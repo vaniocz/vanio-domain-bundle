@@ -4,16 +4,27 @@ namespace Vanio\DomainBundle\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 class GetPostParamConverter implements ParamConverterInterface
 {
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    /** @var ConfigurableRequirementsInterface|null */
+    private $configurableUrlGenerator;
+
+    /**
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param UrlGeneratorInterface|null $defaultUrlGenerator
+     */
+    public function __construct(UrlGeneratorInterface $urlGenerator, ?UrlGeneratorInterface $defaultUrlGenerator = null)
     {
         $this->urlGenerator = $urlGenerator;
+        $this->configurableUrlGenerator = $this->resolveConfigurableRequirementsUrlGenerator($urlGenerator)
+            ?: $this->resolveConfigurableRequirementsUrlGenerator($defaultUrlGenerator);
     }
 
     public function supports(ParamConverter $configuration): bool
@@ -59,15 +70,42 @@ class GetPostParamConverter implements ParamConverterInterface
         $request->attributes->replace($attributes);
     }
 
+    /**
+     * @param UrlGeneratorInterface $urlGenerator
+     * @return UrlGeneratorInterface|null
+     */
+    private function resolveConfigurableRequirementsUrlGenerator(UrlGeneratorInterface $urlGenerator)
+    {
+        if ($urlGenerator instanceof ConfigurableRequirementsInterface) {
+            return $urlGenerator;
+        } elseif ($urlGenerator instanceof Router) {
+            return $this->resolveConfigurableRequirementsUrlGenerator($urlGenerator->getGenerator());
+        }
+
+        return null;
+    }
+
     private function resolveAdditionalAttributes(array $attributes): array
     {
-        $additionalAttributes = [];
-
-        if (isset($attributes['_route'])) {
-            $routeParameters = array_fill_keys(array_keys($attributes['_route_params']), '__UNIQUE_DEFAULT_VALUE__');
-            $url = $this->urlGenerator->generate($attributes['_route'], $routeParameters);
-            parse_str(parse_url($url, PHP_URL_QUERY), $additionalAttributes);
+        if (!isset($attributes['_route'])) {
+            return [];
         }
+
+        $additionalAttributes = [];
+        $routeParameters = array_fill_keys(array_keys($attributes['_route_params']), '__UNIQUE_DEFAULT_VALUE__');
+
+        if ($this->configurableUrlGenerator) {
+            $isStrictRequirements = $this->configurableUrlGenerator->isStrictRequirements();
+            $this->configurableUrlGenerator->setStrictRequirements(null);
+        }
+
+        $url = $this->urlGenerator->generate($attributes['_route'], $routeParameters);
+
+        if (isset($isStrictRequirements)) {
+            $this->configurableUrlGenerator->setStrictRequirements($isStrictRequirements);
+        }
+
+        parse_str(parse_url($url, PHP_URL_QUERY), $additionalAttributes);
 
         return $additionalAttributes;
     }
