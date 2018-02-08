@@ -52,13 +52,15 @@ class CurrentLocale implements QueryModifier
             foreach ($listeners as $listener) {
                 if ($listener instanceof TranslatableListener) {
                     $currentLocale = $listener->resolveCurrentLocale();
-                    if ($currentLocale) {
-                        return $currentLocale;
-                    }
+                    break;
                 }
             }
         }
 
-        throw new \RuntimeException('Cannot resolve current locale.');
+        if (!isset($currentLocale)) {
+            throw new \RuntimeException('Cannot resolve current locale.');
+        }
+        
+        return $currentLocale;
     }
 }
