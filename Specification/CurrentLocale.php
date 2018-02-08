@@ -50,7 +50,7 @@ class CurrentLocale implements QueryModifier
             foreach ($listeners as $listener) {
                 if ($listener instanceof TranslatableListener) {
                     $currentLocale = $listener->resolveCurrentLocale();
-                    break;
+                    break 2;
                 }
             }
         }
