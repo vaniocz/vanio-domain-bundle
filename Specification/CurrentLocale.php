@@ -34,11 +34,9 @@ class CurrentLocale implements QueryModifier
             $this->dqlAlias = $dqlAlias;
         }
 
-        $currentLocale = $this->resolveCurrentLocale($queryBuilder);
-
         $queryBuilder
             ->leftJoin("$dqlAlias.translations", '__t', 'WITH', '__t.locale = :locale')
-            ->setParameter('locale', $currentLocale)
+            ->setParameter('locale', $this->resolveCurrentLocale($queryBuilder))
             ->addSelect('__t');
 
         if (!$this->withUntranslated) {
