@@ -48,19 +48,17 @@ class CurrentLocale implements QueryModifier
 
     private function resolveCurrentLocale(QueryBuilder $queryBuilder): string
     {
-        $currentLocale = null;
         foreach ($queryBuilder->getEntityManager()->getEventManager()->getListeners() as $listeners) {
             foreach ($listeners as $listener) {
                 if ($listener instanceof TranslatableListener) {
-                    $currentLocale = $listener->resolveCurrentLocale() ?? $currentLocale;
+                    $currentLocale = $listener->resolveCurrentLocale();
+                    if ($currentLocale) {
+                        return $currentLocale;
+                    }
                 }
             }
         }
 
-        if (!$currentLocale) {
-            throw new \RuntimeException('Cannot resolve current locale.');
-        }
-
-        return $currentLocale;
+        throw new \RuntimeException('Cannot resolve current locale.');
     }
 }
