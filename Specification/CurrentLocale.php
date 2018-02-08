@@ -35,9 +35,6 @@ class CurrentLocale implements QueryModifier
         }
 
         $currentLocale = $this->resolveCurrentLocale($queryBuilder);
-        if (!$currentLocale) {
-            return;
-        }
 
         $queryBuilder
             ->leftJoin("$dqlAlias.translations", '__t', 'WITH', '__t.locale = :locale')
@@ -49,16 +46,21 @@ class CurrentLocale implements QueryModifier
         }
     }
 
-    private function resolveCurrentLocale(QueryBuilder $queryBuilder): ?string
+    private function resolveCurrentLocale(QueryBuilder $queryBuilder): string
     {
+        $currentLocale = null;
         foreach ($queryBuilder->getEntityManager()->getEventManager()->getListeners() as $listeners) {
             foreach ($listeners as $listener) {
                 if ($listener instanceof TranslatableListener) {
-                    return $listener->resolveCurrentLocale();
+                    $currentLocale = $listener->resolveCurrentLocale() ?? $currentLocale;
                 }
             }
         }
 
-        return null;
+        if (!$currentLocale) {
+            throw new \RuntimeException('Cannot resolve current locale.');
+        }
+
+        return $currentLocale;
     }
 }
