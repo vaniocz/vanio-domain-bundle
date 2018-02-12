@@ -2,7 +2,7 @@
 namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
-use Vanio\DomainBundle\Assert\Validation;
+use Vanio\DomainBundle\Assert\Validate;
 
 /**
  * @ORM\Embeddable
@@ -30,12 +30,20 @@ class Location
     public function __construct($address, $latitude, $longitude)
     {
         $this->address = trim($address);
-        Validation::notBlank($this->address, 'Address must not be blank.');
-        Validation::maxLength($this->address, 255, 'Address must not be longer than {{ max_length }} characters.');
         $this->latitude = (float) $latitude;
-        Validation::range($this->latitude, -90, 90, 'Latitude must be between {{ min }} and {{ max }} degrees.');
         $this->longitude = (float) $longitude;
-        Validation::range($this->longitude, -180, 180, 'Longitude must be between {{ min }} and {{ max }} degrees.');
+
+        Validate::lazy()
+            ->that($this->address, 'address')
+                ->notBlank('Address must not be blank.')
+                ->maxLength(255, 'Address must not be longer than {{ max_length }} characters.')
+            ->that($latitude, 'latitude')
+                ->notBlank('Latitude must not be blank.')
+                ->range(-90, 90, 'Latitude must be between {{ min }} and {{ max }} degrees.')
+            ->that($longitude, 'longitude')
+                ->notBlank('Longitude must not be blank.')
+                ->range(-180, 180, 'Longitude must be between {{ min }} and {{ max }} degrees.')
+            ->verifyNow();
     }
 
     public function address(): string

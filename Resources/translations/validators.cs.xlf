@@ -41,9 +41,19 @@
                 <target>Adresa nesmí být delší než {{ max_length }} znaků.</target>
             </trans-unit>
 
+            <trans-unit id="a891cc4a631651482e9e358591a9b6ef" resname="Latitude must not be blank.">
+                <source>Latitude must not be blank.</source>
+                <target>Vyplňte zeměpisnou šířku.</target>
+            </trans-unit>
+
             <trans-unit id="7a28911169b0284ea45817e9dcf17125" resname="Latitude must be between {{ min }} and {{ max }} degrees.">
                 <source>Latitude must be between {{ min }} and {{ max }} degrees.</source>
                 <target>Zeměpisná šířka musí být mezi {{ min }} a {{ max }} stupni.</target>
+            </trans-unit>
+
+            <trans-unit id="283c0a453ffb626b8bf5cfe5879bdcb2" resname="Longitude must not be blank.">
+                <source>Longitude must not be blank.</source>
+                <target>Vyplňte zeměpisnou délku.</target>
             </trans-unit>
 
             <trans-unit id="6b661900029be61c0e2a2a7e61d167e2" resname="Longitude must be between {{ min }} and {{ max }} degrees.">

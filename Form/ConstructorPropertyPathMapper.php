@@ -70,9 +70,6 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
                 $argument = $parameters[$name];
             } elseif ($reflectionParameter->isDefaultValueAvailable()) {
                 $argument = $reflectionParameter->getDefaultValue();
-            } elseif (!$reflectionParameter->isOptional()) {
-
-                throw new \RuntimeException(sprintf('The form is missing data for argument "%s".', $name));
             }
 
             $reflectionType = $reflectionParameter->getType();
