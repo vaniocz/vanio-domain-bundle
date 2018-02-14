@@ -198,11 +198,7 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
      */
     public function match($specification, ResultModifier $resultModifier = null)
     {
-        list($specification, $resultModifier, $resultTransformers) = $this->mergeSpecifications(
-            $specification,
-            $resultModifier
-        );
-        $query = $this->getQuery($specification, $resultModifier);
+        $query = $this->getQuery($specification, $resultModifier, $resultTransformers);
 
         return $this->transformResult($query, $query->execute(), $resultTransformers);
     }
@@ -214,11 +210,7 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
      */
     public function matchSingleResult($specification, ResultModifier $resultModifier = null)
     {
-        list($specification, $resultModifier, $resultTransformers) = $this->mergeSpecifications(
-            $specification,
-            $resultModifier
-        );
-        $query = $this->getQuery($specification, $resultModifier);
+        $query = $this->getQuery($specification, $resultModifier, $resultTransformers);
 
         try {
             $result = $query->getSingleResult();
@@ -282,10 +274,15 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
     /**
      * @param Filter[]|QueryModifier[] $specification
      * @param ResultModifier|null $resultModifier
+     * @param ResultTransformer[] $resultTransformers
      * @return Query
      */
-    public function getQuery($specification, ResultModifier $resultModifier = null): Query
+    public function getQuery($specification, ResultModifier $resultModifier = null, &$resultTransformers = []): Query
     {
+        list($specification, $resultModifier, $resultTransformers) = $this->mergeSpecifications(
+            $specification,
+            $resultModifier
+        );
         $queryBuilder = $this->createQueryBuilder($this->getAlias());
 
         if ($specification instanceof QueryModifier) {
