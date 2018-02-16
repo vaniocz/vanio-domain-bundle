@@ -16,7 +16,7 @@ class Assertion extends BaseAssertion
      */
     public static function inArray($value, array $values, $message = null, $propertyPath = null): bool
     {
-        if (!in_array($value, $values, true)) {
+        if (!in_array($value, $values)) {
             $message = sprintf(
                 static::generateMessage($message ?: 'Value "%s" is not an element of the valid values: %s'),
                 static::stringify($value),
