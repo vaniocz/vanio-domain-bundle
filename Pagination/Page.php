@@ -45,11 +45,7 @@ class Page implements PageSpecification
 
     public function firstRecord(): int
     {
-        if ($this->pageNumber === 1) {
-            return 0;
-        } else {
-            return $this->lastRecord() - $this->recordsPerPage;
-        }
+        return $this->pageNumber === 1 ? 0 : $this->lastRecord() - $this->recordsPerPage
     }
 
     public function lastRecord(): int
