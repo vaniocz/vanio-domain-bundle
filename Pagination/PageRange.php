@@ -58,11 +58,7 @@ class PageRange implements PageSpecification
 
     public function firstRecord(): int
     {
-        if ($this->fromPage === 1) {
-            return 0;
-        } else {
-            return $this->recordsOnFirstPage + $this->recordsPerPage * ($this->fromPage - 2);
-        }
+        $this->fromPage === 1 ? 0 : $this->recordsOnFirstPage + $this->recordsPerPage * ($this->fromPage - 2);
     }
 
     public function lastRecord(): int
