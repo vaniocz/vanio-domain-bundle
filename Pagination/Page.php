@@ -13,15 +13,19 @@ class Page implements PageSpecification
     /** @var int */
     private $recordsPerPage;
 
-    public function __construct(int $pageNumber, int $recordsPerPage)
+    /** @var int */
+    private $recordsOnFirstPage;
+
+    public function __construct(int $pageNumber, int $recordsPerPage, ?int $recordsOnFirstPage = null)
     {
         $this->pageNumber = max($pageNumber, 1);
         $this->recordsPerPage = max($recordsPerPage, 1);
+        $this->recordsOnFirstPage = $recordsOnFirstPage ?? $recordsPerPage;
     }
 
-    public static function create(string $value, int $recordsPerPage): PageSpecification
+    public static function create(string $value, int $recordsPerPage, ?int $recordsOnFirstPage = null): PageSpecification
     {
-        return new self(ctype_digit($value) ? max((int) $value, 1) : 1, $recordsPerPage);
+        return new self(ctype_digit($value) ? max((int) $value, 1) : 1, $recordsPerPage, $recordsOnFirstPage);
     }
 
     public function pageNumber(): int
@@ -34,14 +38,28 @@ class Page implements PageSpecification
         return $this->recordsPerPage;
     }
 
+    public function recordsOnFirstPage(): int
+    {
+        return $this->recordsOnFirstPage;
+    }
+
     public function firstRecord(): int
     {
-        return $this->lastRecord() - $this->recordsPerPage;
+        if ($this->pageNumber === 1) {
+            return 0;
+        } else {
+            return $this->lastRecord() - $this->recordsPerPage;
+        }
     }
 
     public function lastRecord(): int
     {
-        return $this->pageNumber * $this->recordsPerPage;
+        return $this->pageNumber * $this->recordsPerPage + ($this->recordsOnFirstPage - $this->recordsPerPage);
+    }
+
+    public function maximalPage(int $recordsCount): int
+    {
+        return ceil(max($recordsCount - $this->recordsOnFirstPage, 0) / $this->recordsPerPage + 1);
     }
 
     /**
@@ -52,6 +70,6 @@ class Page implements PageSpecification
         Assertion::isInstanceOf($query, Query::class);
         $query
             ->setFirstResult($this->firstRecord())
-            ->setMaxResults($this->recordsPerPage);
+            ->setMaxResults($this->pageNumber === 1 ? $this->recordsOnFirstPage : $this->recordsPerPage);
     }
 }

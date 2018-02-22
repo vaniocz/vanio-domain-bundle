@@ -10,6 +10,7 @@ class PageParamConverter implements ParamConverterInterface
     const DEFAULT_OPTIONS = [
         'page_parameter' => 'page',
         'records_per_page' => 10,
+        'records_on_first_page' => null,
     ];
 
     /** @var array */
@@ -24,7 +25,11 @@ class PageParamConverter implements ParamConverterInterface
     {
         $options = $configuration->getOptions() + $this->options;
         $class = $configuration->getClass();
-        $page = $class::{'create'}($request->query->get($options['page_parameter'], '1'), $options['records_per_page']);
+        $page = $class::{'create'}(
+            $request->query->get($options['page_parameter'], '1'),
+            $options['records_per_page'],
+            $options['records_on_first_page']
+        );
         $request->attributes->set($configuration->getName(), $page);
 
         return true;
