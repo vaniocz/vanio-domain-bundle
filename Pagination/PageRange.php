@@ -19,7 +19,7 @@ class PageRange implements PageSpecification
     /** @var int */
     private $recordsOnFirstPage;
 
-    public function __construct(int $fromPage, int $toPage, int $recordsPerPage, ?int $recordsOnFirstPage = null)
+    public function __construct(int $fromPage, int $toPage, int $recordsPerPage, int $recordsOnFirstPage = null)
     {
         $this->fromPage = max($fromPage, 1);
         $this->toPage = max($toPage, $this->fromPage);
@@ -27,7 +27,7 @@ class PageRange implements PageSpecification
         $this->recordsOnFirstPage = $recordsOnFirstPage ?? $recordsPerPage;
     }
 
-    public static function create(string $value, int $recordsPerPage, ?int $recordsOnFirstPage = null): PageSpecification
+    public static function create(string $value, int $recordsPerPage, int $recordsOnFirstPage = null): PageSpecification
     {
         list($fromPage, $toPage) = explode('-', $value) + [null, null];
         $fromPage = ctype_digit($fromPage) ? (int) $fromPage : 1;
@@ -58,17 +58,12 @@ class PageRange implements PageSpecification
 
     public function firstRecord(): int
     {
-        return $this->fromPage === 1 ? 0 : $this->recordsOnFirstPage + $this->recordsPerPage * ($this->fromPage - 2);
+        return $this->fromPage === 1 ? 0 : ($this->fromPage - 2) * $this->recordsPerPage + $this->recordsOnFirstPage;
     }
 
     public function lastRecord(): int
     {
-        return $this->toPage * $this->recordsPerPage + ($this->recordsOnFirstPage - $this->recordsPerPage);
-    }
-
-    public function maximalPage(int $recordsCount): int
-    {
-        return ceil(max($recordsCount - $this->recordsOnFirstPage, 0) / $this->recordsPerPage + 1);
+        return $this->toPage * $this->recordsPerPage + $this->recordsOnFirstPage - $this->recordsPerPage;
     }
 
     /**

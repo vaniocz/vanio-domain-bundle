@@ -16,14 +16,14 @@ class Page implements PageSpecification
     /** @var int */
     private $recordsOnFirstPage;
 
-    public function __construct(int $pageNumber, int $recordsPerPage, ?int $recordsOnFirstPage = null)
+    public function __construct(int $pageNumber, int $recordsPerPage, int $recordsOnFirstPage = null)
     {
         $this->pageNumber = max($pageNumber, 1);
         $this->recordsPerPage = max($recordsPerPage, 1);
         $this->recordsOnFirstPage = $recordsOnFirstPage ?? $recordsPerPage;
     }
 
-    public static function create(string $value, int $recordsPerPage, ?int $recordsOnFirstPage = null): PageSpecification
+    public static function create(string $value, int $recordsPerPage, int $recordsOnFirstPage = null): PageSpecification
     {
         return new self(ctype_digit($value) ? max((int) $value, 1) : 1, $recordsPerPage, $recordsOnFirstPage);
     }
@@ -50,7 +50,7 @@ class Page implements PageSpecification
 
     public function lastRecord(): int
     {
-        return $this->pageNumber * $this->recordsPerPage + ($this->recordsOnFirstPage - $this->recordsPerPage);
+        return $this->pageNumber * $this->recordsPerPage + $this->recordsOnFirstPage - $this->recordsPerPage;
     }
 
     public function maximalPage(int $recordsCount): int
