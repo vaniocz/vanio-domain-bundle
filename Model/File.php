@@ -78,7 +78,7 @@ class File
 
     public function isImage(): bool
     {
-        return $this->isImage;
+        return $this->metaData['isImage'];
     }
 
     /**
@@ -120,16 +120,18 @@ class File
             'name' => $name,
             'mimeType' => MimeTypeGuesser::getInstance()->guess($this->file->getPathname()),
             'size' => $this->file->getSize(),
+            'isImage' => false,
         ];
 
         if (Strings::startsWith($this->metaData['mimeType'], 'image/')) {
             if ($this->metaData['mimeType'] === 'image/svg+xml') {
-                $this->isImage = true;
+                $this->metaData['isImage'] = true;
             } elseif ($metadata = @getimagesize($this->file)) {
                 $this->isImage = true;
                 $this->metaData['mimeType'] = $metadata['mime'];
                 $this->metaData['width'] = $metadata[0];
                 $this->metaData['height'] = $metadata[1];
+                $this->metaData['isImage'] = true;
             }
         }
     }
