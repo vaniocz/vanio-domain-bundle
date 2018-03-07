@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class ValueToEntityTransformer implements DataTransformerInterface
@@ -10,14 +11,17 @@ class ValueToEntityTransformer implements DataTransformerInterface
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var string */
-    private $class;
+    /** @var ClassMetadata */
+    private $classMetadata;
 
     /** @var string[] */
     private $properties;
 
     /** @var bool */
     private $isMultiple;
+
+    /** @var bool */
+    private $isPropertyIdentifier;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -26,9 +30,10 @@ class ValueToEntityTransformer implements DataTransformerInterface
         bool $isMultiple = false
     ) {
         $this->entityManager = $entityManager;
-        $this->class = $class;
+        $this->classMetadata = $entityManager->getClassMetadata($class);
         $this->properties = (array) $properties;
         $this->isMultiple = $isMultiple;
+        $this->isPropertyIdentifier = !array_diff($this->classMetadata->identifier, $this->properties);
     }
 
     /**
@@ -77,16 +82,14 @@ class ValueToEntityTransformer implements DataTransformerInterface
      */
     public function transformValueToEntity($value)
     {
-        $classMetadata = $this->entityManager->getClassMetadata($this->class);
-
-        if (!array_diff($classMetadata->identifier, $this->properties)) {
-            return $this->entityManager->getReference($this->class, $value);
+        if (!array_diff($this->classMetadata->identifier, $this->properties)) {
+            return $this->entityManager->getReference($this->classMetadata->name, $value);
         }
-        
+
         $criteria = count($this->properties) > 1 ? $value : [current($this->properties) => $value];
 
-        if (!$entity = $this->entityManager->getRepository($this->class)->findOneBy($criteria)) {
-            throw EntityNotFoundException::fromClassNameAndIdentifier($this->class, $criteria);
+        if (!$entity = $this->entityManager->getRepository($this->classMetadata->name)->findOneBy($criteria)) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier($this->classMetadata->name, $criteria);
         }
 
         return $entity;
@@ -98,15 +101,10 @@ class ValueToEntityTransformer implements DataTransformerInterface
      */
     public function transformEntityToValue($entity)
     {
-        $classMetadata = $this->entityManager->getClassMetadata($this->class);
         $values = [];
         
         foreach ($this->properties as $property) {
-            $values[$property] = $classMetadata->getFieldValue($entity, $property);
-        }
-
-        if (isset($classMetadata->identifierDiscriminatorField)) {
-            unset($values[$classMetadata->identifierDiscriminatorField]);
+            $values[$property] = $this->classMetadata->getFieldValue($entity, $property);
         }
 
         return count($values) > 1 ? $values : current($values);

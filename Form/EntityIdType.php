@@ -28,8 +28,14 @@ class EntityIdType extends AbstractType
         return function (Options $options) {
             /** @var EntityManager $entityManager */
             $entityManager = $options['em'];
+            $classMetadata = $entityManager->getClassMetadata($options['class']);
+            $property = $classMetadata->identifier;
 
-            return $entityManager->getClassMetadata($options['class'])->identifier;
+            if (isset($classMetadata->identifierDiscriminatorField)) {
+                $property = array_diff($property, (array) $classMetadata->identifierDiscriminatorField);
+            }
+
+            return $property;
         };
     }
 }
