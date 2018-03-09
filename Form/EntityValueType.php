@@ -14,7 +14,8 @@ class EntityValueType extends AbstractType
             $options['em'],
             $options['class'],
             (array) $options['property'],
-            $options['multiple']
+            $options['multiple'],
+            $options['query_builder']
         ));
     }
 
