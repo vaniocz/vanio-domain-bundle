@@ -28,19 +28,35 @@ class CurrentLocale implements QueryModifier
         return new self(true, $this->dqlAlias);
     }
 
+    public function dqlAlias(): ?string
+    {
+        return $this->dqlAlias;
+    }
+
+    public function translationsAlias(): string
+    {
+        return sprintf('%s__translations', $this->dqlAlias);
+    }
+
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
         if ($this->dqlAlias !== null) {
-            $this->dqlAlias = $dqlAlias;
+            $dqlAlias = $this->dqlAlias;
         }
 
+        $translationsAlias = $this->translationsAlias();
         $queryBuilder
-            ->leftJoin("$dqlAlias.translations", '__t', 'WITH', '__t.locale = :locale')
+            ->leftJoin(
+                "$dqlAlias.translations",
+                $translationsAlias,
+                'WITH',
+                "$translationsAlias.locale = :locale"
+            )
             ->setParameter('locale', $this->resolveCurrentLocale($queryBuilder))
-            ->addSelect('__t');
+            ->addSelect($translationsAlias);
 
         if (!$this->withUntranslated) {
-            $queryBuilder->where('__t.locale IS NOT NULL');
+            $queryBuilder->where("$translationsAlias.locale IS NOT NULL");
         }
     }
 
