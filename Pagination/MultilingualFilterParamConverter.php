@@ -5,6 +5,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Vanio\DomainBundle\Request\LocaleParamConverter;
+use Vanio\DomainBundle\Specification\Locale;
 
 class MultilingualFilterParamConverter implements ParamConverterInterface
 {
@@ -14,9 +15,10 @@ class MultilingualFilterParamConverter implements ParamConverterInterface
         $filter = $request->attributes->get($configuration->getName());
 
         (new LocaleParamConverter('filterLocale'))->apply($request, $configuration);
+        /** @var Locale $locale */
         $locale = $request->attributes->get($configuration->getName());
 
-        $multilingualFilter = new MultilingualFilter($filter, $locale->withUntranslated());
+        $multilingualFilter = new MultilingualFilter($filter, $locale->withIncludedUntranslated());
         $request->attributes->set($configuration->getName(), $multilingualFilter);
 
         return true;

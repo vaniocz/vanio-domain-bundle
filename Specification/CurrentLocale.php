@@ -7,41 +7,42 @@ use Vanio\DomainBundle\Translatable\TranslatableListener;
 
 class CurrentLocale implements QueryModifier
 {
-    /**
-     * @var bool
-     */
-    private $withUntranslated;
+    /** @var bool */
+    private $shouldIncludeUntranslated = false;
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(bool $withUntranslated = false, $dqlAlias = null)
+    public function __construct(string $dqlAlias = null)
     {
-        $this->withUntranslated = $withUntranslated;
         $this->dqlAlias = $dqlAlias;
     }
 
-    public function withUntranslated(): self
+    public static function includeUntranslated(string $dqlAlias = null): self
     {
-        return new self(true, $this->dqlAlias);
+        $self = new self($dqlAlias);
+        $self->shouldIncludeUntranslated = true;
+
+        return $self;
     }
 
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
         if ($this->dqlAlias !== null) {
-            $this->dqlAlias = $dqlAlias;
+            $dqlAlias = $this->dqlAlias;
         }
 
+        $joinMethod = $this->shouldIncludeUntranslated ? 'leftJoin' : 'innerJoin';
+        $translationsDqlAlias = sprintf('%s_translations', $dqlAlias);
         $queryBuilder
-            ->leftJoin("$dqlAlias.translations", '__t', 'WITH', '__t.locale = :locale')
-            ->setParameter('locale', $this->resolveCurrentLocale($queryBuilder))
-            ->addSelect('__t');
-
-        if (!$this->withUntranslated) {
-            $queryBuilder->where('__t.locale IS NOT NULL');
-        }
+            ->addSelect($translationsDqlAlias)
+            ->setParameter('_current_locale', $this->resolveCurrentLocale($queryBuilder))
+            ->$joinMethod(
+                sprintf('%s.translations', $dqlAlias),
+                $translationsDqlAlias,
+                'WITH',
+                sprintf('%s.locale = :_current_locale', $translationsDqlAlias)
+            );
     }
 
     private function resolveCurrentLocale(QueryBuilder $queryBuilder): string

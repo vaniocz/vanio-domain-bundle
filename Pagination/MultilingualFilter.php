@@ -1,24 +1,22 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
-use Happyr\DoctrineSpecification\Filter\Filter as FilterSpecification;
-use Happyr\DoctrineSpecification\Result\ResultModifier;
-use Vanio\DomainBundle\Specification\Locale;
+use Happyr\DoctrineSpecification\BaseSpecification;
+use Happyr\DoctrineSpecification\Logic\AndX;
+use Vanio\DomainBundle\Specification\WithTranslations;
 
-class MultilingualFilter implements FilterSpecification, ResultModifier
+class MultilingualFilter extends BaseSpecification
 {
     /** @var Filter */
     private $filter;
 
-    /** @var Locale */
+    /** @var string */
     private $locale;
 
     /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(Filter $filter, Locale $locale, string $dqlAlias = null)
+    public function __construct(Filter $filter, string $locale, string $dqlAlias = null)
     {
         $this->filter = $filter;
         $this->locale = $locale;
@@ -30,7 +28,7 @@ class MultilingualFilter implements FilterSpecification, ResultModifier
         return $this->filter;
     }
 
-    public function locale(): Locale
+    public function locale(): string
     {
         return $this->locale;
     }
@@ -45,14 +43,8 @@ class MultilingualFilter implements FilterSpecification, ResultModifier
         return $this->filter()->page();
     }
 
-    public function getFilter(QueryBuilder $qb, $dqlAlias)
+    public function getSpec(): AndX
     {
-        $this->locale()->modify($qb, $this->dqlAlias ?: $dqlAlias);
-        $this->filter()->getFilter($qb, $this->dqlAlias ?: $dqlAlias);
-    }
-
-    public function modify(AbstractQuery $query)
-    {
-        $this->filter()->modify($query);
+        return new AndX(new WithTranslations($this->locale), $this->filter);
     }
 }
