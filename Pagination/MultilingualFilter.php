@@ -1,22 +1,25 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Happyr\DoctrineSpecification\BaseSpecification;
-use Happyr\DoctrineSpecification\Logic\AndX;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
+use Happyr\DoctrineSpecification\Filter\Filter as FilterSpecification;
+use Happyr\DoctrineSpecification\Result\ResultModifier;
+use Vanio\DomainBundle\Specification\Locale;
 use Vanio\DomainBundle\Specification\WithTranslations;
 
-class MultilingualFilter extends BaseSpecification
+class MultilingualFilter implements FilterSpecification, ResultModifier
 {
     /** @var Filter */
     private $filter;
 
-    /** @var string */
+    /** @var Locale */
     private $locale;
 
     /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(Filter $filter, string $locale, string $dqlAlias = null)
+    public function __construct(Filter $filter, Locale $locale, string $dqlAlias = null)
     {
         $this->filter = $filter;
         $this->locale = $locale;
@@ -28,7 +31,7 @@ class MultilingualFilter extends BaseSpecification
         return $this->filter;
     }
 
-    public function locale(): string
+    public function locale(): Locale
     {
         return $this->locale;
     }
@@ -43,8 +46,20 @@ class MultilingualFilter extends BaseSpecification
         return $this->filter()->page();
     }
 
-    public function getSpec(): AndX
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $dqlAlias
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+     */
+    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        return new AndX(new WithTranslations($this->locale), $this->filter);
+        $this->locale()->modify($queryBuilder, $this->dqlAlias ?? $dqlAlias);
+        (new WithTranslations)->modify($queryBuilder, $this->dqlAlias ?? $dqlAlias);
+        $this->filter()->getFilter($queryBuilder, $this->dqlAlias ?? $dqlAlias);
+    }
+
+    public function modify(AbstractQuery $query)
+    {
+        $this->filter()->modify($query);
     }
 }

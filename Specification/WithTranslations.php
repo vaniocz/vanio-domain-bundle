@@ -61,15 +61,21 @@ class WithTranslations implements QueryModifier
         $this->entityManager = $queryBuilder->getEntityManager();
         $this->isLocalesParameterSet = false;
         $dqlAliasClasses = $this->resolveDqlAliasClasses();
+        $selectedDqlAliases = [];
 
+        /** @var Select $select */
         foreach ($this->queryBuilder->getDQLPart('select') as $select) {
-            /** @var Select $select */
-
             foreach ($select->getParts() as $part) {
-                if ($class = $dqlAliasClasses[$part] ?? null) {
-                    if (is_a($class, Translatable::class, true)) {
-                        $this->joinTranslations($part);
-                    }
+                $selectedDqlAliases[$part] = $part;
+            }
+        }
+
+        foreach ($selectedDqlAliases as $selectedDqlAlias) {
+            if ($class = $dqlAliasClasses[$selectedDqlAlias] ?? null) {
+                $translationsDqlAlias = sprintf('%s_translations', $selectedDqlAlias);
+
+                if (!isset($selectedDqlAliases[$translationsDqlAlias]) && is_a($class, Translatable::class, true)) {
+                    $this->joinTranslations(sprintf('%s.translations', $selectedDqlAlias), $translationsDqlAlias);
                 }
             }
         }
@@ -82,14 +88,14 @@ class WithTranslations implements QueryModifier
     {
         $dqlAliasClasses = [];
 
+        /** @var From $from */
         foreach ($this->queryBuilder->getDQLPart('from') as $from) {
-            /** @var From $from */
             $dqlAliasClasses[$from->getAlias()] = $from->getFrom();
         }
 
         foreach ($this->queryBuilder->getDQLPart('join') as $joins) {
+            /** @var Join $join */
             foreach ($joins as $join) {
-                /** @var Join $join */
                 list($dqlAlias, $association) = explode('.', $join->getJoin(), 2) + [null, null];
 
                 if ($association) {
@@ -104,14 +110,12 @@ class WithTranslations implements QueryModifier
         return $dqlAliasClasses;
     }
 
-    private function joinTranslations(string $dqlAlias)
+    private function joinTranslations(string $join, string $dqlAlias)
     {
         $joinMethod = $this->shouldIncludeUntranslated ? 'leftJoin' : 'innerJoin';
-        $join = sprintf('%s.translations', $dqlAlias);
-        $translationsDqlAlias = sprintf('%s_translations', $dqlAlias);
 
         if ($this->locale === false) {
-            $this->queryBuilder->$joinMethod($join, $translationsDqlAlias);
+            $this->queryBuilder->$joinMethod($join, $dqlAlias);
         } else {
             if (!$this->isLocalesParameterSet) {
                 $this->queryBuilder->setParameter('_with_translations_locales', $this->resolveLocales());
@@ -120,13 +124,13 @@ class WithTranslations implements QueryModifier
 
             $this->queryBuilder->$joinMethod(
                 $join,
-                $translationsDqlAlias,
+                $dqlAlias,
                 'WITH',
-                sprintf('%s.locale IN (:_with_translations_locales)', $translationsDqlAlias)
+                sprintf('%s.locale IN (:_with_translations_locales)', $dqlAlias)
             );
         }
 
-        $this->queryBuilder->addSelect($translationsDqlAlias);
+        $this->queryBuilder->addSelect($dqlAlias);
     }
 
     /**
