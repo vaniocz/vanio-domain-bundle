@@ -75,7 +75,7 @@ class WithTranslations implements QueryModifier
                 $translationsDqlAlias = sprintf('%s_translations', $selectedDqlAlias);
 
                 if (!isset($selectedDqlAliases[$translationsDqlAlias]) && is_a($class, Translatable::class, true)) {
-                    $this->joinTranslations(sprintf('%s.translations', $selectedDqlAlias), $translationsDqlAlias);
+                    $this->joinTranslations($class, $selectedDqlAlias, $translationsDqlAlias);
                 }
             }
         }
@@ -110,16 +110,21 @@ class WithTranslations implements QueryModifier
         return $dqlAliasClasses;
     }
 
-    private function joinTranslations(string $join, string $dqlAlias)
-    {
+    private function joinTranslations(
+        string $translatableClass,
+        string $translatableDqlAlias,
+        string $translationsDqlAlias
+    ) {
+        $join = sprintf('%s.translations', $translatableDqlAlias);
+
         if ($this->locale === false) {
-            $this->queryBuilder->leftJoin($join, $dqlAlias);
+            $this->queryBuilder->leftJoin($join, $translationsDqlAlias);
         } else {
             $this->queryBuilder->leftJoin(
                 $join,
-                $dqlAlias,
+                $translationsDqlAlias,
                 'WITH',
-                sprintf('%s.locale IN (:_with_translations_locales)', $dqlAlias)
+                sprintf('%s.locale IN (:_with_translations_locales)', $translationsDqlAlias)
             );
 
             if (!$this->isLocalesParameterSet) {
@@ -128,10 +133,21 @@ class WithTranslations implements QueryModifier
             }
         }
 
-        $this->queryBuilder->addSelect($dqlAlias);
+        $this->queryBuilder->addSelect($translationsDqlAlias);
 
         if (!$this->shouldIncludeUntranslated) {
-            $this->queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $dqlAlias));
+            $classMetadata = $this->entityManager->getClassMetadata($translatableClass);
+            $conditions = [];
+
+            foreach ($classMetadata->identifier as $id) {
+                $conditions[] = sprintf('%s.%s IS NULL', $translatableDqlAlias, $id);
+            }
+
+            $this->queryBuilder->andWhere(sprintf(
+                '(%s) OR %s.locale IS NOT NULL',
+                implode(' AND ', $conditions),
+                $translationsDqlAlias
+            ));
         }
     }
 
