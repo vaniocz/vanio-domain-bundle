@@ -48,17 +48,20 @@ class Locale implements QueryModifier
             $dqlAlias = $this->dqlAlias;
         }
 
-        $joinMethod = $this->shouldIncludeUntranslated ? 'leftJoin' : 'innerJoin';
         $translationsDqlAlias = sprintf('%s_translations', $dqlAlias);
         $queryBuilder
-            ->addSelect($translationsDqlAlias)
-            ->setParameter('_locale', $this->locale)
-            ->$joinMethod(
+            ->leftJoin(
                 sprintf('%s.translations', $dqlAlias),
                 $translationsDqlAlias,
                 'WITH',
                 sprintf('%s.locale = :_locale', $translationsDqlAlias)
-            );
+            )
+            ->addSelect($translationsDqlAlias)
+            ->setParameter('_locale', $this->locale);
+
+        if (!$this->shouldIncludeUntranslated) {
+            $queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $translationsDqlAlias));
+        }
     }
 
     public function __toString(): string

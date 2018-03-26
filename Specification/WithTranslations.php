@@ -112,25 +112,27 @@ class WithTranslations implements QueryModifier
 
     private function joinTranslations(string $join, string $dqlAlias)
     {
-        $joinMethod = $this->shouldIncludeUntranslated ? 'leftJoin' : 'innerJoin';
-
         if ($this->locale === false) {
-            $this->queryBuilder->$joinMethod($join, $dqlAlias);
+            $this->queryBuilder->leftJoin($join, $dqlAlias);
         } else {
-            if (!$this->isLocalesParameterSet) {
-                $this->queryBuilder->setParameter('_with_translations_locales', $this->resolveLocales());
-                $this->isLocalesParameterSet = true;
-            }
-
-            $this->queryBuilder->$joinMethod(
+            $this->queryBuilder->leftJoin(
                 $join,
                 $dqlAlias,
                 'WITH',
                 sprintf('%s.locale IN (:_with_translations_locales)', $dqlAlias)
             );
+
+            if (!$this->isLocalesParameterSet) {
+                $this->queryBuilder->setParameter('_with_translations_locales', $this->resolveLocales());
+                $this->isLocalesParameterSet = true;
+            }
         }
 
         $this->queryBuilder->addSelect($dqlAlias);
+
+        if (!$this->shouldIncludeUntranslated) {
+            $this->queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $dqlAlias));
+        }
     }
 
     /**
