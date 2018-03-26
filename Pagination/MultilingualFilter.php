@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Filter\Filter as FilterSpecification;
 use Happyr\DoctrineSpecification\Result\ResultModifier;
 use Vanio\DomainBundle\Specification\Locale;
+use Vanio\DomainBundle\Specification\WithTranslations;
 
 class MultilingualFilter implements FilterSpecification, ResultModifier
 {
@@ -45,10 +46,16 @@ class MultilingualFilter implements FilterSpecification, ResultModifier
         return $this->filter()->page();
     }
 
-    public function getFilter(QueryBuilder $qb, $dqlAlias)
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $dqlAlias
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+     */
+    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        $this->locale()->modify($qb, $this->dqlAlias ?: $dqlAlias);
-        $this->filter()->getFilter($qb, $this->dqlAlias ?: $dqlAlias);
+        $this->locale()->modify($queryBuilder, $this->dqlAlias ?? $dqlAlias);
+        (new WithTranslations)->modify($queryBuilder, $this->dqlAlias ?? $dqlAlias);
+        $this->filter()->getFilter($queryBuilder, $this->dqlAlias ?? $dqlAlias);
     }
 
     public function modify(AbstractQuery $query)
