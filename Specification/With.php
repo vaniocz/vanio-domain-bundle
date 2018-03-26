@@ -34,7 +34,7 @@ class With implements QueryModifier
         $this->condition = $condition;
     }
 
-    public static function withAllowedNull(
+    public static function allowNull(
         string $field,
         string $newAlias,
         string $dqlAlias = null,
