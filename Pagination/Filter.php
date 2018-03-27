@@ -1,12 +1,10 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
-use Happyr\DoctrineSpecification\Filter\Filter as FilterSpecification;
-use Happyr\DoctrineSpecification\Result\ResultModifier;
+use Happyr\DoctrineSpecification\BaseSpecification;
+use Happyr\DoctrineSpecification\Logic\AndX;
 
-class Filter implements FilterSpecification, ResultModifier
+class Filter extends BaseSpecification
 {
     /** @var OrderBy */
     private $orderBy;
@@ -14,14 +12,11 @@ class Filter implements FilterSpecification, ResultModifier
     /** @var PageSpecification */
     private $page;
 
-    /** @var string|null */
-    private $dqlAlias;
-
     public function __construct(OrderBy $orderBy, PageSpecification $page, string $dqlAlias = null)
     {
+        parent::__construct($dqlAlias);
         $this->orderBy = $orderBy;
         $this->page = $page;
-        $this->dqlAlias = $dqlAlias;
     }
 
     public function orderBy(): OrderBy
@@ -34,18 +29,8 @@ class Filter implements FilterSpecification, ResultModifier
         return $this->page;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string $dqlAlias
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
-     */
-    public function getFilter(QueryBuilder $queryBuilder, $dqlAlias)
+    public function getSpec(): AndX
     {
-        $this->orderBy()->modify($queryBuilder, $this->dqlAlias ?: $dqlAlias);
-    }
-
-    public function modify(AbstractQuery $query)
-    {
-        $this->page->modify($query);
+        return new AndX($this->orderBy, $this->page);
     }
 }

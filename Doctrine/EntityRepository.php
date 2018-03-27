@@ -296,10 +296,7 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
         }
 
         $query = $queryBuilder->getQuery();
-
-        if ($resultModifier) {
-            $resultModifier->modify($query);
-        }
+        $resultModifier->modify($query);
 
         return $query;
     }
@@ -359,7 +356,6 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
     {
         $specifications = is_array($specifications) ? $specifications : [$specifications];
         $and = new AndX;
-        $resultModifiers = [];
         $resultTransformers = [];
 
         foreach ($specifications as $specification) {
@@ -367,24 +363,22 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
                 $and->andX($specification);
             }
 
-            if ($specification instanceof ResultModifier) {
-                $resultModifiers[] = $specification;
-            }
-
             if ($specification instanceof ResultTransformer) {
                 $resultTransformers[] = $specification;
             }
         }
 
+        $resultModifier = new ResultModifierChain($and);
+
         if ($modifier instanceof ResultModifier) {
-            $resultModifiers[] = $modifier;
+            $resultModifier->append($modifier);
         }
 
         if ($modifier instanceof ResultTransformer) {
             $resultTransformers[] = $modifier;
         }
 
-        return [$and, new ResultModifierChain($resultModifiers), $resultTransformers];
+        return [$and, $resultModifier, $resultTransformers];
     }
 
     /**

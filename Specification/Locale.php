@@ -30,6 +30,14 @@ class Locale implements QueryModifier
         return $self;
     }
 
+    public function withIncludedUntranslated(): self
+    {
+        $self = new self($this->locale, $this->dqlAlias);
+        $self->shouldIncludeUntranslated = true;
+
+        return $self;
+    }
+
     public function locale(): string
     {
         return $this->locale;
@@ -41,14 +49,6 @@ class Locale implements QueryModifier
     public function dqlAlias()
     {
         return $this->dqlAlias;
-    }
-
-    public function withIncludedUntranslated(): self
-    {
-        $self = new self($this->locale, $this->dqlAlias);
-        $self->shouldIncludeUntranslated = true;
-
-        return $self;
     }
 
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
