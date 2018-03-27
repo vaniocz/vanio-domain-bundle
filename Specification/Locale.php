@@ -51,6 +51,11 @@ class Locale implements QueryModifier
         return $this->dqlAlias;
     }
 
+    public function withDqlAlias(string $dqlAlias = null): self
+    {
+        return new self($this->locale, $dqlAlias);
+    }
+
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
         if ($this->dqlAlias !== null) {

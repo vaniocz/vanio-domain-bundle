@@ -21,7 +21,7 @@ class MultilingualFilter extends BaseSpecification
     {
         parent::__construct($dqlAlias);
         $this->filter = $filter;
-        $this->locale = $locale;
+        $this->locale = $locale->withDqlAlias($dqlAlias);
         $this->dqlAlias = $dqlAlias;
     }
 
@@ -51,6 +51,11 @@ class MultilingualFilter extends BaseSpecification
     public function dqlAlias()
     {
         return $this->dqlAlias;
+    }
+
+    public function withDqlAlias(string $dqlAlias = null): self
+    {
+        return new self($this->filter, $this->locale, $dqlAlias);
     }
 
     public function getSpec(): AndX

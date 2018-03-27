@@ -1,8 +1,6 @@
 <?php
 namespace Vanio\DomainBundle\Specification;
 
-use Doctrine\ORM\Query\Expr\From;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
 use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
@@ -27,6 +25,19 @@ class CurrentLocale implements QueryModifier
         $self->shouldIncludeUntranslated = true;
 
         return $self;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function dqlAlias()
+    {
+        return $this->dqlAlias;
+    }
+
+    public function withDqlAlias(string $dqlAlias = null): self
+    {
+        return new self($dqlAlias);
     }
 
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)

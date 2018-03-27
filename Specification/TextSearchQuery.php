@@ -33,12 +33,12 @@ class TextSearchQuery extends TextSearchSpecification implements Filter
      */
     public function getFilter(QueryBuilder $queryBuilder, $dqlAlias): string
     {
+        if ($this->dqlAlias !== null) {
+            $dqlAlias = $this->dqlAlias;
+        }
+
         $queryBuilder->setParameter('_searchQuery', $this->processSearchTerm($this->searchTerm));
 
-        return sprintf(
-            'TSQUERY(%s.%s, :_searchQuery) = true',
-            $this->dqlAlias ?? $dqlAlias,
-            $this->searchDocumentField
-        );
+        return sprintf('tsquery(%s.%s, :_searchQuery) = true', $dqlAlias, $this->searchDocumentField);
     }
 }
