@@ -1,8 +1,11 @@
 <?php
 namespace Vanio\DomainBundle\Specification;
 
+use Doctrine\ORM\Query\Expr\From;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
+use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
 use Vanio\DomainBundle\Translatable\TranslatableListener;
 
 class CurrentLocale implements QueryModifier
@@ -44,6 +47,20 @@ class CurrentLocale implements QueryModifier
             ->setParameter('_current_locale', $this->resolveCurrentLocale($queryBuilder));
 
         if (!$this->shouldIncludeUntranslated) {
+            $class = QueryBuilderUtility::resolveDqlAliasClasses($queryBuilder)[$dqlAlias];
+            $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($class);
+            $conditions = [];
+
+            foreach ($classMetadata->identifier as $property) {
+                $conditions[] = sprintf('%s.%s IS NULL', $dqlAlias, $property);
+            }
+
+            $queryBuilder->andWhere(sprintf(
+                '(%s) OR %s.locale IS NOT NULL',
+                implode(' AND ', $conditions),
+                $translationsDqlAlias
+            ));
+
             $queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $translationsDqlAlias));
         }
     }

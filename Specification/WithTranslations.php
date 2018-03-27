@@ -1,12 +1,10 @@
 <?php
 namespace Vanio\DomainBundle\Specification;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr\From;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
+use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
 use Vanio\DomainBundle\Translatable\Translatable;
 use Vanio\DomainBundle\Translatable\TranslatableListener;
 
@@ -23,9 +21,6 @@ class WithTranslations implements QueryModifier
 
     /** @var QueryBuilder */
     private $queryBuilder;
-
-    /** @var EntityManager */
-    private $entityManager;
 
     /** @var TranslatableListener|null */
     private $translatableListener;
@@ -58,9 +53,8 @@ class WithTranslations implements QueryModifier
     public function modify(QueryBuilder $queryBuilder, $dqlAlias = null)
     {
         $this->queryBuilder = $queryBuilder;
-        $this->entityManager = $queryBuilder->getEntityManager();
         $this->isLocalesParameterSet = false;
-        $dqlAliasClasses = $this->resolveDqlAliasClasses();
+        $dqlAliasClasses = QueryBuilderUtility::resolveDqlAliasClasses($queryBuilder);
         $selectedDqlAliases = [];
 
         /** @var Select $select */
@@ -79,35 +73,6 @@ class WithTranslations implements QueryModifier
                 }
             }
         }
-    }
-
-    /**
-     * @return string[]
-     */
-    private function resolveDqlAliasClasses(): array
-    {
-        $dqlAliasClasses = [];
-
-        /** @var From $from */
-        foreach ($this->queryBuilder->getDQLPart('from') as $from) {
-            $dqlAliasClasses[$from->getAlias()] = $from->getFrom();
-        }
-
-        foreach ($this->queryBuilder->getDQLPart('join') as $joins) {
-            /** @var Join $join */
-            foreach ($joins as $join) {
-                list($dqlAlias, $association) = explode('.', $join->getJoin(), 2) + [null, null];
-
-                if ($association) {
-                    $classMetadata = $this->entityManager->getClassMetadata($dqlAliasClasses[$dqlAlias]);
-                    $dqlAliasClasses[$join->getAlias()] = $classMetadata->getAssociationTargetClass($association);
-                } else {
-                    $dqlAliasClasses[$join->getAlias()] = $join->getJoin();
-                }
-            }
-        }
-
-        return $dqlAliasClasses;
     }
 
     private function joinTranslations(
@@ -136,11 +101,11 @@ class WithTranslations implements QueryModifier
         $this->queryBuilder->addSelect($translationsDqlAlias);
 
         if (!$this->shouldIncludeUntranslated) {
-            $classMetadata = $this->entityManager->getClassMetadata($translatableClass);
+            $classMetadata = $this->queryBuilder->getEntityManager()->getClassMetadata($translatableClass);
             $conditions = [];
 
-            foreach ($classMetadata->identifier as $id) {
-                $conditions[] = sprintf('%s.%s IS NULL', $translatableDqlAlias, $id);
+            foreach ($classMetadata->identifier as $property) {
+                $conditions[] = sprintf('%s.%s IS NULL', $translatableDqlAlias, $property);
             }
 
             $this->queryBuilder->andWhere(sprintf(
@@ -176,7 +141,7 @@ class WithTranslations implements QueryModifier
     private function translatableListener(): TranslatableListener
     {
         if ($this->translatableListener === null) {
-            foreach ($this->entityManager->getEventManager()->getListeners() as $listeners) {
+            foreach ($this->queryBuilder->getEntityManager()->getEventManager()->getListeners() as $listeners) {
                 foreach ($listeners as $listener) {
                     if ($listener instanceof TranslatableListener) {
                         $this->translatableListener = $listener;

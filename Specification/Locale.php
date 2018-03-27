@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Specification;
 
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
+use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
 
 class Locale implements QueryModifier
 {
@@ -68,6 +69,20 @@ class Locale implements QueryModifier
             ->setParameter('_locale', $this->locale);
 
         if (!$this->shouldIncludeUntranslated) {
+            $class = QueryBuilderUtility::resolveDqlAliasClasses($queryBuilder)[$dqlAlias];
+            $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($class);
+            $conditions = [];
+
+            foreach ($classMetadata->identifier as $property) {
+                $conditions[] = sprintf('%s.%s IS NULL', $dqlAlias, $property);
+            }
+
+            $queryBuilder->andWhere(sprintf(
+                '(%s) OR %s.locale IS NOT NULL',
+                implode(' AND ', $conditions),
+                $translationsDqlAlias
+            ));
+
             $queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $translationsDqlAlias));
         }
     }
