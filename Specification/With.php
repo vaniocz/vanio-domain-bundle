@@ -10,7 +10,7 @@ class With implements QueryModifier
     private $field;
 
     /** @var string */
-    private $newAlias;
+    private $joinDqlAlias;
 
     /** @var string|null */
     private $dqlAlias;
@@ -23,13 +23,13 @@ class With implements QueryModifier
 
     /**
      * @param string $field
-     * @param string $newAlias
+     * @param string $joinAlias
      * @param string $dqlAlias
      */
-    public function __construct(string $field, string $newAlias, string $dqlAlias = null, string $condition = null)
+    public function __construct(string $field, string $joinAlias, string $dqlAlias = null, string $condition = null)
     {
         $this->field = $field;
-        $this->newAlias = $newAlias;
+        $this->joinDqlAlias = $joinAlias;
         $this->dqlAlias = $dqlAlias;
         $this->condition = $condition;
     }
@@ -54,10 +54,10 @@ class With implements QueryModifier
     {
         $joinMethod = $this->isNullAllowed ? 'leftJoin' : 'innerJoin';
         $queryBuilder
-            ->addSelect($this->newAlias)
+            ->addSelect($this->joinDqlAlias)
             ->$joinMethod(
                 sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, $this->field),
-                $this->newAlias,
+                $this->joinDqlAlias,
                 'WITH',
                 $this->condition
             );

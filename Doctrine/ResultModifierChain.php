@@ -38,6 +38,9 @@ class ResultModifierChain implements ResultModifier
     {
         if ($specification instanceof ResultModifier) {
             return [$specification];
+        } elseif ($specification instanceof Specification) {
+            /** @noinspection PhpInternalEntityUsedInspection */
+            return $this->resolveResultModifiers($specification->buildSpecification('e'));
         } elseif ($specification instanceof BaseSpecification) {
             return $this->resolveResultModifiers($this->getBaseSpecificationSpec($specification));
         }

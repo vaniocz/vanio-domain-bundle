@@ -1,12 +1,12 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Happyr\DoctrineSpecification\BaseSpecification;
 use Happyr\DoctrineSpecification\Logic\AndX;
+use Vanio\DomainBundle\Doctrine\Specification;
 use Vanio\DomainBundle\Specification\Locale;
 use Vanio\DomainBundle\Specification\WithTranslations;
 
-class MultilingualFilter extends BaseSpecification
+class MultilingualFilter extends Specification
 {
     /** @var Filter */
     private $filter;
@@ -14,12 +14,8 @@ class MultilingualFilter extends BaseSpecification
     /** @var Locale */
     private $locale;
 
-    /** @var string|null */
-    private $dqlAlias;
-
     public function __construct(Filter $filter, Locale $locale, string $dqlAlias = null)
     {
-        parent::__construct($dqlAlias);
         $this->filter = $filter;
         $this->locale = $locale->withDqlAlias($dqlAlias);
         $this->dqlAlias = $dqlAlias;
@@ -58,7 +54,7 @@ class MultilingualFilter extends BaseSpecification
         return new self($this->filter, $this->locale, $dqlAlias);
     }
 
-    public function getSpec(): AndX
+    public function buildSpecification(string $dqlAlias): AndX
     {
         return new AndX($this->locale, new WithTranslations, $this->filter);
     }

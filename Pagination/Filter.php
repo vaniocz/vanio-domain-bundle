@@ -1,10 +1,10 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Happyr\DoctrineSpecification\BaseSpecification;
 use Happyr\DoctrineSpecification\Logic\AndX;
+use Vanio\DomainBundle\Doctrine\Specification;
 
-class Filter extends BaseSpecification
+class Filter extends Specification
 {
     /** @var OrderBy */
     private $orderBy;
@@ -14,9 +14,9 @@ class Filter extends BaseSpecification
 
     public function __construct(OrderBy $orderBy, PageSpecification $page, string $dqlAlias = null)
     {
-        parent::__construct($dqlAlias);
         $this->orderBy = $orderBy;
         $this->page = $page;
+        $this->dqlAlias = $dqlAlias;
     }
 
     public function orderBy(): OrderBy
@@ -29,7 +29,7 @@ class Filter extends BaseSpecification
         return $this->page;
     }
 
-    public function getSpec(): AndX
+    public function buildSpecification(string $dqlAlias): AndX
     {
         return new AndX($this->orderBy, $this->page);
     }
