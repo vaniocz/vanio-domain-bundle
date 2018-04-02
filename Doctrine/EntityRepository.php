@@ -357,21 +357,23 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
         $specifications = is_array($specifications) ? $specifications : [$specifications];
         $and = new AndX;
         $resultTransformers = [];
+        $resultModifier = new ResultModifierChain;
+
+        if ($modifier) {
+            $resultModifier->append($modifier);
+        }
 
         foreach ($specifications as $specification) {
             if ($specification instanceof Filter || $specification instanceof QueryModifier) {
                 $and->andX($specification);
+                $resultModifier->append($specification);
+            } elseif ($specification instanceof ResultModifier) {
+                $resultModifier->append($specification);
             }
 
             if ($specification instanceof ResultTransformer) {
                 $resultTransformers[] = $specification;
             }
-        }
-
-        $resultModifier = new ResultModifierChain($and);
-
-        if ($modifier instanceof ResultModifier) {
-            $resultModifier->append($modifier);
         }
 
         if ($modifier instanceof ResultTransformer) {

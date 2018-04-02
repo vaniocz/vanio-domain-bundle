@@ -13,9 +13,9 @@ class ResultModifierChain implements ResultModifier
     /** @var AndX */
     private $specification;
 
-    public function __construct(AndX $specification = null)
+    public function __construct(array $specifications = [])
     {
-        $this->specification = $specification ?: new AndX;
+        $this->specification = new AndX(...$specifications);
     }
 
     public function append($specification)
