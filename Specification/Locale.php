@@ -3,12 +3,15 @@ namespace Vanio\DomainBundle\Specification;
 
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
-use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
+use Vanio\DomainBundle\Translatable\TranslatableQueryBuilderUtility;
 
 class Locale implements QueryModifier
 {
     /** @var string */
     private $locale;
+
+    /** @var string|bool|null */
+    private $fallbackLocale;
 
     /** @var bool */
     private $shouldIncludeUntranslated = false;
@@ -16,23 +19,27 @@ class Locale implements QueryModifier
     /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(string $locale, string $dqlAlias = null)
+    /**
+     * @param string $locale
+     * @param string|bool|null $fallbackLocale
+     * @param string|null $dqlAlias
+     */
+    public function __construct(string $locale, $fallbackLocale = null, string $dqlAlias = null)
     {
         $this->locale = $locale;
+        $this->fallbackLocale = $fallbackLocale;
         $this->dqlAlias = $dqlAlias;
     }
 
-    public static function includeUntranslated(string $locale, string $dqlAlias = null): self
+    /**
+     * @param string $locale
+     * @param string|bool|null $fallbackLocale
+     * @param string|null $dqlAlias
+     * @return $this
+     */
+    public static function includeUntranslated(string $locale, $fallbackLocale = null, string $dqlAlias = null): self
     {
-        $self = new self($locale, $dqlAlias);
-        $self->shouldIncludeUntranslated = true;
-
-        return $self;
-    }
-
-    public function withIncludedUntranslated(): self
-    {
-        $self = new self($this->locale, $this->dqlAlias);
+        $self = new self($locale, $fallbackLocale, $dqlAlias);
         $self->shouldIncludeUntranslated = true;
 
         return $self;
@@ -51,6 +58,14 @@ class Locale implements QueryModifier
         return $this->dqlAlias;
     }
 
+    public function withIncludedUntranslated(): self
+    {
+        $self = new self($this->locale, $this->fallbackLocale, $this->dqlAlias);
+        $self->shouldIncludeUntranslated = true;
+
+        return $self;
+    }
+
     public function withDqlAlias(string $dqlAlias = null): self
     {
         return new self($this->locale, $dqlAlias);
@@ -58,38 +73,13 @@ class Locale implements QueryModifier
 
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        if ($this->dqlAlias !== null) {
-            $dqlAlias = $this->dqlAlias;
-        }
-
-        $translationsDqlAlias = sprintf('%s_translations', $dqlAlias);
-        $queryBuilder
-            ->leftJoin(
-                sprintf('%s.translations', $dqlAlias),
-                $translationsDqlAlias,
-                'WITH',
-                sprintf('%s.locale = :_locale', $translationsDqlAlias)
-            )
-            ->addSelect($translationsDqlAlias)
-            ->setParameter('_locale', $this->locale);
-
-        if (!$this->shouldIncludeUntranslated) {
-            $class = QueryBuilderUtility::resolveDqlAliasClasses($queryBuilder)[$dqlAlias];
-            $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($class);
-            $conditions = [];
-
-            foreach ($classMetadata->identifier as $property) {
-                $conditions[] = sprintf('%s.%s IS NULL', $dqlAlias, $property);
-            }
-
-            $queryBuilder->andWhere(sprintf(
-                '(%s) OR %s.locale IS NOT NULL',
-                implode(' AND ', $conditions),
-                $translationsDqlAlias
-            ));
-
-            $queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $translationsDqlAlias));
-        }
+        TranslatableQueryBuilderUtility::joinTranslations(
+            $queryBuilder,
+            $this->dqlAlias ?? $dqlAlias,
+            $this->shouldIncludeUntranslated,
+            $this->locale,
+            $this->fallbackLocale
+        );
     }
 
     public function __toString(): string

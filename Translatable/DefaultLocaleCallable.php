@@ -1,18 +1,25 @@
 <?php
 namespace Vanio\DomainBundle\Translatable;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+
 class DefaultLocaleCallable
 {
-    /** @var string */
-    private $locale;
+    /** @var RequestStack */
+    private $requestStack;
 
-    public function __construct(string $locale = 'en')
+    public function __construct(RequestStack $requestStack)
     {
-        $this->locale = $locale;
+        $this->requestStack = $requestStack;
     }
 
-    public function __invoke(): string
+    /**
+     * @return string|null
+     */
+    public function __invoke()
     {
-        return $this->locale;
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request ? $request->getDefaultLocale() : null;
     }
 }

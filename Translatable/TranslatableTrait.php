@@ -102,6 +102,25 @@ trait TranslatableTrait
         }
     }
 
+    /**
+     * @param \Traversable|Translation[] $translations
+     */
+    public function replaceTranslations($translations)
+    {
+        $locales = [];
+
+        foreach ($translations as $translation) {
+            $locales[$translation->locale()] = true;
+            $this->addTranslation($translation);
+        }
+
+        foreach ($this->translations as $locale => $translation) {
+            if (!isset($locales[$locale])) {
+                $this->translations->remove($locale);
+            }
+        }
+    }
+
     public function translate(string $locale): Translation
     {
         if ($translation = $this->translations()[$locale]) {
@@ -142,23 +161,21 @@ trait TranslatableTrait
     }
 
     /**
-     * @param string $method
-     * @param array $arguments
+     * @param string $property
      * @return mixed
      */
-    public function __call(string $method, array $arguments)
+    public function __get(string $property)
     {
-        return $this->proxyCurrentLocaleTranslation($method, $arguments);
-    }
+        $methods = [sprintf('get%s', ucfirst($property)), $property];
+        $translation = $this->getTranslation();
 
-    public static function translationClass(): string
-    {
-        return __CLASS__ . 'Translation';
-    }
+        foreach ($methods as $method) {
+            if (is_callable([$translation, $method])) {
+                return $translation->$method();
+            }
+        }
 
-    protected function shouldFallbackToDefaultLocale(): bool
-    {
-        return false;
+        return $translation->$property;
     }
 
     /**
@@ -166,9 +183,19 @@ trait TranslatableTrait
      * @param array $arguments
      * @return mixed
      */
-    protected function proxyCurrentLocaleTranslation(string $method, array $arguments = [])
+    public function __call(string $method, array $arguments)
     {
         return $this->getTranslation()->$method(...$arguments);
+    }
+
+    public static function translationClass(): string
+    {
+        return __CLASS__ . 'Translation';
+    }
+
+    public static function shouldFallbackToDefaultLocale(): bool
+    {
+        return false;
     }
 
     /**

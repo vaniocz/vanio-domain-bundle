@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Vanio\DomainBundle\Doctrine\ColumnHydrator;
+use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
+use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
@@ -66,6 +68,8 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'TSQUERY' => TsQueryFunction::class,
                         'TSRANK' => TsRankFunction::class,
                         'TSRANKCD' => TsRankCDFunction::class,
+                        'TOP' => TopFunction::class,
+                        'FIELD' => FieldFunction::class,
                     ],
                 ],
             ],

@@ -24,6 +24,11 @@ class CollectionUtility
         }
     }
 
+    public static function clear(Collection $collection)
+    {
+        self::replace($collection, []);
+    }
+
     /**
      * @param PersistentCollection $collection
      * @param \Traversable|object[] $entities

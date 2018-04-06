@@ -3,25 +3,37 @@ namespace Vanio\DomainBundle\Specification;
 
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
-use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
-use Vanio\DomainBundle\Translatable\TranslatableListener;
+use Vanio\DomainBundle\Translatable\TranslatableQueryBuilderUtility;
 
 class CurrentLocale implements QueryModifier
 {
+    /** @var string|bool|null */
+    private $fallbackLocale;
+
     /** @var bool */
     private $shouldIncludeUntranslated = false;
 
     /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(string $dqlAlias = null)
+    /**
+     * @param string|bool|null $fallbackLocale
+     * @param string|null $dqlAlias
+     */
+    public function __construct($fallbackLocale = null, string $dqlAlias = null)
     {
+        $this->fallbackLocale = $fallbackLocale;
         $this->dqlAlias = $dqlAlias;
     }
 
-    public static function includeUntranslated(string $dqlAlias = null): self
+    /**
+     * @param string|bool|null $fallbackLocale
+     * @param string|null $dqlAlias
+     * @return $this
+     */
+    public static function includeUntranslated($fallbackLocale = null, string $dqlAlias = null): self
     {
-        $self = new self($dqlAlias);
+        $self = new self($fallbackLocale, $dqlAlias);
         $self->shouldIncludeUntranslated = true;
 
         return $self;
@@ -42,55 +54,10 @@ class CurrentLocale implements QueryModifier
 
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        if ($this->dqlAlias !== null) {
-            $dqlAlias = $this->dqlAlias;
-        }
-
-        $translationsDqlAlias = sprintf('%s_translations', $dqlAlias);
-        $queryBuilder
-            ->leftJoin(
-                sprintf('%s.translations', $dqlAlias),
-                $translationsDqlAlias,
-                'WITH',
-                sprintf('%s.locale = :_current_locale', $translationsDqlAlias)
-            )
-            ->addSelect($translationsDqlAlias)
-            ->setParameter('_current_locale', $this->resolveCurrentLocale($queryBuilder));
-
-        if (!$this->shouldIncludeUntranslated) {
-            $class = QueryBuilderUtility::resolveDqlAliasClasses($queryBuilder)[$dqlAlias];
-            $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($class);
-            $conditions = [];
-
-            foreach ($classMetadata->identifier as $property) {
-                $conditions[] = sprintf('%s.%s IS NULL', $dqlAlias, $property);
-            }
-
-            $queryBuilder->andWhere(sprintf(
-                '(%s) OR %s.locale IS NOT NULL',
-                implode(' AND ', $conditions),
-                $translationsDqlAlias
-            ));
-
-            $queryBuilder->andWhere(sprintf('%s.locale IS NOT NULL', $translationsDqlAlias));
-        }
-    }
-
-    private function resolveCurrentLocale(QueryBuilder $queryBuilder): string
-    {
-        foreach ($queryBuilder->getEntityManager()->getEventManager()->getListeners() as $listeners) {
-            foreach ($listeners as $listener) {
-                if ($listener instanceof TranslatableListener) {
-                    $currentLocale = $listener->resolveCurrentLocale();
-                    break 2;
-                }
-            }
-        }
-
-        if (!isset($currentLocale)) {
-            throw new \RuntimeException('Cannot resolve current locale.');
-        }
-        
-        return $currentLocale;
+        TranslatableQueryBuilderUtility::joinTranslations(
+            $queryBuilder,
+            $this->dqlAlias ?? $dqlAlias,
+            $this->shouldIncludeUntranslated
+        );
     }
 }

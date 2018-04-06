@@ -76,6 +76,12 @@ trait TranslationTrait
         return true;
     }
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->locale = null;
+    }
+
     public static function translatableClass(): string
     {
         return substr(__CLASS__, 0, -11);

@@ -15,6 +15,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\ORM\UnitOfWork;
@@ -272,7 +273,29 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
     }
 
     /**
-     * @param Filter[]|QueryModifier[] $specification
+     * @param mixed $specification
+     * @return QueryBuilder
+     */
+    public function getQueryBuilder($specification): QueryBuilder
+    {
+        list($specification) = $this->mergeSpecifications($specification);
+        $queryBuilder = $this->createQueryBuilder($this->getAlias());
+
+        if ($specification instanceof QueryModifier) {
+            $specification->modify($queryBuilder, $this->getAlias());
+        }
+
+        if ($specification instanceof Filter) {
+            if ($filter = (string) $specification->getFilter($queryBuilder, $this->getAlias())) {
+                $queryBuilder->andWhere($filter);
+            }
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param mixed $specification
      * @param ResultModifier|null $resultModifier
      * @param ResultTransformer[] $resultTransformers
      * @return Query

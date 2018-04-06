@@ -43,4 +43,6 @@ interface Translatable
     public function translate(string $locale);
 
     public static function translationClass(): string;
+
+    public static function shouldFallbackToDefaultLocale(): bool;
 }

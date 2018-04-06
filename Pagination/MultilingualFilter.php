@@ -49,6 +49,11 @@ class MultilingualFilter extends Specification
         return $this->dqlAlias;
     }
 
+    public function withIncludedUntranslated(): self
+    {
+        return new self($this->filter, $this->locale->withIncludedUntranslated(), $this->dqlAlias);
+    }
+
     public function withDqlAlias(string $dqlAlias = null): self
     {
         return new self($this->filter, $this->locale, $dqlAlias);

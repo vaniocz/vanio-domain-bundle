@@ -97,7 +97,9 @@
             <argument type="service" id="request_stack"/>
         </service>
 
-        <service id="vanio_domain.translatable.default_locale_callable" class="%vanio_domain.translatable.default_locale_callable.class%" public="false"/>
+        <service id="vanio_domain.translatable.default_locale_callable" class="%vanio_domain.translatable.default_locale_callable.class%" public="false">
+            <argument type="service" id="request_stack"/>
+        </service>
 
         <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="%vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber.class%">
             <tag name="doctrine.event_subscriber"/>
