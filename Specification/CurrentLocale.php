@@ -7,9 +7,6 @@ use Vanio\DomainBundle\Translatable\TranslatableQueryBuilderUtility;
 
 class CurrentLocale implements QueryModifier
 {
-    /** @var string|bool|null */
-    private $fallbackLocale;
-
     /** @var bool */
     private $shouldIncludeUntranslated = false;
 
@@ -17,23 +14,16 @@ class CurrentLocale implements QueryModifier
     private $dqlAlias;
 
     /**
-     * @param string|bool|null $fallbackLocale
      * @param string|null $dqlAlias
      */
-    public function __construct($fallbackLocale = null, string $dqlAlias = null)
+    public function __construct(string $dqlAlias = null)
     {
-        $this->fallbackLocale = $fallbackLocale;
         $this->dqlAlias = $dqlAlias;
     }
 
-    /**
-     * @param string|bool|null $fallbackLocale
-     * @param string|null $dqlAlias
-     * @return $this
-     */
-    public static function includeUntranslated($fallbackLocale = null, string $dqlAlias = null): self
+    public static function includeUntranslated(string $dqlAlias = null): self
     {
-        $self = new self($fallbackLocale, $dqlAlias);
+        $self = new self($dqlAlias);
         $self->shouldIncludeUntranslated = true;
 
         return $self;
