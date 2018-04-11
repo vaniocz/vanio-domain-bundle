@@ -15,11 +15,11 @@ class Unique extends Constraint
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
     ];
 
-    /** @var string[] */
-    public $fields;
-
     /** @var string */
     public $class;
+
+    /** @var string[] */
+    public $properties;
 
     /** @var string|null */
     public $id = null;
@@ -27,12 +27,18 @@ class Unique extends Constraint
     /** @var string */
     public $message = 'This value is already used.';
 
+    /** @var string|null */
+    public $errorPath;
+
+    /** @var bool */
+    public $ignoreNull = true;
+
     /**
      * @return string[]
      */
     public function getRequiredOptions(): array
     {
-        return ['fields', 'class'];
+        return ['class', 'properties'];
     }
 
     public function getTargets(): string
