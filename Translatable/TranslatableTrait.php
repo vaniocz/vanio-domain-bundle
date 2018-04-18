@@ -164,7 +164,7 @@ trait TranslatableTrait
      * @param string $property
      * @return mixed
      */
-    public function __get(string $property)
+    public function __get($property)
     {
         $methods = [sprintf('get%s', ucfirst($property)), $property];
         $translation = $this->getTranslation();
