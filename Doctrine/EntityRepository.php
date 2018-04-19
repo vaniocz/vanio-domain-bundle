@@ -133,9 +133,8 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
      * @param array|Criteria $criteria
      * @param int $limit
      * @param int|null $lockMode
-     * @return mixed
      */
-    public function random($criteria = [], int $limit = 1, int $lockMode = null)
+    public function random($criteria = [], int $limit, int $lockMode = null): array
     {
         $entityPersister = $this->_em->getUnitOfWork()->getEntityPersister($this->_class->name);
         $sql = $entityPersister->getSelectSQL($criteria, null, $lockMode, $limit);
@@ -150,15 +149,25 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
         list($parameters, $types) = $entityPersister->expandParameters($criteria);
         $statement = $this->_em->getConnection()->executeQuery($sql, $parameters, $types);
         $hydrator = $this->_em->newHydrator(Query::HYDRATE_OBJECT);
-        $entities = $hydrator->hydrateAll(
+
+        return $hydrator->hydrateAll(
             $statement,
             $entityPersister->getResultSetMapping(),
             [UnitOfWork::HINT_DEFEREAGERLOAD => true]
         );
+    }
+
+    /**
+     * @param array $criteria
+     * @param int|null $lockMode
+     * @return mixed
+     */
+    public function randomOne($criteria = [], int $lockMode = null)
+    {
+        $entities = $this->random($criteria, 1, $lockMode);
 
         return $entities ? $entities[0] : null;
     }
-
 
     /**
      * @param object $entity
