@@ -2,7 +2,6 @@
 namespace Vanio\DomainBundle\Doctrine;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
-use Doctrine\Common\DataFixtures\SharedFixtureInterface;
 use Doctrine\Common\Util\ClassUtils;
 
 abstract class SharedFixture implements SharedFixtureInterface
