@@ -60,6 +60,7 @@ class UniqueValidator extends ConstraintValidator
         if (
             $id !== null
             && count($entities) === 1
+            && $accessor->getValue($object, $id) !== null
             && $entityManager->getReference($class, $accessor->getValue($object, $id)) === current($entities)
         ) {
             return;
