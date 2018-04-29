@@ -123,7 +123,11 @@ class SluggableParamConverter implements ParamConverterInterface
             ->getOneOrNullResult();
     }
 
-    private function getEntityManager(string $class): EntityManager
+    /**
+     * @param string $class
+     * @return EntityManager|null
+     */
+    private function getEntityManager(string $class)
     {
         return $this->doctrine->getManagerForClass($class);
     }

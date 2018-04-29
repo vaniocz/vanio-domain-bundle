@@ -21,10 +21,10 @@ class With implements QueryModifier
     /** @var bool */
     private $isNullAllowed = false;
 
-    public function __construct(string $field, string $joinAlias, string $dqlAlias = null, string $condition = null)
+    public function __construct(string $field, string $joinDqlAlias, string $dqlAlias = null, string $condition = null)
     {
         $this->field = $field;
-        $this->joinDqlAlias = $joinAlias;
+        $this->joinDqlAlias = $joinDqlAlias;
         $this->dqlAlias = $dqlAlias;
         $this->condition = $condition;
     }

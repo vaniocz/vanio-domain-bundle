@@ -131,10 +131,10 @@ class EntityRepository extends BaseEntityRepository implements EntitySpecificati
 
     /**
      * @param array|Criteria $criteria
-     * @param int $limit
+     * @param int|null $limit
      * @param int|null $lockMode
      */
-    public function random($criteria = [], int $limit, int $lockMode = null): array
+    public function random($criteria = [], int $limit = null, int $lockMode = null): array
     {
         $entityPersister = $this->_em->getUnitOfWork()->getEntityPersister($this->_class->name);
         $sql = $entityPersister->getSelectSQL($criteria, null, $lockMode, $limit);

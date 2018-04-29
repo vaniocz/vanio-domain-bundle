@@ -29,6 +29,18 @@ class OrderBy implements QueryModifier
         $this->dqlAlias = $dqlAlias;
     }
 
+    public function fromString(string $orderBy, string $dqlAlias = null): self
+    {
+        if (($orderBy[0] ?? null) === '-') {
+            $propertyPath = substr($orderBy, 1);
+            $direction = 'DESC';
+        } else {
+            list($propertyPath, $direction) = explode(' ', $orderBy) + [null, 'ASC'];
+        }
+
+        return new self($propertyPath, $direction, $dqlAlias);
+    }
+
     public function propertyPath(): string
     {
         return $this->propertyPath;

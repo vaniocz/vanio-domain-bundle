@@ -24,9 +24,10 @@ class OrderByParamConverter implements ParamConverterInterface
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         $options = $configuration->getOptions() + $this->options;
-        $order = $request->query->get($options['order_parameter'], $options['default_order']);
-        list($field, $direction) = explode(' ', $order) + [null, 'ASC'];
-        $orderBy = new OrderBy($field, $direction, $options['dql_alias']);
+        $orderBy = OrderBy::fromString(
+            $request->query->get($options['order_parameter'], $options['default_order']),
+            $options['dql_alias']
+        );
         $request->attributes->set($configuration->getName(), $orderBy);
 
         return true;
