@@ -5,7 +5,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Vanio\DomainBundle\Mapping\EmbeddedPropertyMappingFactory;
 
-class EmbeddedPropertyMetadataCompilerPass implements CompilerPassInterface
+class OverridePropertyMappingFactoryPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
