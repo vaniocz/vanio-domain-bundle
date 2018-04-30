@@ -92,7 +92,6 @@ class File
 
     /**
      * @return string|null
-     * @internal
      */
     public function fileName()
     {

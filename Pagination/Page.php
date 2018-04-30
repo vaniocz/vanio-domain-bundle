@@ -1,7 +1,6 @@
 <?php
 namespace Vanio\DomainBundle\Pagination;
 
-use Assert\Assertion;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 
@@ -63,7 +62,6 @@ class Page implements PageSpecification
      */
     public function modify(AbstractQuery $query)
     {
-        Assertion::isInstanceOf($query, Query::class);
         $query
             ->setFirstResult($this->firstRecord())
             ->setMaxResults($this->pageNumber === 1 ? $this->recordsOnFirstPage : $this->recordsPerPage);

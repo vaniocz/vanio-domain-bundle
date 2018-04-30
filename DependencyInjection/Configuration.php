@@ -16,6 +16,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('pagination_default_options')
                     ->children()
                         ->integerNode('records_per_page')->end()
+                        ->scalarNode('default_order')->end()
                     ->end()
                     ->addDefaultsIfNotSet()
                 ->end()
