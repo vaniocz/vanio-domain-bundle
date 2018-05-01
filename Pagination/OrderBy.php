@@ -13,42 +13,43 @@ use Happyr\DoctrineSpecification\Query\QueryModifier;
 
 class OrderBy implements QueryModifier
 {
-    /** @var string */
-    private $propertyPath;
-
-    /** @var string */
-    private $direction;
+    /** @var string[] */
+    private $orderBy;
 
     /** @var string|null */
     private $dqlAlias;
 
-    public function __construct(string $propertyPath, string $direction = 'ASC', string $dqlAlias = null)
+    /**
+     * @param string|string[] $orderBy
+     * @param string|null $dqlAlias
+     */
+    public function __construct($orderBy, string $dqlAlias = null)
     {
-        $this->propertyPath = $propertyPath;
-        $this->direction = $direction;
+        $this->orderBy = is_array($orderBy) ? $orderBy : [$orderBy => 'ASC'];
         $this->dqlAlias = $dqlAlias;
     }
 
-    public function fromString(string $orderBy, string $dqlAlias = null): self
+    public static function fromString(string $orderByString, string $dqlAlias = null): self
     {
-        if (($orderBy[0] ?? null) === '-') {
-            $propertyPath = substr($orderBy, 1);
-            $direction = 'DESC';
-        } else {
-            list($propertyPath, $direction) = explode(' ', $orderBy) + [null, 'ASC'];
+        $orderBy = [];
+
+        foreach (preg_split('~,\s*~', $orderByString) as $order) {
+            if (($order[0] ?? null) === '-') {
+                $propertyPath = substr($order, 1);
+                $direction = 'DESC';
+            } else {
+                list($propertyPath, $direction) = explode(' ', $order) + [null, 'ASC'];
+            }
+
+            $orderBy[$propertyPath] = $direction;
         }
 
-        return new self($propertyPath, $direction, $dqlAlias);
+        return new self($orderBy, $dqlAlias);
     }
 
-    public function propertyPath(): string
+    public function orderBy(): array
     {
-        return $this->propertyPath;
-    }
-
-    public function direction(): string
-    {
-        return $this->direction;
+        return $this->orderBy;
     }
 
     /**
@@ -62,18 +63,20 @@ class OrderBy implements QueryModifier
         }
 
         $classMetadata = $this->getClassMetadata($queryBuilder, $dqlAlias);
-        $propertyPath = explode('.', $this->propertyPath);
-        $dqlAlias = $this->joinAssociations($queryBuilder, $dqlAlias, $classMetadata, $propertyPath);
-        $path = $this->resolveEmbeddedPath($queryBuilder->getEntityManager(), $dqlAlias, $classMetadata, $propertyPath);
-        $databasePlatform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
+        $entityManager = $queryBuilder->getEntityManager();
 
-        if (count($propertyPath) > 1 && $this->isFieldOfJsonType($classMetadata, $databasePlatform, $propertyPath[0])) {
-            $this->orderByJsonField($queryBuilder, $path, $propertyPath);
+        foreach ($this->orderBy as $propertyPath => $direction) {
+            $propertyPath = explode('.', $propertyPath);
+            $dqlAlias = $this->joinAssociations($queryBuilder, $dqlAlias, $classMetadata, $propertyPath);
+            $path = $this->resolveEmbeddedPath($entityManager, $dqlAlias, $classMetadata, $propertyPath);
+            $databasePlatform = $entityManager->getConnection()->getDatabasePlatform();
 
-            return;
+            if (count($propertyPath) > 1 && $this->isJsonField($classMetadata, $databasePlatform, $propertyPath[0])) {
+                $this->orderByJsonField($queryBuilder, $path, $propertyPath);
+            } else {
+                $queryBuilder->addOrderBy(sprintf('%s.%s', $path, implode('.', $propertyPath)), $direction);
+            }
         }
-
-        $queryBuilder->addOrderBy(sprintf('%s.%s', $path, implode('.', $propertyPath)), $this->direction);
     }
 
     private function joinAssociations(
@@ -130,9 +133,6 @@ class OrderBy implements QueryModifier
         return $path;
     }
 
-    /**
-     * @throws \InvalidArgumentException
-     */
     private function getClassMetadata(QueryBuilder $queryBuilder, string $alias): ClassMetadataInfo
     {
         /** @var From[] $froms */
@@ -166,7 +166,7 @@ class OrderBy implements QueryModifier
         return null;
     }
 
-    private function isFieldOfJsonType(
+    private function isJsonField(
         ClassMetadataInfo $classMetadata,
         AbstractPlatform $databasePlatform,
         string $field
