@@ -3,9 +3,11 @@ namespace Vanio\DomainBundle\Doctrine;
 
 use Assert\Assertion;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\EntityRepository as BaseEntityRepository;
 use Doctrine\ORM\Mapping\MappingException;
@@ -19,7 +21,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\ORM\UnitOfWork;
-use Happyr\DoctrineSpecification\EntitySpecificationRepositoryInterface;
 use Happyr\DoctrineSpecification\Exception\NonUniqueResultException;
 use Happyr\DoctrineSpecification\Exception\NoResultException;
 use Happyr\DoctrineSpecification\Filter\Filter;
@@ -30,10 +31,21 @@ use Happyr\DoctrineSpecification\Result\ResultModifier;
 /**
  * @method mixed findOneBy(array $criteria, array $orderBy = null)
  */
-class EntityRepository extends BaseEntityRepository implements EntitySpecificationRepositoryInterface
+class EntityRepository extends BaseEntityRepository implements EntityRepositoryInterface
 {
     /** @var string */
     private $alias = 'e';
+
+    /**
+     * @param ManagerRegistry|EntityManager $doctrine
+     * @param ClassMetadata|string $class
+     */
+    public function __construct($doctrine, $class)
+    {
+        $entityManager = $doctrine instanceof ManagerRegistry ? $doctrine->getManagerForClass($class) : $doctrine;
+        $classMetadata = is_string($class) ? $entityManager->getClassMetadata($class) : $class;
+        parent::__construct($entityManager, $classMetadata);
+    }
 
     /**
      * @param mixed $id
