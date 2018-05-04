@@ -31,7 +31,7 @@ use Happyr\DoctrineSpecification\Result\ResultModifier;
 /**
  * @method mixed findOneBy(array $criteria, array $orderBy = null)
  */
-class EntityRepository extends BaseEntityRepository implements EntityRepositoryInterface
+class EntityRepository extends BaseEntityRepository
 {
     /** @var string */
     private $alias = 'e';
