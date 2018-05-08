@@ -9,12 +9,12 @@ use Happyr\DoctrineSpecification\Query\QueryModifier;
 class Join implements QueryModifier
 {
     /** @var string */
-    private $field;
+    private $join;
 
     /** @var string */
     private $joinDqlAlias;
 
-    /** @var string|null */
+    /** @var string|bool|null */
     private $dqlAlias;
 
     /** @var string|null */
@@ -26,14 +26,17 @@ class Join implements QueryModifier
     private function __construct()
     {}
 
-    public static function inner(
-        string $field,
-        string $joinDqlAlias,
-        string $dqlAlias = null,
-        string $condition = null
-    ): self {
+    /**
+     * @param string $join
+     * @param string $joinDqlAlias
+     * @param string|bool|null $dqlAlias
+     * @param string|null $condition
+     * @return $this
+     */
+    public static function inner(string $join, string $joinDqlAlias, $dqlAlias = null, string $condition = null): self
+    {
         $self = new self;
-        $self->field = $field;
+        $self->join = $join;
         $self->joinDqlAlias = $joinDqlAlias;
         $self->dqlAlias = $dqlAlias;
         $self->condition = $condition;
@@ -42,14 +45,17 @@ class Join implements QueryModifier
         return $self;
     }
 
-    public static function left(
-        string $field,
-        string $joinDqlAlias,
-        string $dqlAlias = null,
-        string $condition = null
-    ): self {
+    /**
+     * @param string $join
+     * @param string $joinDqlAlias
+     * @param string|bool|null $dqlAlias
+     * @param string|null $condition
+     * @return $this
+     */
+    public static function left(string $join, string $joinDqlAlias, $dqlAlias = null, string $condition = null): self
+    {
         $self = new self;
-        $self->field = $field;
+        $self->join = $join;
         $self->joinDqlAlias = $joinDqlAlias;
         $self->dqlAlias = $dqlAlias;
         $self->condition = $condition;
@@ -65,7 +71,7 @@ class Join implements QueryModifier
     public function modify(QueryBuilder $queryBuilder, $dqlAlias = null)
     {
         $queryBuilder->{$this->joinMethod}(
-            sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, $this->field),
+            $this->dqlAlias === false ? $this->join : sprintf('%s.%s', $this->dqlAlias ?? $dqlAlias, $this->join),
             $this->joinDqlAlias,
             $this->condition === null ? null : 'WITH',
             $this->resolveJoinCondition($queryBuilder, $this->condition)
