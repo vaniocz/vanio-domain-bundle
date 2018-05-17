@@ -74,9 +74,7 @@ class TranslatableListener implements EventSubscriber
     {
         $metadata = $event->getClassMetadata();
 
-        if (!$metadata->reflClass) {
-            return;
-        } elseif (is_a($metadata->name, Translatable::class, true)) {
+        if (is_a($metadata->name, Translatable::class, true)) {
             $this->mapTranslatable($metadata);
         } elseif (is_a($metadata->name, Translation::class, true)) {
             $this->mapTranslation($metadata, $event->getEntityManager());
