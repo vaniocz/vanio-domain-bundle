@@ -1,6 +1,7 @@
 <?php
 namespace Vanio\DomainBundle\Request;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +17,16 @@ class GetPostParamConverter implements ParamConverterInterface
     /** @var ConfigurableRequirementsInterface|null */
     private $configurableUrlGenerator;
 
+    /** @var ManagerRegistry */
+    private $registry;
+
     /**
      * @param UrlGeneratorInterface $urlGenerator
      * @param UrlGeneratorInterface|null $defaultUrlGenerator
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator, ?UrlGeneratorInterface $defaultUrlGenerator = null)
+    public function __construct(ManagerRegistry $registry, UrlGeneratorInterface $urlGenerator, ?UrlGeneratorInterface $defaultUrlGenerator = null)
     {
+        $this->registry = $registry;
         $this->urlGenerator = $urlGenerator;
         $this->configurableUrlGenerator = $this->resolveConfigurableRequirementsUrlGenerator($urlGenerator)
             ?: $this->resolveConfigurableRequirementsUrlGenerator($defaultUrlGenerator);
@@ -48,7 +53,7 @@ class GetPostParamConverter implements ParamConverterInterface
 
         if (array_key_exists($name, $attributes) && !isset($additionalAttributes[$name])) {
             return;
-        } elseif ($class === null) {
+        } elseif (!$this->isEntityClass($class, $options)) {
             if (array_key_exists($name, $parameters)) {
                 $attributes = [$name => $parameters[$name]] + $attributes;
             }
@@ -108,5 +113,22 @@ class GetPostParamConverter implements ParamConverterInterface
         parse_str(parse_url($url, PHP_URL_QUERY), $additionalAttributes);
 
         return $additionalAttributes;
+    }
+
+    private function isEntityClass(string $class, array $options): bool
+    {
+        if ($class === null || $this->registry === null || !count($this->registry->getManagers())) {
+            return false;
+        }
+
+        $entityManager = isset($options['entity_manager'])
+            ? $this->registry->getManager($options['entity_manager'])
+            : $this->registry->getManagerForClass($class);
+
+        if ($entityManager === null) {
+            return false;
+        }
+
+        return !$entityManager->getMetadataFactory()->isTransient($class);
     }
 }
