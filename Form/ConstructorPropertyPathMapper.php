@@ -26,7 +26,7 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
     }
 
     /**
-     * @param \Traversable|FormInterface[]| $forms
+     * @param \Traversable|FormInterface[] $forms
      * @param mixed $data
      */
     public function mapFormsToData($forms, &$data)
