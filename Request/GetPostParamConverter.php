@@ -116,7 +116,7 @@ class GetPostParamConverter implements ParamConverterInterface
 
     private function isEntityClass(string $class, array $options): bool
     {
-        if ($class === null || $this->registry === null || !count($this->registry->getManagers())) {
+        if (!$class || !$this->registry || !$this->registry->getManagers()) {
             return false;
         }
 
