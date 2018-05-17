@@ -46,9 +46,9 @@
         </service>
 
         <service id="vanio_domain.request.get_post_param_converter" class="%vanio_domain.request.get_post_param_converter.class%" abstract="true" public="false">
-            <argument type="service" id="doctrine"/>
             <argument type="service" id="router"/>
             <argument type="service" id="router.default" on-invalid="null"/>
+            <argument type="service" id="doctrine" on-invalid="null"/>
         </service>
 
         <service id="vanio_domain.request.locale_param_converter" class="%vanio_domain.request.locale_param_converter.class%" public="false">

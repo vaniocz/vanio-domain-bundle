@@ -20,16 +20,15 @@ class GetPostParamConverter implements ParamConverterInterface
     /** @var ManagerRegistry */
     private $registry;
 
-    /**
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param UrlGeneratorInterface|null $defaultUrlGenerator
-     */
-    public function __construct(ManagerRegistry $registry, UrlGeneratorInterface $urlGenerator, ?UrlGeneratorInterface $defaultUrlGenerator = null)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        UrlGeneratorInterface $defaultUrlGenerator = null,
+        ManagerRegistry $registry = null
+    ) {
         $this->urlGenerator = $urlGenerator;
         $this->configurableUrlGenerator = $this->resolveConfigurableRequirementsUrlGenerator($urlGenerator)
             ?: $this->resolveConfigurableRequirementsUrlGenerator($defaultUrlGenerator);
+        $this->registry = $registry;
     }
 
     public function supports(ParamConverter $configuration): bool
@@ -125,10 +124,6 @@ class GetPostParamConverter implements ParamConverterInterface
             ? $this->registry->getManager($options['entity_manager'])
             : $this->registry->getManagerForClass($class);
 
-        if ($entityManager === null) {
-            return false;
-        }
-
-        return !$entityManager->getMetadataFactory()->isTransient($class);
+        return $entityManager ? !$entityManager->getMetadataFactory()->isTransient($class) : false;
     }
 }
