@@ -17,7 +17,7 @@ class GetPostParamConverter implements ParamConverterInterface
     /** @var ConfigurableRequirementsInterface|null */
     private $configurableUrlGenerator;
 
-    /** @var ManagerRegistry */
+    /** @var ManagerRegistry|null */
     private $registry;
 
     public function __construct(
