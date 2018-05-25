@@ -114,7 +114,7 @@ class GetPostParamConverter implements ParamConverterInterface
         return $additionalAttributes;
     }
 
-    private function isEntityClass(string $class, array $options): bool
+    private function isEntityClass(?string $class, array $options): bool
     {
         if (!$class || !$this->registry || !$this->registry->getManagers()) {
             return false;
