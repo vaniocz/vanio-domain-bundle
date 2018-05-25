@@ -181,8 +181,6 @@ class RequiredExtension extends AbstractTypeExtension
      */
     private function getMetadataFor(string $class)
     {
-        return $this->metadataFactory && $this->metadataFactory->hasMetadataFor($class)
-            ? $this->metadataFactory->getMetadataFor($class)
-            : null;
+        return $this->metadataFactory->hasMetadataFor($class) ? $this->metadataFactory->getMetadataFor($class) : null;
     }
 }
