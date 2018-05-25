@@ -52,7 +52,7 @@ class GetPostParamConverter implements ParamConverterInterface
 
         if (array_key_exists($name, $attributes) && !isset($additionalAttributes[$name])) {
             return;
-        } elseif (!$this->isEntityClass($class, $options)) {
+        } elseif (!$class || !$this->isEntityClass($class, $options)) {
             if (array_key_exists($name, $parameters)) {
                 $attributes = [$name => $parameters[$name]] + $attributes;
             }
@@ -114,9 +114,9 @@ class GetPostParamConverter implements ParamConverterInterface
         return $additionalAttributes;
     }
 
-    private function isEntityClass(?string $class, array $options): bool
+    private function isEntityClass(string $class, array $options): bool
     {
-        if (!$class || !$this->registry || !$this->registry->getManagers()) {
+        if (!$this->registry || !$this->registry->getManagers()) {
             return false;
         }
 
