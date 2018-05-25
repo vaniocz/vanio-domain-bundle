@@ -69,6 +69,7 @@
         </service>
 
         <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">
+            <argument type="service" id="validator"/>
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
         </service>
 
