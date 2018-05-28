@@ -2,11 +2,15 @@
 namespace Vanio\DomainBundle\Form;
 
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Vanio\DomainBundle\Assert\LazyValidationException;
+use Vanio\DomainBundle\Assert\Validation;
 use Vanio\DomainBundle\Assert\ValidationException;
+use Vanio\Stdlib\Objects;
 
 class ValidatingMapper implements DataMapperInterface
 {
@@ -78,7 +82,27 @@ class ValidatingMapper implements DataMapperInterface
                 $error->getMessageParameters(),
                 'validators'
             );
+
+            if ($error->getCode() === Validation::INVALID_NOT_BLANK) {
+                $this->removeNotBlankConstraints($form);
+            }
+
             $form->addError(new FormError($message, $error->getMessageTemplate(), $error->getMessageParameters()));
         }
+    }
+
+    private function removeNotBlankConstraints(FormInterface $form)
+    {
+        $config = $form->getConfig();
+        $options = $config->getOptions();
+        $options['constraints'] = [];
+
+        foreach ($config->getOption('constraints') as $constraint) {
+            if (!$constraint instanceof NotBlank) {
+                $options['constraints'][] = $constraint;
+            }
+        }
+
+        Objects::setPropertyValue($config, 'options', $options, FormConfigBuilder::class);
     }
 }

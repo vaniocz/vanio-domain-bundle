@@ -10,4 +10,9 @@ class Validate extends Assert
 
     /** @var string */
     protected static $lazyAssertionExceptionClass = LazyValidationException::class;
+
+    public static function assertionClass(): string
+    {
+        return static::$assertionClass;
+    }
 }

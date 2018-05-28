@@ -159,6 +159,12 @@ class RequiredExtension extends AbstractTypeExtension
         return $metadata && $this->hasValidConstraint($metadata->getConstraints());
     }
 
+    /**
+     * @param string $dataClass
+     * @param PropertyPath $propertyPath
+     * @param string[] $groups
+     * @return bool
+     */
     private function hasPropertyNotBlankConstraint(string $dataClass, PropertyPath $propertyPath, array $groups): bool
     {
         if ($metadata = $this->getMetadataFor($dataClass)) {
