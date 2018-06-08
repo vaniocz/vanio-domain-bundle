@@ -29,7 +29,7 @@ class ForeignKeysHelper
         string $foreignTableName,
         $foreignColumnNames,
         array $options,
-        ?string $foreignKeyName = null
+        string $foreignKeyName = null
     ): void {
         $localColumnNames = (array) $localColumnNames;
         $foreignColumnNames = (array) $foreignColumnNames;
