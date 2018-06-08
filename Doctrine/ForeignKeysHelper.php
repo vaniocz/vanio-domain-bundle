@@ -17,9 +17,9 @@ class ForeignKeysHelper
 
     /**
      * @param string $localTableName
-     * @param string[]|string $localColumnNames
+     * @param string|string[] $localColumnNames
      * @param string $foreignTableName
-     * @param string[]|string $foreignColumnNames
+     * @param string|string[] $foreignColumnNames
      * @param array $options
      * @param string|null $foreignKeyName
      */
@@ -40,12 +40,12 @@ class ForeignKeysHelper
 
     /**
      * @param string $table
-     * @param string[]|string $columns
+     * @param string|string[] $columns
      * @param array $options
      */
     public function updateTableForeignKeyOptions(string $table, $columns, array $options)
     {
-        $foreignKey = $this->getTableForeignKey($table, (array) $columns);
+        $foreignKey = $this->getTableForeignKey($table, $columns);
         $foreignKey = new ForeignKeyConstraint(
             $foreignKey->getLocalColumns(),
             $foreignKey->getForeignTableName(),
@@ -58,12 +58,13 @@ class ForeignKeysHelper
 
     /**
      * @param string $table
-     * @param string[] $columns
+     * @param string|string[] $columns
      * @return ForeignKeyConstraint
      * @throws \RuntimeException
      */
-    public function getTableForeignKey(string $table, array $columns): ForeignKeyConstraint
+    public function getTableForeignKey(string $table, $columns): ForeignKeyConstraint
     {
+        $columns = (array) $columns;
         $foreignKeys = $this->schemaManager->listTableForeignKeys($table);
 
         foreach ($foreignKeys as $foreignKey) {
