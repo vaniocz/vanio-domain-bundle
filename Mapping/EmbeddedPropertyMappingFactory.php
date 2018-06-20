@@ -22,14 +22,16 @@ class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
         $class = $this->getClassName($object, $class);
         $entityManager = $this->doctrine()->getManagerForClass($class);
 
-        if (
-            !$entityManager->getMetadataFactory()->hasMetadataFor($class)
-            || !isset($entityManager->getClassMetadata($class)->embeddedClasses[$field])
-        ) {
-            return $mapping;
-        }
+        try {
+            if (
+                $entityManager->getMetadataFactory()->getMetadataFor($class)
+                && isset($entityManager->getClassMetadata($class)->embeddedClasses[$field])
+            ) {
+                return $this->createEmbeddedMapping($mapping, $this->metadata->getUploadableField($class, $field));
+            }
+        } catch(\Exception $e) {}
 
-        return $this->createEmbeddedMapping($mapping, $this->metadata->getUploadableField($class, $field));
+        return $mapping;
     }
 
     /**
