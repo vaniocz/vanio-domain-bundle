@@ -34,8 +34,15 @@ class ForeignKeysHelper
         $localColumnNames = (array) $localColumnNames;
         $foreignColumnNames = (array) $foreignColumnNames;
         $foreignKeyName = $foreignKeyName ?? sprintf('fk_%s_%s', $localTableName, implode('_', $localColumnNames));
-        $foreignKey = new ForeignKeyConstraint($localColumnNames, $foreignTableName, $foreignColumnNames, $foreignKeyName, $options);
-        $this->schemaManager->createForeignKey($foreignKey, $this->schemaManager->getDatabasePlatform()->quoteSingleIdentifier($localTableName));
+        $foreignKey = new ForeignKeyConstraint(
+            $localColumnNames,
+            $foreignTableName,
+            $foreignColumnNames,
+            $foreignKeyName,
+            $options
+        );
+        $table = $this->schemaManager->getDatabasePlatform()->quoteSingleIdentifier($localTableName);
+        $this->schemaManager->createForeignKey($foreignKey, $table);
     }
 
     /**
@@ -53,7 +60,8 @@ class ForeignKeysHelper
             $foreignKey->getName(),
             $options + $foreignKey->getOptions()
         );
-        $this->schemaManager->dropAndCreateForeignKey($foreignKey, $this->schemaManager->getDatabasePlatform()->quoteSingleIdentifier($table));
+        $table = $this->schemaManager->getDatabasePlatform()->quoteSingleIdentifier($table);
+        $this->schemaManager->dropAndCreateForeignKey($foreignKey, $table);
     }
 
     /**
