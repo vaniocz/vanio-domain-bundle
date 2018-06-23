@@ -24,7 +24,7 @@ trait Timestampable
      * @ORM\PrePersist
      * @internal
      */
-    public function stampWhenCreated(): void
+    public function stampOnCreate(): void
     {
         $this->createdAt = new \DateTimeImmutable;
     }
@@ -34,7 +34,7 @@ trait Timestampable
      * @ORM\PreUpdate
      * @internal
      */
-    public function stampWhenUpdated(): void
+    public function stampOnUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable;
     }
