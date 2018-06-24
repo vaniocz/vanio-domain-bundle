@@ -20,6 +20,16 @@ trait Timestampable
      */
     private $updatedAt;
 
+    public function createdAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
     /**
      * @ORM\PrePersist
      * @internal
