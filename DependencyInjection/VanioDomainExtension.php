@@ -12,6 +12,7 @@ use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
+use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankCDFunction;
 
@@ -53,9 +54,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
             'dbal' => [
                 'types' => [
                     'tsvector' => TsVector::class,
-                ],
-                'mapping_types' => [
-                    'tsvector' => 'tsvector',
+                    TextArrayType::NAME => TextArrayType::class,
                 ],
             ],
             'orm' => [

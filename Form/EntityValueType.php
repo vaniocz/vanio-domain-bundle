@@ -38,6 +38,7 @@ class EntityValueType extends AbstractType
                     'json' => 'array',
                     'json_array' => 'array',
                     'simple_array' => 'array<string>',
+                    'text_array' => 'array<string>',
                     'uuid' => [
                         'type' => 'uuid',
                         'example' => '7e57d004-2b97-0e7a-b45f-5387367791cd',
