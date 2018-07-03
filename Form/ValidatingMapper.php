@@ -45,8 +45,10 @@ class ValidatingMapper implements DataMapperInterface
             $this->dataMapper->mapFormsToData($forms, $data);
         } catch (LazyValidationException $e) {
             $this->addValidationErrors($forms, $e->getErrorExceptions());
+            $data = null;
         } catch (ValidationException $e) {
             $this->addValidationErrors($forms, [$e]);
+            $data = null;
         }
     }
 

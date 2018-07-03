@@ -44,11 +44,9 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
             $parameters[(string) $propertyPath] = $form->getData();
         }
 
-        if (!$form) {
-            return;
+        if (isset($form)) {
+            $data = $this->createObject($form->getParent()->getConfig()->getDataClass(), $parameters);
         }
-
-        $data = $this->createObject($form->getParent()->getConfig()->getDataClass(), $parameters);
     }
 
     /**

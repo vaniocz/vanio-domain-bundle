@@ -2,6 +2,7 @@
 namespace Vanio\DomainBundle\Mapping;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\MappingException;
 use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Vich\UploaderBundle\Mapping\PropertyMappingFactory;
 
@@ -22,14 +23,13 @@ class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
         $class = $this->getClassName($object, $class);
         $entityManager = $this->doctrine()->getManagerForClass($class);
 
-        if (
-            !$entityManager->getMetadataFactory()->hasMetadataFor($class)
-            || !isset($entityManager->getClassMetadata($class)->embeddedClasses[$field])
-        ) {
-            return $mapping;
-        }
+        try {
+            if (isset($entityManager->getClassMetadata($class)->embeddedClasses[$field])) {
+                return $this->createEmbeddedMapping($mapping, $this->metadata->getUploadableField($class, $field));
+            }
+        } catch (MappingException $e) {}
 
-        return $this->createEmbeddedMapping($mapping, $this->metadata->getUploadableField($class, $field));
+        return $mapping;
     }
 
     /**

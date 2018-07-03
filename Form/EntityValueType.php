@@ -65,7 +65,7 @@ class EntityValueType extends AbstractType
             /** @var EntityManager $entityManager */
             $entityManager = $options['em'];
 
-            if (count($options['property']) === 1) {
+            if (!is_array($options['property']) || count($options['property']) === 1) {
                 $type = $entityManager->getClassMetadata($options['class'])->getTypeOfField($options['property'][0]);
 
                 if ($data = $options['documentation_type_mapping'][$type] ?? null) {
