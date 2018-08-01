@@ -7,7 +7,11 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Vanio\DomainBundle\Doctrine\ColumnHydrator;
+use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetPathFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetTextFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
@@ -69,6 +73,10 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'TSRANKCD' => TsRankCDFunction::class,
                         'TOP' => TopFunction::class,
                         'FIELD' => FieldFunction::class,
+                        'CAST' => CastFunction::class,
+                        'JSON_GET' => JsonGetFunction::class,
+                        'JSON_GET_TEXT' => JsonGetTextFunction::class,
+                        'JSON_GET_PATH' => JsonGetPathFunction::class,
                     ],
                 ],
             ],

@@ -194,7 +194,7 @@ class OrderBy implements QueryModifier
         $alias = sprintf('%s_%s', str_replace('.', '_', $path), implode('_', $propertyPath));
         $databasePlatform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
         $select = sprintf(
-            'JSON_GET(%s.%s, %s) AS HIDDEN %s',
+            'JSON_GET_PATH(%s.%s, %s) AS HIDDEN %s',
             $path,
             array_shift($propertyPath),
             implode(', ', array_map([$databasePlatform, 'quoteStringLiteral'], $propertyPath)),
