@@ -3,11 +3,12 @@ namespace Vanio\DomainBundle\Doctrine\Functions;
 
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\AST\Node;
+use Doctrine\ORM\Query\AST\SimpleArithmeticExpression;
 use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
-class JsonGetFunction extends FunctionNode
+class JsonGetNumberFunction extends FunctionNode
 {
     /** @var Node */
     private $json;
@@ -27,6 +28,6 @@ class JsonGetFunction extends FunctionNode
 
     public function getSql(SqlWalker $sqlWalker): string
     {
-        return sprintf('(%s->%s)', $this->json->dispatch($sqlWalker), $this->field->dispatch($sqlWalker));
+        return sprintf('(%s->>%s)::numeric', $this->json->dispatch($sqlWalker), $this->field->dispatch($sqlWalker));
     }
 }

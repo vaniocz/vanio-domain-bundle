@@ -8,7 +8,7 @@ use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
-class JsonGetTextFunction extends FunctionNode
+class JsonGetStringFunction extends FunctionNode
 {
     /** @var Node */
     private $json;
@@ -28,6 +28,6 @@ class JsonGetTextFunction extends FunctionNode
 
     public function getSql(SqlWalker $sqlWalker): string
     {
-        return sprintf('(%s->>%s::text)', $this->json->dispatch($sqlWalker), $this->field->dispatch($sqlWalker));
+        return sprintf('(%s->>%s)', $this->json->dispatch($sqlWalker), $this->field->dispatch($sqlWalker));
     }
 }
