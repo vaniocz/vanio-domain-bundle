@@ -20,6 +20,7 @@ use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
 use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
+use Vanio\DomainBundle\Doctrine\Types\UuidArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankCDFunction;
 
@@ -62,6 +63,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                 'types' => [
                     'tsvector' => TsVector::class,
                     TextArrayType::NAME => TextArrayType::class,
+                    UuidArrayType::NAME => UuidArrayType::class,
                 ],
             ],
             'orm' => [
