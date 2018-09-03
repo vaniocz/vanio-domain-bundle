@@ -3,9 +3,6 @@ namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\HasLifecycleCallbacks
- */
 trait Timestampable
 {
     /**
