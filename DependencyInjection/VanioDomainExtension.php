@@ -65,6 +65,9 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                     TextArrayType::NAME => TextArrayType::class,
                     UuidArrayType::NAME => UuidArrayType::class,
                 ],
+                'mapping_types' => [
+                    '_uuid' => 'text', // uuid[] - migrations
+                ],
             ],
             'orm' => [
                 'hydrators' => [
