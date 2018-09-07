@@ -53,7 +53,6 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
      * @param string $class
      * @param array $parameters
      * @return object
-     * @throws \ReflectionException
      */
     private function createObject(string $class, array $parameters)
     {
@@ -70,11 +69,13 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
                 $argument = $reflectionParameter->getDefaultValue();
             }
 
-            $reflectionType = $reflectionParameter->getType();
-
-            if ($reflectionType && $reflectionType->isBuiltin()) {
-                if ($argument !== null || !$reflectionType->allowsNull()) {
-                    settype($argument, $reflectionType->getName());
+            if ($reflectionType = $reflectionParameter->getType()) {
+                if ($reflectionType->isBuiltin()) {
+                    if ($argument !== null || !$reflectionType->allowsNull()) {
+                        settype($argument, $reflectionType->getName());
+                    }
+                } elseif ($argument === null && !$reflectionType->allowsNull()) {
+                    return null;
                 }
             }
 
