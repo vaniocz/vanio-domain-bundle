@@ -4,6 +4,7 @@ namespace Vanio\DomainBundle\Doctrine;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Vanio\Stdlib\Strings;
 
 class QueryBuilderUtility
 {
@@ -34,5 +35,12 @@ class QueryBuilderUtility
         }
 
         return $dqlAliasClasses;
+    }
+
+    public static function generateUniqueDqlAlias(string $class): string
+    {
+        static $i = 0;
+
+        return Strings::baseName($class) . $i++;
     }
 }

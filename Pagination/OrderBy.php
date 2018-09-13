@@ -72,9 +72,9 @@ class OrderBy implements QueryModifier
             $databasePlatform = $entityManager->getConnection()->getDatabasePlatform();
 
             if (count($propertyPath) > 1 && $this->isJsonField($classMetadata, $databasePlatform, $propertyPath[0])) {
-                $this->orderByJsonField($queryBuilder, $path, $propertyPath);
-            } else {
-                $queryBuilder->addOrderBy(sprintf('%s.%s', $path, implode('.', $propertyPath)), $direction);
+                $this->orderByJsonField($queryBuilder, $path, $propertyPath, $direction);
+            } elseif (count($propertyPath) === 1 && $classMetadata->hasField($propertyPath[0])) {
+                $queryBuilder->addOrderBy(sprintf('%s.%s', $path, $propertyPath[0]), $direction);
             }
         }
     }
@@ -171,6 +171,10 @@ class OrderBy implements QueryModifier
         AbstractPlatform $databasePlatform,
         string $field
     ): bool {
+        if (!$classMetadata->hasField($field)) {
+            return false;
+        }
+
         $type = Type::getType($classMetadata->getTypeOfField($field));
         $fieldMapping = $classMetadata->getFieldMapping($field);
 
@@ -188,13 +192,14 @@ class OrderBy implements QueryModifier
      * @param QueryBuilder $queryBuilder
      * @param string $path
      * @param string[] $propertyPath
+     * @param string $direction
      */
-    private function orderByJsonField(QueryBuilder $queryBuilder, string $path, array $propertyPath)
+    private function orderByJsonField(QueryBuilder $queryBuilder, string $path, array $propertyPath, string $direction)
     {
         $alias = sprintf('%s_%s', str_replace('.', '_', $path), implode('_', $propertyPath));
         $databasePlatform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
         $select = sprintf(
-            'JSON_GET(%s.%s, %s) AS HIDDEN %s',
+            'JSON_GET_PATH(%s.%s, %s) AS HIDDEN %s',
             $path,
             array_shift($propertyPath),
             implode(', ', array_map([$databasePlatform, 'quoteStringLiteral'], $propertyPath)),
@@ -205,7 +210,7 @@ class OrderBy implements QueryModifier
             $queryBuilder->addSelect($select);
         }
 
-        $queryBuilder->addOrderBy($alias, $this->direction);
+        $queryBuilder->addOrderBy($alias, $direction);
     }
 
     private function hasSelect(QueryBuilder $queryBuilder, string $select): bool

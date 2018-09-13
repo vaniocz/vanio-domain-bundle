@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ValueToEntityTransformer implements DataTransformerInterface
 {
@@ -108,9 +109,12 @@ class ValueToEntityTransformer implements DataTransformerInterface
     public function transformEntityToValue($entity)
     {
         $values = [];
-        
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
         foreach ($this->properties as $property) {
-            $values[$property] = $this->classMetadata->getFieldValue($entity, $property);
+            $values[$property] = $this->classMetadata->hasField($property) || $this->classMetadata->hasAssociation($property)
+                ? $this->classMetadata->getFieldValue($entity, $property)
+                : $propertyAccessor->getValue($entity, $property);
         }
 
         return count($values) > 1 ? $values : current($values);

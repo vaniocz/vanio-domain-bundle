@@ -44,18 +44,15 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
             $parameters[(string) $propertyPath] = $form->getData();
         }
 
-        if (!$form) {
-            return;
+        if (isset($form)) {
+            $data = $this->createObject($form->getParent()->getConfig()->getDataClass(), $parameters);
         }
-
-        $data = $this->createObject($form->getParent()->getConfig()->getDataClass(), $parameters);
     }
 
     /**
      * @param string $class
      * @param array $parameters
      * @return object
-     * @throws \ReflectionException
      */
     private function createObject(string $class, array $parameters)
     {
@@ -72,11 +69,13 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
                 $argument = $reflectionParameter->getDefaultValue();
             }
 
-            $reflectionType = $reflectionParameter->getType();
-
-            if ($reflectionType && $reflectionType->isBuiltin()) {
-                if ($argument !== null || !$reflectionType->allowsNull()) {
-                    settype($argument, $reflectionType->getName());
+            if ($reflectionType = $reflectionParameter->getType()) {
+                if ($reflectionType->isBuiltin()) {
+                    if ($argument !== null || !$reflectionType->allowsNull()) {
+                        settype($argument, $reflectionType->getName());
+                    }
+                } elseif ($argument === null && !$reflectionType->allowsNull()) {
+                    return null;
                 }
             }
 

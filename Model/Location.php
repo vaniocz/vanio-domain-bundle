@@ -11,19 +11,19 @@ class Location
 {
     /**
      * @var string
-     * @ORM\Column
+     * @ORM\Column(type="string")
      */
     private $address;
 
     /**
      * @var float
-     * @ORM\Column
+     * @ORM\Column(type="float")
      */
     private $latitude;
 
     /**
      * @var float
-     * @ORM\Column
+     * @ORM\Column(type="float")
      */
     private $longitude;
 
