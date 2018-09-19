@@ -39,9 +39,10 @@ class File
 
     /**
      * @param SymfonyFile|self|string $file
+     * @param mixed[] $metaData
      * @throws \InvalidArgumentException
      */
-    public function __construct($file)
+    public function __construct($file, array $metaData = [])
     {
         Validation::notBlank($file, 'File must not be blank.');
 
@@ -52,8 +53,10 @@ class File
             ));
         }
 
+        $this->metaData = $metaData;
+
         if ($file instanceof self) {
-            $this->metaData = $file->metaData;
+            $this->metaData += $file->metaData;
             $file = $file->file();
         }
 
@@ -108,28 +111,32 @@ class File
 
     protected function loadMetadata()
     {
-        if ($this->metaData) {
-            return;
+        if (!isset($this->metaData['name'])) {
+            $name = $this->file instanceof SymfonyUploadedFile
+                ? $this->file->getClientOriginalName()
+                : $this->file->getBasename();
+            $this->metaData['name'] = $name;
         }
 
-        $name = $this->file instanceof SymfonyUploadedFile
-            ? $this->file->getClientOriginalName()
-            : $this->file->getBasename();
-        $this->metaData = [
-            'name' => $name,
-            'mimeType' => MimeTypeGuesser::getInstance()->guess($this->file->getPathname()),
-            'size' => $this->file->getSize(),
-            'isImage' => false,
-        ];
+        if (!isset($this->metaData['mimeType'])) {
+            $this->metaData['mimeType'] = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+        }
+
+        if (!isset($this->metaData['size'])) {
+            $this->metaData['size'] = $this->file->getSize();
+        }
+
+        if (!isset($this->metaData['isImage'])) {
+            $this->metaData['isImage'] = false;
+        }
 
         if (Strings::startsWith($this->metaData['mimeType'], 'image/')) {
             if ($this->metaData['mimeType'] === 'image/svg+xml') {
                 $this->metaData['isImage'] = true;
-            } elseif ($metadata = @getimagesize($this->file)) {
-                $this->isImage = true;
-                $this->metaData['mimeType'] = $metadata['mime'];
-                $this->metaData['width'] = $metadata[0];
-                $this->metaData['height'] = $metadata[1];
+            } elseif ($metaData = @getimagesize($this->file)) {
+                $this->metaData['mimeType'] = $metaData['mime'];
+                $this->metaData['width'] = $metaData[0];
+                $this->metaData['height'] = $metaData[1];
                 $this->metaData['isImage'] = true;
             }
         }

@@ -12,11 +12,12 @@ class Image extends File
 {
     /**
      * @param SymfonyFile|File|string $file
+     * @param mixed[] $metaData
      */
-    public function __construct($file)
+    public function __construct($file, array $metaData = [])
     {
         Validation::notBlank($file, 'Image must not be blank.');
-        parent::__construct($file);
+        parent::__construct($file, $metaData);
         Validation::true(parent::isImage(), sprintf('Unknown image format of file "%s".', $this->metaData['name']));
     }
 
