@@ -34,9 +34,6 @@ class File
      */
     protected $metaData = [];
 
-    /** @var bool */
-    private $isImage = false;
-
     /**
      * @param SymfonyFile|self|string $file
      * @param mixed[] $metaData
