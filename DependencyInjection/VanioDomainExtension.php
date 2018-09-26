@@ -16,6 +16,7 @@ use Vanio\DomainBundle\Doctrine\Functions\JsonGetObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetPathFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
+use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
@@ -76,6 +77,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                 ],
                 'dql' => [
                     'string_functions' => [
+                        'REPLACE' => ReplaceFunction::class,
                         'UNACCENT' => UnaccentFunction::class,
                         'PAD_LEFT' => PadLeftFunction::class,
                         'TSQUERY' => TsQueryFunction::class,
