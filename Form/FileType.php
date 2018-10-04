@@ -141,10 +141,15 @@ class FileType extends AbstractType implements DataMapperInterface, EventSubscri
     {
         $data = $formEvent->getData();
 
-        if (($data['file'] ?? null) === [null]) {
-            $data['file'] = null;
-            $formEvent->setData($data);
+        if (!is_array($data)) {
+            $data = ['file' => $data];
         }
+
+        if (($data['file'] ?? $data) === [null]) {
+            $data['file'] = null;
+        }
+
+        $formEvent->setData($data);
     }
 
     /**

@@ -3,9 +3,6 @@ namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\HasLifecycleCallbacks
- */
 trait Timestampable
 {
     /**
@@ -20,9 +17,19 @@ trait Timestampable
      */
     private $updatedAt;
 
+    public function createdAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function updatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
     /**
-     * @ORM\PrePersist
      * @internal
+     * @ORM\PrePersist
      */
     public function stampOnCreate(): void
     {
@@ -30,9 +37,9 @@ trait Timestampable
     }
 
     /**
+     * @internal
      * @ORM\PrePersist
      * @ORM\PreUpdate
-     * @internal
      */
     public function stampOnUpdate(): void
     {
