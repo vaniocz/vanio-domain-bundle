@@ -6,6 +6,8 @@ use Doctrine\DBAL\Types\Type;
 
 class JsonbType extends Type
 {
+    const NAME = 'jsonb';
+
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return 'JSONB';
@@ -37,6 +39,6 @@ class JsonbType extends Type
 
     public function getName(): string
     {
-        return 'jsonb';
+        return self::NAME;
     }
 }

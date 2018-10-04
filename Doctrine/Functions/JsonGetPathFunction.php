@@ -7,7 +7,7 @@ use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
-class JsonGetFunction extends FunctionNode
+class JsonGetPathFunction extends FunctionNode
 {
     /** @var Node */
     private $json;

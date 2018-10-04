@@ -7,11 +7,22 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Vanio\DomainBundle\Doctrine\ColumnHydrator;
+use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
+use Vanio\DomainBundle\Doctrine\Functions\IsBetweenFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetObjectFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetPathFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
+use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
+use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
+use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
+use Vanio\DomainBundle\Doctrine\Types\UuidArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankCDFunction;
 
@@ -53,9 +64,11 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
             'dbal' => [
                 'types' => [
                     'tsvector' => TsVector::class,
+                    TextArrayType::NAME => TextArrayType::class,
+                    UuidArrayType::NAME => UuidArrayType::class,
                 ],
                 'mapping_types' => [
-                    'tsvector' => 'tsvector',
+                    '_uuid' => 'text', // uuid[] - migrations
                 ],
             ],
             'orm' => [
@@ -64,12 +77,20 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                 ],
                 'dql' => [
                     'string_functions' => [
+                        'REPLACE' => ReplaceFunction::class,
                         'UNACCENT' => UnaccentFunction::class,
+                        'PAD_LEFT' => PadLeftFunction::class,
                         'TSQUERY' => TsQueryFunction::class,
                         'TSRANK' => TsRankFunction::class,
                         'TSRANKCD' => TsRankCDFunction::class,
                         'TOP' => TopFunction::class,
                         'FIELD' => FieldFunction::class,
+                        'CAST' => CastFunction::class,
+                        'JSON_GET_OBJECT' => JsonGetObjectFunction::class,
+                        'JSON_GET_STRING' => JsonGetStringFunction::class,
+                        'JSON_GET_NUMBER' => JsonGetNumberFunction::class,
+                        'JSON_GET_BOOLEAN' => JsonGetBooleanFunction::class,
+                        'JSON_GET_PATH' => JsonGetPathFunction::class,
                     ],
                 ],
             ],
