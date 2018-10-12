@@ -295,19 +295,21 @@ class EntityRepository extends BaseEntityRepository
 
     /**
      * @param mixed $specification
+     * @param string $dqlAlias
      * @return QueryBuilder
      */
-    public function getQueryBuilder($specification): QueryBuilder
+    public function getQueryBuilder($specification, $dqlAlias = null): QueryBuilder
     {
+        $dqlAlias = $dqlAlias === null ? $this->getAlias() : $dqlAlias;
         list($specification) = $this->mergeSpecifications($specification);
-        $queryBuilder = $this->createQueryBuilder($this->getAlias());
+        $queryBuilder = $this->createQueryBuilder($dqlAlias);
 
         if ($specification instanceof QueryModifier) {
-            $specification->modify($queryBuilder, $this->getAlias());
+            $specification->modify($queryBuilder, $dqlAlias);
         }
 
         if ($specification instanceof Filter) {
-            if ($filter = (string) $specification->getFilter($queryBuilder, $this->getAlias())) {
+            if ($filter = (string) $specification->getFilter($queryBuilder, $dqlAlias)) {
                 $queryBuilder->andWhere($filter);
             }
         }

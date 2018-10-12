@@ -31,9 +31,4 @@ class UniqueCollection extends Constraint
     {
         return 'propertyPath';
     }
-
-    public function getTargets(): string
-    {
-        return self::CLASS_CONSTRAINT;
-    }
 }

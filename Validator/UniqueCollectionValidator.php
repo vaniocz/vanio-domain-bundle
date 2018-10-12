@@ -24,20 +24,20 @@ class UniqueCollectionValidator extends ConstraintValidator
         foreach ($collection as $index => $value) {
             if ($constraint->propertyPath !== null) {
                 $value = $accessor->getValue($value, $constraint->propertyPath);
-
-                if ($value === null && $constraint->ignoreNull) {
-                    continue;
-                } elseif (isset($uniqueValues[$value])) {
-                    $this->context->buildViolation($constraint->message)
-                        ->atPath(sprintf('[%s]%s', $index, $constraint->errorPath ?? $constraint->propertyPath))
-                        ->setParameter('{{ value }}', $value)
-                        ->setInvalidValue($value)
-                        ->setCode(UniqueCollection::NOT_UNIQUE_COLLECTION_ERROR)
-                        ->addViolation();
-                }
-
-                $uniqueValues[$value] = true;
             }
+
+            if ($value === null && $constraint->ignoreNull) {
+                continue;
+            } elseif (isset($uniqueValues[(string) $value])) {
+                $this->context->buildViolation($constraint->message)
+                    ->atPath(sprintf('[%s]%s', $index, $constraint->errorPath ?? $constraint->propertyPath))
+                    ->setParameter('{{ value }}', $value)
+                    ->setInvalidValue($value)
+                    ->setCode(UniqueCollection::NOT_UNIQUE_COLLECTION_ERROR)
+                    ->addViolation();
+            }
+
+            $uniqueValues[(string) $value] = true;
         }
     }
 }
