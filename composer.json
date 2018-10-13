@@ -16,7 +16,7 @@
         "type": "git"
     }],
     "require": {
-        "php": "^7.0",
+        "php": "^7.1",
         "beberlei/assert": "^2.9.2",
         "ramsey/uuid-doctrine": "^1.2",
         "happyr/doctrine-specification": "^0.8",
@@ -53,7 +53,7 @@
     "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "0.4.x-dev"
+            "dev-master": "0.5.x-dev"
         }
     }
 }
