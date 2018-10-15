@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Form;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -77,15 +78,22 @@ class RequiredExtension extends AbstractTypeExtension
             return;
         }
 
-        while ($form->getParent() && $form->getConfig()->getErrorBubbling()) {
-            $form = $form->getParent();
+        $target = $form;
+
+        while ($target->getParent() && $target->getConfig()->getErrorBubbling()) {
+            $target = $target->getParent();
         }
 
-        if ($this->hasNotBlankOrNotNullViolationError($form)) {
+        if ($this->hasNotBlankOrNotNullViolationError($target)) {
             return;
         }
 
-        foreach ($this->validator->validate($form->getData(), new NotBlank) as $violation) {
+        $constraint = new NotBlank([
+            'message' => $form->getConfig()->getOption('required_message'),
+            'groups' => $this->resolveValidationGroups($form),
+        ]);
+
+        foreach ($this->validator->validate($form->getData(), $constraint) as $violation) {
             $this->addViolationError($form, $violation);
         }
     }
@@ -154,5 +162,18 @@ class RequiredExtension extends AbstractTypeExtension
         } while ($form = $form->getParent());
 
         return false;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function resolveValidationGroups(FormInterface $form): array
+    {
+        $resolveValidationGroups = function () use ($form) {
+            return FormValidator::{'getValidationGroups'}($form);
+        };
+        $resolveValidationGroups = $resolveValidationGroups->bindTo(null, FormValidator::class);
+
+        return $resolveValidationGroups();
     }
 }
