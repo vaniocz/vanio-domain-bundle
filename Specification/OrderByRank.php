@@ -3,8 +3,9 @@ namespace Vanio\DomainBundle\Specification;
 
 use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Query\QueryModifier;
+use Vanio\DomainBundle\Doctrine\QueryBuilderUtility;
 
-class SortByRank extends TextSearchSpecification implements QueryModifier
+class OrderByRank implements QueryModifier
 {
     /** @var string */
     private $searchTerm;
@@ -21,9 +22,10 @@ class SortByRank extends TextSearchSpecification implements QueryModifier
      */
     public function __construct(
         string $searchTerm,
-        string $searchDocumentField = 'searchDocument',
+        string $searchDocumentField = 'fulltextDocument',
         string $dqlAlias = null
-    ) {
+    )
+    {
         $this->searchTerm = $searchTerm;
         $this->searchDocumentField = $searchDocumentField;
         $this->dqlAlias = $dqlAlias;
@@ -36,12 +38,14 @@ class SortByRank extends TextSearchSpecification implements QueryModifier
      */
     public function modify(QueryBuilder $queryBuilder, $dqlAlias)
     {
-        if ($this->dqlAlias !== null) {
-            $dqlAlias = $this->dqlAlias;
-        }
-
+        $parameter = QueryBuilderUtility::generateUniqueDqlAlias(__CLASS__);
+        $sort = sprintf(
+            'tsrank(%s.%s, :%s)',
+            $this->dqlAlias ?? $dqlAlias,
+            $this->searchDocumentField, $parameter
+        );
         $queryBuilder
-            ->addOrderBy(sprintf('tsrank(%s.%s, :_rankQuery)', $dqlAlias, $this->searchDocumentField), 'DESC')
-            ->setParameter('_rankQuery', $this->processSearchTerm($this->searchTerm));
+            ->addOrderBy($sort, 'DESC')
+            ->setParameter($parameter, FulltextSearch::processSearchTerm($this->searchTerm));
     }
 }
