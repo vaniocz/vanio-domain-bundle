@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\ConstraintViolation;
 use Vanio\DomainBundle\Assert\LazyValidationException;
 use Vanio\DomainBundle\Assert\Validation;
 use Vanio\DomainBundle\Assert\ValidationException;
@@ -85,22 +87,28 @@ class ValidatingMapper implements DataMapperInterface
                 'validators'
             );
 
-            if ($error->getCode() === Validation::INVALID_NOT_BLANK) {
-                $this->removeNotBlankConstraints($form);
+            if (in_array($error->getCode(), [Validation::INVALID_NOT_BLANK, Validation::VALUE_NULL])) {
+                $this->removeNotBlankAndNotNullConstraints($form);
             }
 
-            $form->addError(new FormError($message, $error->getMessageTemplate(), $error->getMessageParameters()));
+            $form->addError(new FormError(
+                $message,
+                $error->getMessageTemplate(),
+                $error->getMessageParameters(),
+                null,
+                $error
+            ));
         }
     }
 
-    private function removeNotBlankConstraints(FormInterface $form)
+    private function removeNotBlankAndNotNullConstraints(FormInterface $form)
     {
         $config = $form->getConfig();
         $options = $config->getOptions();
         $options['constraints'] = [];
 
         foreach ($config->getOption('constraints') as $constraint) {
-            if (!$constraint instanceof NotBlank) {
+            if (!$constraint instanceof NotBlank && !$constraint instanceof NotNull) {
                 $options['constraints'][] = $constraint;
             }
         }

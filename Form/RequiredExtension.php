@@ -10,11 +10,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Vanio\DomainBundle\Assert\Validation;
+use Vanio\DomainBundle\Assert\ValidationException;
 
 class RequiredExtension extends AbstractTypeExtension
 {
@@ -74,7 +77,7 @@ class RequiredExtension extends AbstractTypeExtension
      */
     public function validateRequired(FormInterface $form)
     {
-        if (!$form->isSynchronized()) {
+        if (!$form->isSynchronized() || $this->resolveValidationGroups($form) === []) {
             return;
         }
 
@@ -84,14 +87,11 @@ class RequiredExtension extends AbstractTypeExtension
             $target = $target->getParent();
         }
 
-        if ($this->hasNotBlankOrNotNullViolationError($target)) {
+        if ($this->hasNotBlankOrNotNullError($target)) {
             return;
         }
 
-        $constraint = new NotBlank([
-            'message' => $form->getConfig()->getOption('required_message'),
-            'groups' => $this->resolveValidationGroups($form),
-        ]);
+        $constraint = new NotBlank(['message' => $form->getConfig()->getOption('required_message')]);
 
         foreach ($this->validator->validate($form->getData(), $constraint) as $violation) {
             $this->addViolationError($form, $violation);
@@ -109,12 +109,17 @@ class RequiredExtension extends AbstractTypeExtension
         ));
     }
 
-    private function hasNotBlankOrNotNullViolationError(FormInterface $form): bool
+    private function hasNotBlankOrNotNullError(FormInterface $form): bool
     {
         foreach ($form->getErrors() as $error) {
             $cause = $error->getCause();
 
-            if (!$cause instanceof ConstraintViolation) {
+            if (
+                $cause instanceof ValidationException
+                && in_array($cause->getCode(), [Validation::INVALID_NOT_BLANK, Validation::VALUE_NULL])
+            ) {
+                return true;
+            } elseif (!$cause instanceof ConstraintViolation) {
                 continue;
             }
 
@@ -139,7 +144,7 @@ class RequiredExtension extends AbstractTypeExtension
         static $skippedParentTypes;
 
         if ($skippedParentTypes === null) {
-            $skippedParentTypes = array_flip(['choice', 'scalar_object', 'repeated']);
+            $skippedParentTypes = array_flip(['choice', 'repeated', 'scalar_object']);
         }
 
         if ($config->getCompound() && $config->getType()->getBlockPrefix() !== 'repeated') {
@@ -173,7 +178,10 @@ class RequiredExtension extends AbstractTypeExtension
             return FormValidator::{'getValidationGroups'}($form);
         };
         $resolveValidationGroups = $resolveValidationGroups->bindTo(null, FormValidator::class);
+        $validationGroups = $resolveValidationGroups();
 
-        return $resolveValidationGroups();
+        return $validationGroups instanceof GroupSequence
+            ? $validationGroups->groups
+            : $validationGroups;
     }
 }
