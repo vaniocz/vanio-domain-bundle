@@ -18,13 +18,13 @@ use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
 use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
-use Vanio\DomainBundle\Doctrine\Functions\TsQueryFunction;
-use Vanio\DomainBundle\Doctrine\Functions\TsRankFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
 use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
 use Vanio\DomainBundle\Doctrine\Types\UuidArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsQueryFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankCDFunction;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankFunction;
 
 class VanioDomainExtension extends Extension implements PrependExtensionInterface
 {
