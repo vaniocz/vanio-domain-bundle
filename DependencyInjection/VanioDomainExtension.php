@@ -1,15 +1,17 @@
 <?php
 namespace Vanio\DomainBundle\DependencyInjection;
 
+use Ramsey\Uuid\Doctrine\UuidType;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Vanio\DoctrineGenericTypes\DBAL\ScalarObjectType;
+use Vanio\DoctrineGenericTypes\DBAL\UniversalJsonType;
 use Vanio\DomainBundle\Doctrine\ColumnHydrator;
 use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
-use Vanio\DomainBundle\Doctrine\Functions\IsBetweenFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetObjectFunction;
@@ -19,6 +21,7 @@ use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
 use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
+use Vanio\DomainBundle\Doctrine\Types\JsonbType;
 use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
 use Vanio\DomainBundle\Doctrine\Types\UuidArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
@@ -63,9 +66,13 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
         $container->prependExtensionConfig('doctrine', [
             'dbal' => [
                 'types' => [
-                    'tsvector' => TsVector::class,
+                    ScalarObjectType::NAME => ScalarObjectType::class,
+                    UuidType::NAME => UuidType::class,
+                    TsVector::NAME => TsVector::class,
                     TextArrayType::NAME => TextArrayType::class,
                     UuidArrayType::NAME => UuidArrayType::class,
+                    JsonbType::NAME => JsonbType::class,
+                    UniversalJsonType::NAME => UniversalJsonType::class,
                 ],
                 'mapping_types' => [
                     '_uuid' => 'text', // uuid[] - migrations
