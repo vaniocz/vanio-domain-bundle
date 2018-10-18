@@ -11,15 +11,15 @@ trait Sortable
      * @ORM\Column(type="integer")
      * @Gedmo\SortablePosition
      */
-    private $position;
+    private $position = -1;
 
     public function position(): int
     {
         return $this->position;
     }
 
-    public function move(int $position)
+    public function move(?int $position)
     {
-        $this->position = $position;
+        $this->position = $position ?? -1;
     }
 }
