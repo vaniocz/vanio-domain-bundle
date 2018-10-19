@@ -5,15 +5,22 @@ use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Vanio\Stdlib\Objects;
 
 class ConstructorPropertyPathMapper implements DataMapperInterface
 {
     /** @var PropertyPathMapper */
     private $propertyPathMapper;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
-    {
+    /** @var string */
+    private $factoryMethod;
+
+    public function __construct(
+        PropertyAccessorInterface $propertyAccessor = null,
+        string $factoryMethod = '__construct'
+    ) {
         $this->propertyPathMapper = new PropertyPathMapper($propertyAccessor);
+        $this->factoryMethod = $factoryMethod;
     }
 
     /**
@@ -45,43 +52,7 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
         }
 
         if (isset($form)) {
-            $data = $this->createObject($form->getParent()->getConfig()->getDataClass(), $parameters);
+            $data = Objects::create($form->getParent()->getConfig()->getDataClass(), $parameters, $this->factoryMethod);
         }
-    }
-
-    /**
-     * @param string $class
-     * @param array $parameters
-     * @return object
-     */
-    private function createObject(string $class, array $parameters)
-    {
-        $reflectionClass = new \ReflectionClass($class);
-        $arguments = [];
-
-        foreach ($reflectionClass->getConstructor()->getParameters() as $reflectionParameter) {
-            $name = $reflectionParameter->getName();
-            $argument = null;
-
-            if (array_key_exists($name, $parameters)) {
-                $argument = $parameters[$name];
-            } elseif ($reflectionParameter->isDefaultValueAvailable()) {
-                $argument = $reflectionParameter->getDefaultValue();
-            }
-
-            if ($reflectionType = $reflectionParameter->getType()) {
-                if ($reflectionType->isBuiltin()) {
-                    if ($argument !== null || !$reflectionType->allowsNull()) {
-                        settype($argument, $reflectionType->getName());
-                    }
-                } elseif ($argument === null && !$reflectionType->allowsNull()) {
-                    return null;
-                }
-            }
-
-            $arguments[] = $argument;
-        }
-
-        return $reflectionClass->newInstanceArgs($arguments);
     }
 }

@@ -8,11 +8,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\ConstraintViolation;
 use Vanio\DomainBundle\Assert\LazyValidationException;
 use Vanio\DomainBundle\Assert\Validation;
 use Vanio\DomainBundle\Assert\ValidationException;
 use Vanio\Stdlib\Objects;
+use Vanio\Stdlib\Strings;
 
 class ValidatingMapper implements DataMapperInterface
 {
@@ -62,25 +62,9 @@ class ValidatingMapper implements DataMapperInterface
     {
         $forms = iterator_to_array($forms);
         $parent = current($forms)->getParent();
-        /** @var FormInterface[] $forms */
 
         foreach ($validationErrors as $error) {
-            $form = $parent;
-            $propertyPath = $error->getPropertyPath();
-
-            if ($propertyPath !== null) {
-                foreach ($forms as $child) {
-                    if ($propertyPath === str_replace(['][', '[', ']'], ['.', '', ''], $child->getPropertyPath())) {
-                        $form = $child;
-                        break;
-                    }
-                }
-            }
-
-            if (!$form) {
-                throw $error;
-            }
-
+            $form = $this->resolveTargetForm($parent, $this->normalizePropertyPath($error->getPropertyPath()));
             $message = $this->translator->trans(
                 $error->getMessageTemplate(),
                 $error->getMessageParameters(),
@@ -114,5 +98,29 @@ class ValidatingMapper implements DataMapperInterface
         }
 
         Objects::setPropertyValue($config, 'options', $options, FormConfigBuilder::class);
+    }
+
+    private function resolveTargetForm(FormInterface $form, ?string $propertyPath)
+    {
+        if ($propertyPath === null) {
+            return $form;
+        }
+
+        foreach ($form->all() as $child) {
+            $childPropertyPath = $this->normalizePropertyPath($child->getPropertyPath());
+
+            if ($propertyPath === $childPropertyPath) {
+                return $child;
+            } elseif (Strings::startsWith($propertyPath, "{$childPropertyPath}.")) {
+                return $this->resolveTargetForm($child, substr($propertyPath, strlen($childPropertyPath) + 1));
+            }
+        }
+
+        return $form;
+    }
+
+    private function normalizePropertyPath(string $propertyPath): string
+    {
+        return trim(str_replace(['[', ']', '..'], ['.', '.', '.'], $propertyPath), '.');
     }
 }
