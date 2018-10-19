@@ -3,6 +3,7 @@ namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Vanio\DomainBundle\Assert\Validation;
@@ -117,6 +118,10 @@ class File
 
         if (!isset($this->metaData['mimeType'])) {
             $this->metaData['mimeType'] = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+        }
+
+        if (!isset($this->metaData['format'])) {
+            $this->metaData['format'] = ExtensionGuesser::getInstance()->guess($this->metaData['mimeType']);
         }
 
         if (!isset($this->metaData['size'])) {
