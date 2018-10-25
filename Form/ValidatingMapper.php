@@ -119,7 +119,7 @@ class ValidatingMapper implements DataMapperInterface
         return $form;
     }
 
-    private function normalizePropertyPath(string $propertyPath): string
+    private function normalizePropertyPath(?string $propertyPath): string
     {
         return trim(str_replace(['[', ']', '..'], ['.', '.', '.'], $propertyPath), '.');
     }

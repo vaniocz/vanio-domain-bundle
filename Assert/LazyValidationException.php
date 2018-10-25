@@ -1,15 +1,23 @@
 <?php
 namespace Vanio\DomainBundle\Assert;
 
-use Assert\LazyAssertionException;
-
-/**
- * @method ValidationException[] getErrorExceptions
- */
-class LazyValidationException extends LazyAssertionException
+class LazyValidationException extends ValidationException
 {
+    /** @var ValidationException[] */
+    private $errors = [];
+
     /**
-     * @param LazyValidationException|LazyValidationException[]|ValidationException|ValidationException[] $childrenErrors
+     * @param string $message
+     * @param ValidationException[] $errors
+     */
+    public function __construct(string $message, array $errors)
+    {
+        parent::__construct($message, 0, null, null);
+        $this->errors = $errors;
+    }
+
+    /**
+     * @param ValidationException|ValidationException[] $errors
      * @return self
      */
     public static function fromErrors($errors): self
@@ -26,7 +34,7 @@ class LazyValidationException extends LazyAssertionException
     }
 
     /**
-     * @param LazyValidationException|LazyValidationException[]|ValidationException|ValidationException[] $childrenErrors
+     * @param ValidationException|ValidationException[] $childrenErrors
      * @return self
      */
     public static function fromChildrenErrors(array $childrenErrors): self
@@ -49,7 +57,15 @@ class LazyValidationException extends LazyAssertionException
     }
 
     /**
-     * @param LazyValidationException|LazyValidationException[]|ValidationException|ValidationException[] $errors
+     * @return ValidationException[]
+     */
+    public function getErrorExceptions(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param ValidationException|ValidationException[] $childrenErrors
      * @return ValidationException[]
      */
     private static function normalizeErrors($errors): array
