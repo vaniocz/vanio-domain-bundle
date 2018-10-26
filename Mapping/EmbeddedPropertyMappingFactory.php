@@ -14,7 +14,7 @@ class EmbeddedPropertyMappingFactory extends PropertyMappingFactory
      * @param string|null $class
      * @return PropertyMapping|EmbeddedPropertyMapping|null
      */
-    public function fromField($object, $field, $class = null)
+    public function fromField($object, string $field, ?string $class = null): ?PropertyMapping
     {
         if (!$mapping = parent::fromField($object, $field, $class)) {
             return null;
