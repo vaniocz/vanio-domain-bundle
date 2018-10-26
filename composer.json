@@ -12,7 +12,7 @@
         "url": "https://github.com/maryo/JsFormValidatorBundle.git",
         "type": "git"
     }, {
-        "url": "https://github.com/dizzy7/DoctrineFullTextPostrgres.git",
+        "url": "https://github.com/maryo/DoctrineFullTextPostrgres.git",
         "type": "git"
     }],
     "require": {
@@ -26,7 +26,7 @@
         "vanio/stdlib": "~0.1",
         "vanio/doctrine-domain-events": "^0.1",
         "vanio/doctrine-generic-types": "^0.1",
-        "vertigolabs/doctrine-full-text-postgres": "dev-master#75e767c660fcbc85fa29db40946242f5172a5721"
+        "vertigolabs/doctrine-full-text-postgres": "dev-fork"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.5",
