@@ -27,7 +27,7 @@ class EmbeddedPropertyMapping extends PropertyMapping
      * @param object|array $object
      * @return File|null
      */
-    public function getFile($object)
+    public function getFile($object): ?File
     {
         try {
             $file = parent::getFile($object);
@@ -42,7 +42,7 @@ class EmbeddedPropertyMapping extends PropertyMapping
      * @param object|array $object
      * @return string|null
      */
-    public function getFileName($object)
+    public function getFileName($object): ?string
     {
         try {
             $fileName = parent::getFileName($object);
