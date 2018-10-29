@@ -107,5 +107,7 @@
         <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="%vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber.class%">
             <tag name="doctrine.event_subscriber"/>
         </service>
+
+        <service id="Doctrine\ORM\EntityManager" alias="doctrine.orm.entity_manager"/>
     </services>
 </container>
