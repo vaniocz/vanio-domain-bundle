@@ -14,6 +14,16 @@ use Vanio\Stdlib\Strings;
  */
 class File
 {
+    public const OOXML_MIME_TYPES = [
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'dotx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'xltx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'potx' => 'application/vnd.openxmlformats-officedocument.presentationml.template',
+        'ppsx' => 'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+    ];
+
     /** @var SymfonyFile */
     protected $file;
 
@@ -72,6 +82,9 @@ class File
         return $this->uploadedAt;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function metaData(): array
     {
         return $this->metaData;
@@ -85,16 +98,13 @@ class File
     /**
      * @internal
      */
-    public function setFile(SymfonyFile $file = null)
+    public function setFile(?SymfonyFile $file): void
     {
         $this->file = $file;
         $this->uploadedAt = new \DateTimeImmutable;
     }
 
-    /**
-     * @return string|null
-     */
-    public function fileName()
+    public function fileName(): ?string
     {
         return $this->fileName;
     }
@@ -102,12 +112,12 @@ class File
     /**
      * @internal
      */
-    public function setFileName(string $fileName = null)
+    public function setFileName(?string $fileName): void
     {
         $this->fileName = $fileName;
     }
 
-    protected function loadMetadata()
+    protected function loadMetadata(): void
     {
         if (!isset($this->metaData['name'])) {
             $name = $this->file instanceof SymfonyUploadedFile
@@ -117,7 +127,7 @@ class File
         }
 
         if (!isset($this->metaData['mimeType'])) {
-            $this->metaData['mimeType'] = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+            $this->metaData['mimeType'] = $this->guessMimeType(pathinfo($this->metaData['name'], PATHINFO_EXTENSION));
         }
 
         if (!isset($this->metaData['format'])) {
@@ -142,5 +152,24 @@ class File
                 $this->metaData['isImage'] = true;
             }
         }
+    }
+
+    private function guessMimeType(string $extension): string
+    {
+        $mimeType = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+
+        if (
+            $mimeType !== 'application/octet-stream'
+            || (new \finfo)->file($this->file->getPathname()) !== 'Microsoft OOXML'
+        ) {
+            return $mimeType;
+        } elseif (
+            $this->file instanceof SymfonyUploadedFile
+            && Strings::startsWith($this->file->getClientMimeType(), 'application/vnd.openxmlformats-officedocument.')
+        ) {
+            return $this->file->getClientMimeType();
+        }
+
+        return self::OOXML_MIME_TYPES[$extension] ?? $mimeType;
     }
 }
