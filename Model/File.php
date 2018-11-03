@@ -22,6 +22,7 @@ class File
         'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         'potx' => 'application/vnd.openxmlformats-officedocument.presentationml.template',
         'ppsx' => 'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+        'sldx' => 'application/vnd.openxmlformats-officedocument.presentationml.slide',
     ];
 
     /** @var SymfonyFile */
