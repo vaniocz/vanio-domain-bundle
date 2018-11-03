@@ -11,7 +11,7 @@ trait Sortable
      * @ORM\Column(type="integer")
      * @Gedmo\SortablePosition
      */
-    private $position = -1;
+    protected $position = -1;
 
     public function position(): int
     {
