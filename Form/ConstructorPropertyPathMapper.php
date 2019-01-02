@@ -15,12 +15,24 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
     /** @var string */
     private $factoryMethod;
 
+    /** @var bool */
+    private $isNullable;
+
     public function __construct(
         PropertyAccessorInterface $propertyAccessor = null,
-        string $factoryMethod = '__construct'
+        string $factoryMethod = '__construct',
+        bool $isNullable = false
     ) {
         $this->propertyPathMapper = new PropertyPathMapper($propertyAccessor);
         $this->factoryMethod = $factoryMethod;
+        $this->isNullable = $isNullable;
+    }
+
+    public static function nullable(
+        PropertyAccessorInterface $propertyAccessor = null,
+        string $factoryMethod = '__construct'
+    ): self {
+        return new self($propertyAccessor, $factoryMethod, true);
     }
 
     /**
@@ -40,6 +52,7 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
     {
         $parameters = [];
         $data = null;
+        $hasData = false;
 
         foreach ($forms as $form) {
             $propertyPath = $form->getPropertyPath();
@@ -49,9 +62,13 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
             }
 
             $parameters[(string) $propertyPath] = $form->getData();
+
+            if ($form->getData() !== null) {
+                $hasData = true;
+            }
         }
 
-        if (isset($form)) {
+        if ($hasData || !$this->isNullable) {
             $data = Objects::create($form->getParent()->getConfig()->getDataClass(), $parameters, $this->factoryMethod);
         }
     }
