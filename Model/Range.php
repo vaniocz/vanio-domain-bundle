@@ -20,10 +20,10 @@ class Range
      */
     private $maximum;
 
-    public function __construct(float $minimum, float $maximum)
+    public function __construct(?float $minimum, ?float $maximum)
     {
-        $this->minimum = $minimum;
-        $this->maximum = $maximum;
+        $this->minimum = $minimum ?? -INF;
+        $this->maximum = $maximum ?? INF;
     }
 
     public function minimum(): float
