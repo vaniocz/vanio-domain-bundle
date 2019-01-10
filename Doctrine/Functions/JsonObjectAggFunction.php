@@ -11,6 +11,7 @@ use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\SqlWalker;
+use Vanio\Stdlib\Objects;
 
 class JsonObjectAggFunction extends FunctionNode
 {
@@ -135,6 +136,10 @@ class JsonObjectAggFunction extends FunctionNode
 
     private function walkSelect(SqlWalker $sqlWalker, SelectStatement $select): string
     {
+        $rootAliases = &Objects::getPropertyValue($sqlWalker, 'rootAliases', SqlWalker::class);
+        $originalRootAliases = $rootAliases;
+        $rootAliases = [];
+
         $sql = $sqlWalker->walkSelectClause($select->selectClause)
             . $sqlWalker->walkFromClause($select->fromClause)
             . $sqlWalker->walkWhereClause($select->whereClause);
@@ -150,6 +155,8 @@ class JsonObjectAggFunction extends FunctionNode
         if ($select->orderByClause) {
             $sql .= $sqlWalker->walkOrderByClause($select->orderByClause);
         }
+
+        $rootAliases = $originalRootAliases;
 
         return $sql;
     }
