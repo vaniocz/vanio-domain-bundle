@@ -10,13 +10,16 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Vanio\DoctrineGenericTypes\DBAL\ScalarObjectType;
 use Vanio\DoctrineGenericTypes\DBAL\UniversalJsonType;
 use Vanio\DomainBundle\Doctrine\ColumnHydrator;
+use Vanio\DomainBundle\Doctrine\Functions\ArrayFunction;
 use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonBuildObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetPathFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonObjectAggFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
 use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
@@ -93,11 +96,14 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'TOP' => TopFunction::class,
                         'FIELD' => FieldFunction::class,
                         'CAST' => CastFunction::class,
+                        'ARRAY' => ArrayFunction::class,
                         'JSON_GET_OBJECT' => JsonGetObjectFunction::class,
                         'JSON_GET_STRING' => JsonGetStringFunction::class,
                         'JSON_GET_NUMBER' => JsonGetNumberFunction::class,
                         'JSON_GET_BOOLEAN' => JsonGetBooleanFunction::class,
                         'JSON_GET_PATH' => JsonGetPathFunction::class,
+                        'JSON_BUILD_OBJECT' => JsonBuildObjectFunction::class,
+                        'JSON_OBJECT_AGG' => JsonObjectAggFunction::class,
                     ],
                 ],
             ],
