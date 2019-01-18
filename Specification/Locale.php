@@ -50,6 +50,11 @@ class Locale implements QueryModifier
         return $this->locale;
     }
 
+    public function language(): string
+    {
+        return substr($this->locale, 0, 2);
+    }
+
     /**
      * @return string|null
      */
