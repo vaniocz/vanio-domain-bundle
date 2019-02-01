@@ -11,6 +11,7 @@
         <parameter key="vanio_domain.request.sluggable_param_converter.class">Vanio\DomainBundle\Request\SluggableParamConverter</parameter>
         <parameter key="vanio_domain.request.uuid_param_converter.class">Vanio\DomainBundle\Request\UuidParamConverter</parameter>
         <parameter key="vanio_domain.unexpected_response.unexpected_response_listener.class">Vanio\DomainBundle\UnexpectedResponse\UnexpectedResponseListener</parameter>
+        <parameter key="vanio_domain.form.collection_extension.class">Vanio\DomainBundle\Form\CollectionExtension</parameter>
         <parameter key="vanio_domain.form.required_extension.class">Vanio\DomainBundle\Form\RequiredExtension</parameter>
         <parameter key="vanio_domain.form.validation_extension.class">Vanio\DomainBundle\Form\ValidationExtension</parameter>
         <parameter key="vanio_domain.validator.unique_validator.class">Vanio\DomainBundle\Validator\UniqueValidator</parameter>
@@ -67,6 +68,10 @@
 
         <service id="vanio_domain.unexpected_response.unexpected_response_listener" class="%vanio_domain.unexpected_response.unexpected_response_listener.class%">
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="1024"/>
+        </service>
+
+        <service id="vanio_domain.form.collection_extension" class="%vanio_domain.form.collection_extension.class%">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\CollectionType"/>
         </service>
 
         <service id="vanio_domain.form.required_extension" class="%vanio_domain.form.required_extension.class%">
