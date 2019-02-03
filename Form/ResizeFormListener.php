@@ -9,11 +9,19 @@ use Symfony\Component\Form\FormInterface;
 
 class ResizeFormListener implements EventSubscriberInterface
 {
-    protected $type;
-    protected $options;
-    protected $allowAdd;
-    protected $allowDelete;
+    /** @var string */
+    private $type;
 
+    /** @var array */
+    private $options;
+
+    /** @var bool */
+    private $allowAdd;
+
+    /** @var bool */
+    private $allowDelete;
+
+    /** @var bool|callable */
     private $deleteEmpty;
 
     /**
@@ -23,7 +31,7 @@ class ResizeFormListener implements EventSubscriberInterface
      * @param bool          $allowDelete Whether children could be removed from the group
      * @param bool|callable $deleteEmpty
      */
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    public function __construct($type, array $options = [], $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
@@ -32,44 +40,42 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->deleteEmpty = $deleteEmpty;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
+        return [
             FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_SUBMIT => 'preSubmit',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
-            FormEvents::SUBMIT => array('onSubmit', 50),
-        );
+            FormEvents::SUBMIT => ['onSubmit', 50],
+        ];
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
 
-        if (null === $data) {
-            $data = array();
+        if ($data === null) {
+            $data = [];
         }
 
         if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        // First remove all rows
         foreach ($form as $name => $child) {
             $form->remove($name);
         }
 
-        // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
             $encodedName = $this->encodeFormName($name);
-            $form->add($encodedName, $this->type, array_replace(array(
+            $form->add($encodedName, $this->type, array_replace([
                 'property_path' => '['.$encodedName.']',
-            ), $this->options));
+            ], $this->options));
         }
     }
 
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -79,10 +85,9 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
-            $data = array();
+            $data = [];
         }
 
-        // Remove all empty rows
         if ($this->allowDelete) {
             foreach ($form as $name => $child) {
                 if (!isset($data[$name])) {
@@ -91,19 +96,18 @@ class ResizeFormListener implements EventSubscriberInterface
             }
         }
 
-        // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
-                    $form->add($name, $this->type, array_replace(array(
+                    $form->add($name, $this->type, array_replace([
                         'property_path' => '['.$name.']',
-                    ), $this->options));
+                    ], $this->options));
                 }
             }
         }
     }
 
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -112,8 +116,8 @@ class ResizeFormListener implements EventSubscriberInterface
         // new entries, which were added by the data mapper. The data mapper ignores existing
         // entries, so we need to manually unset removed entries in the collection.
 
-        if (null === $data) {
-            $data = array();
+        if ($data === null) {
+            $data = [];
         }
 
         if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
@@ -140,7 +144,7 @@ class ResizeFormListener implements EventSubscriberInterface
         // The data mapper only adds, but does not remove items, so do this
         // here
         if ($this->allowDelete) {
-            $toDelete = array();
+            $toDelete = [];
 
             foreach ($data as $name => $child) {
                 if (!$form->has($name)) {
