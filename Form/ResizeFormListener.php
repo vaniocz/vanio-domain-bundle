@@ -70,7 +70,7 @@ class ResizeFormListener implements EventSubscriberInterface
         foreach ($data as $name => $value) {
             $encodedName = $this->encodeFormName($name);
             $form->add($encodedName, $this->type, array_replace([
-                'property_path' => '['.$encodedName.']',
+                'property_path' => '['.$name.']',
             ], $this->options));
         }
     }
@@ -99,8 +99,9 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
+                    $decodedName = $this->decodeFormName($name);
                     $form->add($name, $this->type, array_replace([
-                        'property_path' => '['.$name.']',
+                        'property_path' => '['.$decodedName.']',
                     ], $this->options));
                 }
             }
@@ -135,7 +136,7 @@ class ResizeFormListener implements EventSubscriberInterface
                 // $isNew can only be true if allowAdd is true, so we don't
                 // need to check allowAdd again
                 if ($isEmpty && ($isNew || $this->allowDelete)) {
-                    unset($data[$name]);
+                    unset($data[$decodedName]);
                     $form->remove($name);
                 }
             }
@@ -153,17 +154,11 @@ class ResizeFormListener implements EventSubscriberInterface
             }
 
             foreach ($toDelete as $name) {
-                unset($data[$name]);
+                unset($data[$this->decodeFormName($name)]);
             }
         }
 
-        $dataWithDecodedNames = [];
-
-        foreach ($data as $name => $value) {
-            $dataWithDecodedNames[$this->decodeFormName($name)] = $value;
-        }
-
-        $event->setData($dataWithDecodedNames);
+        $event->setData($data);
     }
 
     private function encodeFormName(string $name): string
