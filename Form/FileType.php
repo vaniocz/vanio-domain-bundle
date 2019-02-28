@@ -41,6 +41,7 @@ class FileType extends AbstractType implements DataMapperInterface, EventSubscri
                 'multiple' => false,
                 'options' => [],
                 'required_message' => 'Choose a file.',
+                'allow_file_upload' => true,
             ])
             ->setAllowedTypes('class', 'string')
             ->setAllowedTypes('multiple', 'bool')
