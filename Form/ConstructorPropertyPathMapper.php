@@ -51,7 +51,6 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
     public function mapFormsToData($forms, &$data)
     {
         $parameters = [];
-        $data = null;
         $hasData = false;
 
         foreach ($forms as $form) {
@@ -66,6 +65,10 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
             if ($form->getData() !== null) {
                 $hasData = true;
             }
+        }
+
+        if ($this->isNullable) {
+            $data = null;
         }
 
         if ($hasData || !$this->isNullable) {
