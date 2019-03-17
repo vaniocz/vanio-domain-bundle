@@ -77,7 +77,13 @@ class RequiredExtension extends AbstractTypeExtension
      */
     public function validateRequired(FormInterface $form)
     {
-        if (!$form->isSynchronized() || $this->resolveValidationGroups($form) === []) {
+        if (!$form->isSynchronized()) {
+            return;
+        }
+
+        $groups = $this->resolveValidationGroups($form);
+
+        if ($groups === [] || $groups === [false]) {
             return;
         }
 
