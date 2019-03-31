@@ -28,6 +28,7 @@ use Vanio\DomainBundle\Doctrine\Types\JsonbType;
 use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
 use Vanio\DomainBundle\Doctrine\Types\UuidArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\PlainTsQueryFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsQueryFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankCDFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankFunction;
@@ -91,6 +92,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'UNACCENT' => UnaccentFunction::class,
                         'PAD_LEFT' => PadLeftFunction::class,
                         'TSQUERY' => TsQueryFunction::class,
+                        'PLAIN_TSQUERY' => PlainTsQueryFunction::class,
                         'TSRANK' => TsRankFunction::class,
                         'TSRANKCD' => TsRankCDFunction::class,
                         'TOP' => TopFunction::class,
