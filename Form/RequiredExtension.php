@@ -150,7 +150,7 @@ class RequiredExtension extends AbstractTypeExtension
         static $skippedParentTypes;
 
         if ($skippedParentTypes === null) {
-            $skippedParentTypes = array_flip(['choice', 'repeated', 'scalar_object']);
+            $skippedParentTypes = array_flip(['choice', 'repeated', 'scalar_object', 'entity_value']);
         }
 
         if ($config->getCompound() && $config->getType()->getBlockPrefix() !== 'repeated') {
