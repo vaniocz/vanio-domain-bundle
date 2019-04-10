@@ -56,7 +56,7 @@ class FulltextSearch implements Filter
 
         return sprintf(
             '%s(%s.%s, :%s) = true',
-            $this->isPlaintext ? : 'plain_tsquery', 'tsquery',
+            $this->isPlaintext ? 'plain_tsquery' : 'tsquery',
             $this->dqlAlias ?? $dqlAlias,
             $this->searchDocumentField,
             $parameter

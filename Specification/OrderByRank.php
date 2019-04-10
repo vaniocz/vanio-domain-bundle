@@ -55,7 +55,7 @@ class OrderByRank implements QueryModifier
         $parameter = QueryBuilderUtility::generateUniqueDqlAlias(__CLASS__);
         $sort = sprintf(
             '%s(%s.%s, :%s)',
-            $this->isPlaintext ? : 'plain_tsrank', 'tsrank',
+            $this->isPlaintext ? 'plain_tsrank' : 'tsrank',
             $this->dqlAlias ?? $dqlAlias,
             $this->searchDocumentField,
             $parameter
