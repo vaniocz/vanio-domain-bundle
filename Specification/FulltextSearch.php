@@ -16,6 +16,9 @@ class FulltextSearch implements Filter
     /** @var string|null */
     private $dqlAlias;
 
+    /** @var bool */
+    private $isPlaintext = false;
+
     public function __construct(
         string $searchTerm,
         string $searchDocumentField = 'fulltextDocument',
@@ -24,6 +27,17 @@ class FulltextSearch implements Filter
         $this->searchTerm = $searchTerm;
         $this->searchDocumentField = $searchDocumentField;
         $this->dqlAlias = $dqlAlias;
+    }
+
+    public static function plaintext(
+        string $searchTerm,
+        string $searchDocumentField = 'fulltextDocument',
+        string $dqlAlias = null
+    ): self {
+        $self = new self($searchTerm, $searchDocumentField, $dqlAlias);
+        $self->isPlaintext = true;
+
+        return $self;
     }
 
     /**
@@ -35,10 +49,14 @@ class FulltextSearch implements Filter
     public function getFilter(QueryBuilder $queryBuilder, $dqlAlias): string
     {
         $parameter = QueryBuilderUtility::generateUniqueDqlAlias(__CLASS__);
-        $queryBuilder->setParameter($parameter, self::processSearchTerm($this->searchTerm));
+        $queryBuilder->setParameter(
+            $parameter,
+            $this->isPlaintext ? $this->searchTerm : self::processSearchTerm($this->searchTerm)
+        );
 
         return sprintf(
-            'tsquery(%s.%s, :%s) = true',
+            '%s(%s.%s, :%s) = true',
+            $this->isPlaintext ? : 'plain_tsquery', 'tsquery',
             $this->dqlAlias ?? $dqlAlias,
             $this->searchDocumentField,
             $parameter

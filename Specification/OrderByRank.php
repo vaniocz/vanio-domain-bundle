@@ -16,6 +16,9 @@ class OrderByRank implements QueryModifier
     /** @var string|null */
     private $dqlAlias;
 
+    /** @var bool */
+    private $isPlaintext = false;
+
     /**
      * @param string $searchTerm
      * @param string $searchDocumentField
@@ -31,6 +34,17 @@ class OrderByRank implements QueryModifier
         $this->dqlAlias = $dqlAlias;
     }
 
+    public static function plaintext(
+        string $searchTerm,
+        string $searchDocumentField = 'fulltextDocument',
+        string $dqlAlias = null
+    ): self {
+        $self = new self($searchTerm, $searchDocumentField, $dqlAlias);
+        $self->isPlaintext = true;
+
+        return $self;
+    }
+
     /**
      * @param QueryBuilder $queryBuilder
      * @param string $dqlAlias
@@ -40,12 +54,17 @@ class OrderByRank implements QueryModifier
     {
         $parameter = QueryBuilderUtility::generateUniqueDqlAlias(__CLASS__);
         $sort = sprintf(
-            'tsrank(%s.%s, :%s)',
+            '%s(%s.%s, :%s)',
+            $this->isPlaintext ? : 'plain_tsrank', 'tsrank',
             $this->dqlAlias ?? $dqlAlias,
-            $this->searchDocumentField, $parameter
+            $this->searchDocumentField,
+            $parameter
         );
         $queryBuilder
             ->addOrderBy($sort, 'DESC')
-            ->setParameter($parameter, FulltextSearch::processSearchTerm($this->searchTerm));
+            ->setParameter(
+                $parameter,
+                $this->isPlaintext ? $this->searchTerm : FulltextSearch::processSearchTerm($this->searchTerm)
+            );
     }
 }
