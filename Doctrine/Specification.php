@@ -26,7 +26,13 @@ abstract class Specification implements SpecificationInterface
         $dqlAlias = $this->resolveAlias($dqlAlias);
         $specification = $this->buildSpecification($dqlAlias);
 
-        return $specification instanceof Filter ? $specification->getFilter($queryBuilder, $dqlAlias) : null;
+        if (!$specification instanceof Filter) {
+            return null;
+        }
+
+        $filter = trim($specification->getFilter($queryBuilder, $dqlAlias));
+
+        return $filter === '' ? null : $filter;
     }
 
     /**
