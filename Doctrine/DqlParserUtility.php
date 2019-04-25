@@ -12,7 +12,7 @@ use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\SqlWalker;
 use Vanio\Stdlib\Objects;
 
-class DqlParserUtility
+abstract class DqlParserUtility
 {
     public static function isSubselectNextToken(Parser $parser): bool
     {

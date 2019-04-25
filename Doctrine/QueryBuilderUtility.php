@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Vanio\Stdlib\Strings;
 
-class QueryBuilderUtility
+abstract class QueryBuilderUtility
 {
     /**
      * @return string[]
