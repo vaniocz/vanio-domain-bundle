@@ -37,6 +37,23 @@ abstract class QueryBuilderUtility
         return $dqlAliasClasses;
     }
 
+    /**
+     * @param mixed $literal
+     * @return string
+     */
+    public static function quoteLiteral($literal): string
+    {
+        if (is_array($literal)) {
+            return implode(', ', array_map([__CLASS__, __FUNCTION__], $literal));
+        } elseif (is_int($literal) || is_float($literal)) {
+            return (string) $literal;
+        } else if (is_bool($literal)) {
+            return $literal ? 'true' : 'false';
+        }
+
+        return sprintf("'%s'", str_replace("'", "''", $literal));
+    }
+
     public static function generateUniqueDqlAlias(string $class): string
     {
         static $i = 0;
