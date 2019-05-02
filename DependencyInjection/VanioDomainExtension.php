@@ -21,6 +21,7 @@ use Vanio\DomainBundle\Doctrine\Functions\JsonGetPathFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonObjectAggFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
+use Vanio\DomainBundle\Doctrine\Functions\PercentileContFunction;
 use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
@@ -88,6 +89,9 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                     'column' => ColumnHydrator::class,
                 ],
                 'dql' => [
+                    'numeric_functions' => [
+                        'PERCENTILE_CONT' => PercentileContFunction::class,
+                    ],
                     'string_functions' => [
                         'REPLACE' => ReplaceFunction::class,
                         'UNACCENT' => UnaccentFunction::class,
