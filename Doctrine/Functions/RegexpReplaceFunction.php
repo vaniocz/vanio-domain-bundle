@@ -7,16 +7,19 @@ use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
-class ReplaceFunction extends FunctionNode
+class RegexpReplaceFunction extends FunctionNode
 {
     /** @var Node */
     private $string;
 
     /** @var Node */
-    private $search;
+    private $pattern;
 
     /** @var Node */
     private $replacement;
+
+    /** @var Node */
+    private $flags;
 
     public function parse(Parser $parser)
     {
@@ -24,19 +27,27 @@ class ReplaceFunction extends FunctionNode
         $parser->match(Lexer::T_OPEN_PARENTHESIS);
         $this->string = $parser->ArithmeticPrimary();
         $parser->match(Lexer::T_COMMA);
-        $this->search = $parser->ArithmeticPrimary();
+        $this->pattern = $parser->ArithmeticPrimary();
         $parser->match(Lexer::T_COMMA);
         $this->replacement = $parser->ArithmeticPrimary();
+        $this->flags = null;
+
+        if ($parser->getLexer()->isNextToken(Lexer::T_COMMA)) {
+            $parser->match(Lexer::T_COMMA);
+            $this->flags = $parser->ArithmeticPrimary();
+        }
+
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
 
     public function getSql(SqlWalker $sqlWalker): string
     {
         return sprintf(
-            'REPLACE(%s, %s, %s)',
+            'REGEXP_REPLACE(%s, %s, %s%s)',
             $this->string->dispatch($sqlWalker),
-            $this->search->dispatch($sqlWalker),
-            $this->replacement->dispatch($sqlWalker)
+            $this->pattern->dispatch($sqlWalker),
+            $this->replacement->dispatch($sqlWalker),
+            $this->flags ? ", {$this->flags->dispatch($sqlWalker)}" : ''
         );
     }
 }

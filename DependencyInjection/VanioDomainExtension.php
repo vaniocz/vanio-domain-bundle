@@ -13,6 +13,7 @@ use Vanio\DomainBundle\Doctrine\ColumnHydrator;
 use Vanio\DomainBundle\Doctrine\Functions\ArrayFunction;
 use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonBuildArrayFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonBuildObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
@@ -22,6 +23,7 @@ use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonObjectAggFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PercentileContFunction;
+use Vanio\DomainBundle\Doctrine\Functions\RegexpReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\ReplaceFunction;
 use Vanio\DomainBundle\Doctrine\Functions\TopFunction;
 use Vanio\DomainBundle\Doctrine\Functions\UnaccentFunction;
@@ -94,6 +96,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                     ],
                     'string_functions' => [
                         'REPLACE' => ReplaceFunction::class,
+                        'REGEXP_REPLACE' => RegexpReplaceFunction::class,
                         'UNACCENT' => UnaccentFunction::class,
                         'PAD_LEFT' => PadLeftFunction::class,
                         'TSQUERY' => TsQueryFunction::class,
@@ -110,6 +113,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'JSON_GET_NUMBER' => JsonGetNumberFunction::class,
                         'JSON_GET_BOOLEAN' => JsonGetBooleanFunction::class,
                         'JSON_GET_PATH' => JsonGetPathFunction::class,
+                        'JSON_BUILD_ARRAY' => JsonBuildObjectFunction::class,
                         'JSON_BUILD_OBJECT' => JsonBuildObjectFunction::class,
                         'JSON_OBJECT_AGG' => JsonObjectAggFunction::class,
                     ],

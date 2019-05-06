@@ -25,13 +25,15 @@ abstract class DqlParserUtility
     public static function parseSubselect(Parser $parser): SelectStatement
     {
         $lexer = $parser->getLexer();
-        $isParenthesized = $lexer->isNextToken(Lexer::T_OPEN_PARENTHESIS);
 
-        if ($isParenthesized) {
+        if ($isParenthesized = $lexer->isNextToken(Lexer::T_OPEN_PARENTHESIS)) {
             $parser->match(Lexer::T_OPEN_PARENTHESIS);
         }
 
-        $selectStatement = new SelectStatement($parser->SelectClause(), $parser->FromClause());
+        $selectStatement = new SelectStatement(
+            $parser->SelectClause(),
+            $lexer->isNextToken(Lexer::T_FROM) ? $parser->FromClause() : null
+        );
         $selectStatement->whereClause = $lexer->isNextToken(Lexer::T_WHERE) ? $parser->WhereClause() : null;
 
         if ($lexer->isNextToken(Lexer::T_GROUP)) {
@@ -81,9 +83,13 @@ abstract class DqlParserUtility
         $originalRootAliases = $rootAliases;
         $rootAliases = [];
 
-        $sql = $sqlWalker->walkSelectClause($subselect->selectClause)
-            . $sqlWalker->walkFromClause($subselect->fromClause)
-            . $sqlWalker->walkWhereClause($subselect->whereClause);
+        $sql = $sqlWalker->walkSelectClause($subselect->selectClause);
+
+        if ($subselect->fromClause) {
+            $sql .= $sqlWalker->walkFromClause($subselect->fromClause);
+        }
+
+        $sql .= $sqlWalker->walkWhereClause($subselect->whereClause);
 
         if ($subselect->groupByClause) {
             $sql .= self::walkGroupBy($sqlWalker, $subselect->groupByClause);
@@ -99,7 +105,7 @@ abstract class DqlParserUtility
 
         $rootAliases = $originalRootAliases;
 
-        return $sql;
+        return "($sql)";
     }
 
     public static function walkGroupBy(SqlWalker $sqlWalker, GroupByClause $groupBy): string
