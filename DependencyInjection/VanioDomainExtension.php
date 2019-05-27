@@ -21,6 +21,7 @@ use Vanio\DomainBundle\Doctrine\Functions\JsonGetObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetPathFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetStringFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonObjectAggFunction;
+use Vanio\DomainBundle\Doctrine\Functions\NullFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PadLeftFunction;
 use Vanio\DomainBundle\Doctrine\Functions\PercentileContFunction;
 use Vanio\DomainBundle\Doctrine\Functions\RegexpReplaceFunction;
@@ -108,6 +109,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'FIELD' => FieldFunction::class,
                         'CAST' => CastFunction::class,
                         'ARRAY' => ArrayFunction::class,
+                        'NULL' => NullFunction::class,
                         'JSON_GET_OBJECT' => JsonGetObjectFunction::class,
                         'JSON_GET_STRING' => JsonGetStringFunction::class,
                         'JSON_GET_NUMBER' => JsonGetNumberFunction::class,
