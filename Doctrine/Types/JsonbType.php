@@ -20,7 +20,7 @@ class JsonbType extends Type
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        return $value === null ? null :  json_encode($value);
+        return $value === null ? null : json_encode($value);
     }
 
     /**
