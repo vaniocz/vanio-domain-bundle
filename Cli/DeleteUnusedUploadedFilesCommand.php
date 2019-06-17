@@ -38,7 +38,7 @@ class DeleteUnusedUploadedFilesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('delete-unused-uploaded-files')
+            ->setName('vanio:delete-unused-uploaded-files')
             ->addOption('entity-manager','em', InputOption::VALUE_OPTIONAL, 'Entity manager name')
             ->addOption('force',
                 'f',
