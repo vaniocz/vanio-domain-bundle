@@ -19,6 +19,7 @@
         <parameter key="vanio_domain.translatable.translatable_listener.class">Vanio\DomainBundle\Translatable\TranslatableListener</parameter>
         <parameter key="vanio_domain.translatable.current_locale_callable.class">Vanio\DomainBundle\Translatable\CurrentLocaleCallable</parameter>
         <parameter key="vanio_domain.translatable.default_locale_callable.class">Vanio\DomainBundle\Translatable\DefaultLocaleCallable</parameter>
+        <parameter key="vanio_domain.cli.delete_unused_uploaded_files_command.class">Vanio\DomainBundle\Cli\DeleteUnusedUploadedFilesCommand</parameter>
         <parameter key="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber.class">VertigoLabs\DoctrineFullTextPostgres\Common\TsVectorSubscriber</parameter>
     </parameters>
 
@@ -107,6 +108,12 @@
 
         <service id="vanio_domain.translatable.default_locale_callable" class="%vanio_domain.translatable.default_locale_callable.class%" public="false">
             <argument type="service" id="request_stack"/>
+        </service>
+
+        <service id="vanio_domain.cli.delete_unused_uploaded_files_command" class="%vanio_domain.cli.delete_unused_uploaded_files_command.class%" public="false" abstract="true">
+            <argument type="service" id="doctrine"/>
+            <argument type="service" id="vich_uploader.metadata_reader"/>
+            <argument type="service" id="vich_uploader.property_mapping_factory"/>
         </service>
 
         <service id="vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber" class="%vertigolabs_doctrine_full_text_postgres.common.ts_vector_subscriber.class%">

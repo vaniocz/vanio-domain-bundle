@@ -13,7 +13,6 @@ use Vanio\DomainBundle\Doctrine\ColumnHydrator;
 use Vanio\DomainBundle\Doctrine\Functions\ArrayFunction;
 use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
-use Vanio\DomainBundle\Doctrine\Functions\JsonBuildArrayFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonBuildObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
@@ -67,6 +66,13 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                 ->getDefinition('vanio_domain.translatable.translatable_listener')
                 ->setAbstract(false)
                 ->addTag('doctrine.event_subscriber', ['priority' => 100]);
+        }
+
+        if (isset($container->getParameter('kernel.bundles')['VichUploaderBundle'])) {
+            $definition = $container->getDefinition('vanio_domain.cli.delete_unused_uploaded_files_command');
+            $definition
+                ->setAbstract(false)
+                ->addTag('console.command', ['command' => 'vanio:delete-unused-uploaded-files']);
         }
     }
 
