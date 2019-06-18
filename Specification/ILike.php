@@ -21,6 +21,7 @@ class ILike extends Like
 
         $parameter = $this->getParameterName($queryBuilder);
         $value = mb_strtolower(ValueConverter::convertToDatabaseValue($this->value, $queryBuilder));
+        $value = str_replace(['\\', '%'], ['\\\\', '\\%'], $value);
         $queryBuilder->setParameter($parameter, $value);
 
         return (string) new Comparison(
