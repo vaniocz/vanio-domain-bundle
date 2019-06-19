@@ -42,6 +42,7 @@ class Search implements Filter
             foreach ($this->properties as $property) {
                 $parameter = sprintf('_term_%d', count($queryBuilder->getParameters()));
                 $value = mb_strtolower(ValueConverter::convertToDatabaseValue($term, $queryBuilder));
+                $value = str_replace(['\\', '%'], ['\\\\', '\\%'], $value);
                 $queryBuilder->setParameter($parameter, "%{$value}%");
                 $or[] = sprintf(
                     'LOWER(UNACCENT(%s)) LIKE UNACCENT(:%s)',
