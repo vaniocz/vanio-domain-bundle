@@ -13,6 +13,7 @@ use Vanio\DomainBundle\Doctrine\ColumnHydrator;
 use Vanio\DomainBundle\Doctrine\Functions\ArrayFunction;
 use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
+use Vanio\DomainBundle\Doctrine\Functions\InFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonBuildObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
@@ -124,6 +125,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'JSON_BUILD_ARRAY' => JsonBuildObjectFunction::class,
                         'JSON_BUILD_OBJECT' => JsonBuildObjectFunction::class,
                         'JSON_OBJECT_AGG' => JsonObjectAggFunction::class,
+                        'IN' => InFunction::class,
                     ],
                 ],
             ],
