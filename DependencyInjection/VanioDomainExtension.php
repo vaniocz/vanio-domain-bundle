@@ -11,9 +11,10 @@ use Vanio\DoctrineGenericTypes\DBAL\ScalarObjectType;
 use Vanio\DoctrineGenericTypes\DBAL\UniversalJsonType;
 use Vanio\DomainBundle\Doctrine\ColumnHydrator;
 use Vanio\DomainBundle\Doctrine\Functions\ArrayFunction;
+use Vanio\DomainBundle\Doctrine\Functions\ArrayPositionFunction;
 use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
-use Vanio\DomainBundle\Doctrine\Functions\InFunction;
+use Vanio\DomainBundle\Doctrine\Functions\AnyOfFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonBuildObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
@@ -116,6 +117,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'FIELD' => FieldFunction::class,
                         'CAST' => CastFunction::class,
                         'ARRAY' => ArrayFunction::class,
+                        'ARRAY_POSITION' => ArrayPositionFunction::class,
                         'NULL' => NullFunction::class,
                         'JSON_GET_OBJECT' => JsonGetObjectFunction::class,
                         'JSON_GET_STRING' => JsonGetStringFunction::class,
@@ -125,7 +127,7 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'JSON_BUILD_ARRAY' => JsonBuildObjectFunction::class,
                         'JSON_BUILD_OBJECT' => JsonBuildObjectFunction::class,
                         'JSON_OBJECT_AGG' => JsonObjectAggFunction::class,
-                        'IN' => InFunction::class,
+                        'ANY_OF' => AnyOfFunction::class,
                     ],
                 ],
             ],
