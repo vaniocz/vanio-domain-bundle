@@ -16,20 +16,25 @@ class OrderBy implements QueryModifier
     /** @var string[] */
     private $orderBy;
 
-    /** @var string|null */
+    /** @var string|bool|null */
     private $dqlAlias;
 
     /**
      * @param string|string[] $orderBy
-     * @param string|null $dqlAlias
+     * @param string|bool|null $dqlAlias
      */
-    public function __construct($orderBy, string $dqlAlias = null)
+    public function __construct($orderBy, $dqlAlias = null)
     {
         $this->orderBy = is_array($orderBy) ? $orderBy : [$orderBy => 'ASC'];
         $this->dqlAlias = $dqlAlias;
     }
 
-    public static function fromString(string $orderByString, string $dqlAlias = null): self
+    /**
+     * @param string $orderByString
+     * @param string|bool|null $dqlAlias
+     * @return self
+     */
+    public static function fromString(string $orderByString, $dqlAlias = null): self
     {
         $orderBy = [];
 
@@ -56,10 +61,18 @@ class OrderBy implements QueryModifier
      * @param QueryBuilder $queryBuilder
      * @param string $dqlAlias
      */
-    public function modify(QueryBuilder $queryBuilder, $dqlAlias)
+    public function modify(QueryBuilder $queryBuilder, $dqlAlias): void
     {
         if ($this->dqlAlias !== null) {
             $dqlAlias = $this->dqlAlias;
+        }
+
+        if ($dqlAlias === false) {
+            foreach ($this->orderBy as $orderBy => $direction) {
+                $queryBuilder->addOrderBy($orderBy, $direction);
+            }
+
+            return;
         }
 
         $classMetadata = $this->getClassMetadata($queryBuilder, $dqlAlias);
