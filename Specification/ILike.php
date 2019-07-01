@@ -1,13 +1,40 @@
 <?php
 namespace Vanio\DomainBundle\Specification;
 
-use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
-use Happyr\DoctrineSpecification\Filter\Like;
+use Happyr\DoctrineSpecification\Filter\Filter;
 use Happyr\DoctrineSpecification\ValueConverter;
 
-class ILike extends Like
+class ILike implements Filter
 {
+    const CONTAINS = '%%%s%%';
+    const ENDS_WITH = '%%%s';
+    const STARTS_WITH = '%s%%';
+
+    /** @var string */
+    private $property;
+
+    /** @var string */
+    private $value;
+
+    /** @var string */
+    private $format;
+
+    /** @var string */
+    private $dqlAlias;
+
+    public function __construct(
+        string $property,
+        string $value,
+        string $format = self::CONTAINS,
+        ?string $dqlAlias = null
+    ) {
+        $this->property = $property;
+        $this->value = $value;
+        $this->format = $format;
+        $this->dqlAlias = $dqlAlias;
+    }
+
     /**
      * @param QueryBuilder $queryBuilder
      * @param string|null $dqlAlias
@@ -19,15 +46,12 @@ class ILike extends Like
             $dqlAlias = $this->dqlAlias;
         }
 
-        $parameter = $this->getParameterName($queryBuilder);
-        $value = mb_strtolower(ValueConverter::convertToDatabaseValue($this->value, $queryBuilder));
-        $value = str_replace(['\\', '%'], ['\\\\', '\\%'], $value);
+        $parameter = sprintf('i_like_%d', $queryBuilder->getParameters()->count());
+        $value = str_replace(['\\', '%'], ['\\\\', '\\%'], $this->value);
+        $value = sprintf($this->format, $value);
+        $value = mb_strtolower(ValueConverter::convertToDatabaseValue($value, $queryBuilder));
         $queryBuilder->setParameter($parameter, $value);
 
-        return (string) new Comparison(
-            sprintf('LOWER(%s.%s)', $dqlAlias, $this->field),
-            'LIKE',
-            sprintf(':%s', $parameter)
-        );
+        return "LOWER({$dqlAlias}.{$this->property}) LIKE :{$parameter}";
     }
 }
