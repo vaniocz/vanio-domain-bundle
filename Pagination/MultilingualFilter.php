@@ -61,6 +61,6 @@ class MultilingualFilter extends Specification
 
     public function buildSpecification(string $dqlAlias): AndX
     {
-        return new AndX($this->locale, new WithTranslations, $this->filter);
+        return new AndX($this->locale, new WithTranslations($this->locale->locale()), $this->filter);
     }
 }
