@@ -9,14 +9,22 @@ use Vanio\DomainBundle\Specification\Locale;
 
 class MultilingualFilterParamConverter implements ParamConverterInterface
 {
+    /** @var callable|null */
+    private $currentLocaleCallable;
+
+    public function __construct(?callable $currentLocaleCallable)
+    {
+        $this->currentLocaleCallable = $currentLocaleCallable;
+    }
+
     public function apply(Request $request, ParamConverter $configuration): bool
     {
         (new FilterParamConverter($configuration->getOptions()))->apply($request, $configuration);
         $filter = $request->attributes->get($configuration->getName());
 
-        (new LocaleParamConverter('filterLocale'))->apply($request, $configuration);
-        /** @var Locale $locale */
+        (new LocaleParamConverter($this->currentLocaleCallable, 'filterLocale'))->apply($request, $configuration);
         $locale = $request->attributes->get($configuration->getName());
+        assert($locale instanceof Locale);
 
         $multilingualFilter = new MultilingualFilter($filter, $locale->withIncludedUntranslated());
         $request->attributes->set($configuration->getName(), $multilingualFilter);

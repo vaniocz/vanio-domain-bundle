@@ -8,11 +8,15 @@ use Vanio\DomainBundle\Specification\Locale;
 
 class LocaleParamConverter implements ParamConverterInterface
 {
+    /** @var callable|null */
+    private $currentLocaleCallable;
+
     /** @var string|null */
     private $localeParameter;
 
-    public function __construct(string $localeParameter = null)
+    public function __construct(?callable $currentLocaleCallable, ?string $localeParameter = null)
     {
+        $this->currentLocaleCallable = $currentLocaleCallable;
         $this->localeParameter = $localeParameter;
     }
 
@@ -31,7 +35,12 @@ class LocaleParamConverter implements ParamConverterInterface
             $locale = $request->query->get($localeParameter);
         }
 
-        $request->attributes->set($configuration->getName(), new Locale($locale ?? $request->getLocale()));
+        if (!$locale) {
+            $currentLocaleCallable = $this->currentLocaleCallable;
+            $locale = $currentLocaleCallable ? $currentLocaleCallable() : $request->getLocale();
+        }
+
+        $request->attributes->set($configuration->getName(), new Locale($locale));
 
         return true;
     }
