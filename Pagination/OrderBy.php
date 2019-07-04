@@ -157,7 +157,10 @@ class OrderBy implements QueryModifier
             }
         }
 
-        throw new \InvalidArgumentException('QueryBuilder does not contain FROM clause with "%s" alias.', $alias);
+        throw new \InvalidArgumentException(sprintf(
+            'QueryBuilder does not contain FROM clause with "%s" alias.',
+            $alias
+        ));
     }
 
     /**
