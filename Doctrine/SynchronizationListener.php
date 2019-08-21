@@ -259,7 +259,7 @@ class SynchronizationListener implements EventSubscriber
      */
     private function deleteTargetEntity($sourceEntity)
     {
-        if ($targetEntity = $this->findTargetEntityBySourceEntity($sourceEntity) && $this->targetEntityRemover) {
+        if ($this->targetEntityRemover && $targetEntity = $this->findTargetEntityBySourceEntity($sourceEntity)) {
             call_user_func($this->targetEntityRemover, $targetEntity);
         }
     }
