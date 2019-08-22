@@ -62,7 +62,7 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
 
             $parameters[(string) $propertyPath] = $form->getData();
 
-            if ($form->getData() !== null) {
+            if ($form->getData() !== null && $form->getData() !== false) {
                 $hasData = true;
             }
         }
