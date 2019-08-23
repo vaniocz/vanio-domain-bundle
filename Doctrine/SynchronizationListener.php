@@ -43,6 +43,12 @@ class SynchronizationListener implements EventSubscriber
     /** @var callable|null */
     private $targetEntityHydrator;
 
+    /** @var callable|null */
+    private $sourceEntityRemover;
+
+    /** @var callable|null */
+    private $targetEntityRemover;
+
     public function __construct(string $sourceEntityClass, string $targetEntityClass, array $mapping)
     {
         $this->sourceEntityClass = $sourceEntityClass;
@@ -55,6 +61,8 @@ class SynchronizationListener implements EventSubscriber
         $this->targetEntityProvider = $this->sourceEntityProvider;
         $this->sourceEntityHydrator = [$this, 'updateTargetEntityBySourceEntity'];
         $this->targetEntityHydrator = $this->sourceEntityHydrator;
+        $this->sourceEntityRemover = [$this, 'removeTargetEntity'];
+        $this->targetEntityRemover = $this->sourceEntityRemover;
     }
 
     public function setSourceEntityFactory(callable $sourceEntityFactory = null): self
@@ -95,6 +103,20 @@ class SynchronizationListener implements EventSubscriber
     public function setTargetEntityHydrator(callable $targetEntityHydrator = null): self
     {
         $this->targetEntityHydrator = $targetEntityHydrator;
+
+        return $this;
+    }
+
+    public function setSourceEntityRemover(callable $sourceEntityRemover = null): self
+    {
+        $this->sourceEntityRemover = $sourceEntityRemover;
+
+        return $this;
+    }
+
+    public function setTargetEntityRemover(callable $targetEntityRemover = null): self
+    {
+        $this->targetEntityRemover = $targetEntityRemover;
 
         return $this;
     }
@@ -249,8 +271,18 @@ class SynchronizationListener implements EventSubscriber
     private function deleteTargetEntity($sourceEntity)
     {
         if ($targetEntity = $this->findTargetEntityBySourceEntity($sourceEntity)) {
-            $this->entityManager->remove($targetEntity);
+            if ($entityRemover = $this->resolveTargetEntityRemover($sourceEntity)) {
+                call_user_func($entityRemover, $targetEntity);
+            }
         }
+    }
+
+    /**
+     * @param object $targetEntity
+     */
+    private function removeTargetEntity($targetEntity)
+    {
+        $this->entityManager->remove($targetEntity);
     }
 
     /**
@@ -330,6 +362,17 @@ class SynchronizationListener implements EventSubscriber
         return $sourceEntity instanceof $this->sourceEntityClass
             ? $this->targetEntityHydrator
             : $this->sourceEntityHydrator;
+    }
+
+    /**
+     * @param object $sourceEntity
+     * @return callable|null
+     */
+    private function resolveTargetEntityRemover($sourceEntity)
+    {
+        return $sourceEntity instanceof $this->sourceEntityClass
+            ? $this->targetEntityRemover
+            : $this->sourceEntityRemover;
     }
 
     /**
