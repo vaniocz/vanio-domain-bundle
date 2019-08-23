@@ -18,6 +18,7 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
     /** @var bool */
     private $isNullable;
 
+    /** @var bool */
     private $treatFalseLikeNull;
 
     public function __construct(
