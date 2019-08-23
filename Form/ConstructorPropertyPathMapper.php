@@ -18,21 +18,26 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
     /** @var bool */
     private $isNullable;
 
+    private $treatFalseLikeNull;
+
     public function __construct(
         PropertyAccessorInterface $propertyAccessor = null,
         string $factoryMethod = '__construct',
-        bool $isNullable = false
+        bool $isNullable = false,
+        bool $treatFalseLikeNull = false
     ) {
         $this->propertyPathMapper = new PropertyPathMapper($propertyAccessor);
         $this->factoryMethod = $factoryMethod;
         $this->isNullable = $isNullable;
+        $this->treatFalseLikeNull = $treatFalseLikeNull;
     }
 
     public static function nullable(
         PropertyAccessorInterface $propertyAccessor = null,
-        string $factoryMethod = '__construct'
+        string $factoryMethod = '__construct',
+        bool $treatFalseLikeNull = false
     ): self {
-        return new self($propertyAccessor, $factoryMethod, true);
+        return new self($propertyAccessor, $factoryMethod, true, $treatFalseLikeNull);
     }
 
     /**
@@ -62,7 +67,7 @@ class ConstructorPropertyPathMapper implements DataMapperInterface
 
             $parameters[(string) $propertyPath] = $form->getData();
 
-            if ($form->getData() !== null && $form->getData() !== false) {
+            if ($form->getData() !== null && ($form->getData() !== false || !$this->treatFalseLikeNull)) {
                 $hasData = true;
             }
         }
