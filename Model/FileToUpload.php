@@ -10,21 +10,20 @@ class FileToUpload extends UploadedFile
     /** @var bool */
     private $temporary = false;
 
-    public function __construct(string $path, string $originalName = null, string $mimeType = null, int $size = null)
+    public function __construct(string $path, string $originalName = null, string $mimeType = null)
     {
-        parent::__construct($path, $originalName ?? self::resolveOriginalName($path), $mimeType, $size, null, true);
+        parent::__construct($path, $originalName ?? self::resolveOriginalName($path), $mimeType, null, true);
     }
 
     public static function temporary(
         string $path,
         string $originalName = null,
-        string $mimeType = null,
-        int $size = null
+        string $mimeType = null
     ): self {
         $filesystem = new Filesystem;
         $target = tempnam(sys_get_temp_dir(), '');
         $filesystem->copy($path, $target, true);
-        $self = new self($target, $originalName, $mimeType, $size);
+        $self = new self($target, $originalName, $mimeType);
         $self->temporary = true;
 
         return $self;
