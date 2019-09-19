@@ -323,8 +323,11 @@ class EntityRepository extends BaseEntityRepository
      * @param ResultTransformer[] $resultTransformers
      * @return Query
      */
-    public function getQuery($specification, ResultModifier $resultModifier = null, &$resultTransformers = []): Query
-    {
+    public function getQuery(
+        $specification = null,
+        ResultModifier $resultModifier = null,
+        &$resultTransformers = []
+    ): Query {
         list($specification, $resultModifier, $resultTransformers) = $this->mergeSpecifications(
             $specification,
             $resultModifier
