@@ -33,8 +33,12 @@ use Vanio\DomainBundle\Doctrine\Types\JsonbType;
 use Vanio\DomainBundle\Doctrine\Types\TextArrayType;
 use Vanio\DomainBundle\Doctrine\Types\UuidArrayType;
 use VertigoLabs\DoctrineFullTextPostgres\DBAL\Types\TsVector;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\PlainToTsQueryFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\PlainTsQueryFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\PlainTsRankFunction;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\ToTsQueryFunction;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsAndFunction;
+use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsOrFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsQueryFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankCDFunction;
 use VertigoLabs\DoctrineFullTextPostgres\ORM\Query\AST\Functions\TsRankFunction;
@@ -113,6 +117,10 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'TSRANK' => TsRankFunction::class,
                         'PLAIN_TSRANK' => PlainTsRankFunction::class,
                         'TSRANKCD' => TsRankCDFunction::class,
+                        'TO_TSQUERY' => ToTsQueryFunction::class,
+                        'PLAINTO_TSQUERY' => PlainToTsQueryFunction::class,
+                        'TS_AND' => TsAndFunction::class,
+                        'TS_OR' => TsOrFunction::class,
                         'TOP' => TopFunction::class,
                         'FIELD' => FieldFunction::class,
                         'CAST' => CastFunction::class,
