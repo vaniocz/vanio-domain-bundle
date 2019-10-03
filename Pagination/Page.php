@@ -57,6 +57,11 @@ class Page implements PageSpecification
         return ceil(max($recordsCount - $this->recordsOnFirstPage, 0) / $this->recordsPerPage + 1);
     }
 
+    public function withRecordsPerPage(int $recordsPerPage, ?int $recordsOnFirstPage = null): self
+    {
+        return new self($this->pageNumber, $recordsPerPage, $recordsOnFirstPage);
+    }
+
     /**
      * @param Query $query
      */

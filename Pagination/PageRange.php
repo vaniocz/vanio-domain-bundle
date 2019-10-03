@@ -66,6 +66,11 @@ class PageRange implements PageSpecification
         return $this->toPage * $this->recordsPerPage + $this->recordsOnFirstPage - $this->recordsPerPage;
     }
 
+    public function withRecordsPerPage(int $recordsPerPage, ?int $recordsOnFirstPage = null): self
+    {
+        return new self($this->fromPage, $this->toPage, $recordsPerPage, $recordsOnFirstPage);
+    }
+
     /**
      * @param Query $query
      */

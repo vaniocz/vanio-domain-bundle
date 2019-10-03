@@ -24,6 +24,9 @@ class Filter extends Specification
         return $this->orderBy;
     }
 
+    /**
+     * @return Page|PageRange|PageSpecification
+     */
     public function page(): PageSpecification
     {
         return $this->page;
