@@ -111,7 +111,7 @@ class ValidatingMapper implements DataMapperInterface
                 return $child;
             } elseif (Strings::startsWith($propertyPath, "{$childPropertyPath}.")) {
                 return $this->resolveTargetForm($child, substr($propertyPath, strlen($childPropertyPath) + 1));
-            } elseif ($child->getConfig()->getOption('inherit_data', false)) {
+            } elseif ($child->getConfig()->getInheritData()) {
                 return $this->resolveTargetForm($child, $propertyPath);
             }
         }
