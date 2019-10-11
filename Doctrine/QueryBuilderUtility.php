@@ -83,6 +83,34 @@ abstract class QueryBuilderUtility
         return sprintf("'%s'", str_replace("'", "''", $literal));
     }
 
+    public static function findJoin(
+        QueryBuilder $queryBuilder,
+        string $dqlAlias,
+        ?string $joinType = null,
+        ?string $join = null,
+        ?string $condition = null
+    ): ?Join {
+        foreach ($queryBuilder->getDQLPart('join') as $joins) {
+            foreach ($joins as $dqlPart) {
+                /** @var Join $dqlPart */
+                if ($dqlPart->getAlias() !== $dqlAlias) {
+                    continue;
+                } elseif (
+                    ($joinType === null || $dqlPart->getJoinType() === $joinType)
+                    && ($join === null || $dqlPart->getJoin() === $join)
+                    && ($condition === null || (string) $dqlPart->getCondition() === $condition)
+                    && ($dqlPart->getConditionType() ?? 'WITH') === 'WITH'
+                ) {
+                    return $dqlPart;
+                }
+
+                throw new \InvalidArgumentException("Different DQL join alias \"{$dqlAlias}\" is already defined.");
+            }
+        }
+
+        return null;
+    }
+
     public static function generateUniqueDqlAlias(string $class): string
     {
         static $i = 0;

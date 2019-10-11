@@ -30,6 +30,10 @@ class TranslatableQueryBuilderUtility
             $translationsDqlAlias = sprintf('%s_translations', $translatableDqlAlias);
         }
 
+        if (QueryBuilderUtility::findJoin($queryBuilder, $translationsDqlAlias)) {
+            return;
+        }
+
         if ($translatableClass === null) {
             $translatableClass = QueryBuilderUtility::resolveDqlAliasClasses($queryBuilder)[$translatableDqlAlias];
         }
