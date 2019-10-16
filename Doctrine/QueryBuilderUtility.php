@@ -40,18 +40,13 @@ abstract class QueryBuilderUtility
         return $dqlAliasClasses;
     }
 
-    public static function setQueryParameters(Query $query, iterable $parameters): void
+    public static function removeUnusedQueryParameters(Query $query): void
     {
-        $params = [];
-        $query->setParameters([]);
+        $parameters = [];
 
-        foreach ($parameters as $name => $value) {
-            if ($value instanceof Parameter) {
-                $name = $value->getName();
-                $value = $value->getValue();
-            }
-
-            $params[$name] = $value;
+        foreach ($query->getParameters() as $parameter) {
+            assert($parameter instanceof Parameter);
+            $parameters[$parameter->getName()] = $parameter->getValue();
         }
 
         $parse = function () {
@@ -60,9 +55,12 @@ abstract class QueryBuilderUtility
         $parse = $parse->bindTo($query, Query::class);
         $parserResult = $parse();
         assert($parserResult instanceof ParserResult);
+        $query->setParameters([]);
 
         foreach ($parserResult->getParameterMappings() as $name => $_) {
-            $query->setParameter($name, $params[$name]);
+            if (array_key_exists($name, $parameters)) {
+                $query->setParameter($name, $parameters[$name]);
+            }
         }
     }
 
