@@ -43,6 +43,7 @@
         </service>
 
         <service id="vanio_domain.pagination.multilingual_filter_param_converter" class="%vanio_domain.pagination.multilingual_filter_param_converter.class%" public="false">
+            <argument type="service" id="translator"/>
             <argument type="service" id="vanio_domain.translatable.current_locale_callable"/>
             <tag name="request.param_converter" priority="1" converter="multilingual_filter"/>
         </service>
