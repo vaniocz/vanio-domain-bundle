@@ -4,6 +4,7 @@ namespace Vanio\DomainBundle\Pagination;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class PageParamConverter implements ParamConverterInterface
 {
@@ -11,13 +12,18 @@ class PageParamConverter implements ParamConverterInterface
         'page_parameter' => 'page',
         'records_per_page' => 10,
         'records_on_first_page' => null,
+        'translation_domain' => null,
     ];
+
+    /** @var TranslatorInterface */
+    private $translator;
 
     /** @var array */
     private $options;
 
-    public function __construct(array $options = [])
+    public function __construct(TranslatorInterface $translator, array $options = [])
     {
+        $this->translator = $translator;
         $this->options = $options + self::DEFAULT_OPTIONS;
     }
 
@@ -25,8 +31,11 @@ class PageParamConverter implements ParamConverterInterface
     {
         $options = $configuration->getOptions() + $this->options;
         $class = $configuration->getClass();
+        $pageParameter = $options['translation_domain']
+            ? $this->translator->trans($options['page_parameter'], [], $options['translation_domain'])
+            : $options['page_parameter'];
         $page = $class::{'create'}(
-            $request->query->get($options['page_parameter'], '1'),
+            $request->query->get($pageParameter, '1'),
             $options['records_per_page'],
             $options['records_on_first_page']
         );

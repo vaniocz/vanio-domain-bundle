@@ -25,11 +25,13 @@
 
     <services>
         <service id="vanio_domain.pagination.page_param_converter" class="%vanio_domain.pagination.page_param_converter.class%" public="false">
+            <argument type="service" id="translator"/>
             <argument>%vanio_domain.pagination_default_options%</argument>
             <tag name="request.param_converter" priority="1" converter="page"/>
         </service>
 
         <service id="vanio_domain.pagination.order_by_param_converter" class="%vanio_domain.pagination.order_by_param_converter.class%" public="false">
+            <argument type="service" id="translator"/>
             <argument>%vanio_domain.pagination_default_options%</argument>
             <tag name="request.param_converter" priority="1" converter="order_by"/>
         </service>
