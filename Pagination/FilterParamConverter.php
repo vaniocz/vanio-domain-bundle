@@ -4,14 +4,19 @@ namespace Vanio\DomainBundle\Pagination;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FilterParamConverter implements ParamConverterInterface
 {
+    /** @var TranslatorInterface */
+    private $translator;
+
     /** @var array */
     private $options;
 
-    public function __construct(array $options = [])
+    public function __construct(TranslatorInterface $translator, array $options = [])
     {
+        $this->translator = $translator;
         $this->options = $options + [
             'dql_alias' => null,
             'page_class' => Page::class,
@@ -22,9 +27,9 @@ class FilterParamConverter implements ParamConverterInterface
     {
         $options = $configuration->getOptions() + $this->options;
         $configuration->setClass($options['page_class']);
-        (new OrderByParamConverter($options))->apply($request, $configuration);
+        (new OrderByParamConverter($this->translator, $options))->apply($request, $configuration);
         $orderBy = $request->attributes->get($configuration->getName());
-        (new PageParamConverter($options))->apply($request, $configuration);
+        (new PageParamConverter($this->translator, $options))->apply($request, $configuration);
         $page = $request->attributes->get($configuration->getName());
         $filter = new Filter($orderBy, $page, $options['dql_alias']);
         $request->attributes->set($configuration->getName(), $filter);
