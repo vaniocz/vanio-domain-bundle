@@ -35,7 +35,7 @@ class LocaleParamConverter implements ParamConverterInterface
             $locale = $request->query->get($localeParameter);
         }
 
-        if (!$locale) {
+        if (empty($locale)) {
             $currentLocaleCallable = $this->currentLocaleCallable;
             $locale = $currentLocaleCallable ? $currentLocaleCallable() : $request->getLocale();
         }
