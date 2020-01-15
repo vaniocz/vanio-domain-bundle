@@ -60,6 +60,11 @@
                 <source>Longitude must be between {{ min }} and {{ max }} degrees.</source>
                 <target>Zeměpisná délka musí být mezi {{ min }} a {{ max }} stupni.</target>
             </trans-unit>
+
+            <trans-unit id="dba3f5c8e028c6f443e26003814c086c" resname='Unknown image format of file "{{ file }}".'>
+                <source>Unknown image format of file "{{ file }}".</source>
+                <target>Neznámý formát obrázku souboru "{{ file }}".</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
