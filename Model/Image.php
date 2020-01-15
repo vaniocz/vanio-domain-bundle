@@ -21,7 +21,7 @@ class Image extends File
 
         if (!parent::isImage()) {
             throw Validation::createException(
-                parent::isImage(),
+                false,
                 'Unknown image format of file "{{ file }}".',
                 Validation::INVALID_TRUE,
                 null,
