@@ -36,7 +36,7 @@ class UuidArrayType extends Type
 
         $uuids = [];
         $values = $platform instanceof PostgreSqlPlatform
-            ? explode(',', substr($value, 1, -1))
+            ? array_filter(explode(',', substr($value, 1, -1)))
             : json_decode($value, true);
 
         foreach ($values as $value) {
