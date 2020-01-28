@@ -79,14 +79,17 @@ class OrderBy implements QueryModifier
         $entityManager = $queryBuilder->getEntityManager();
 
         foreach ($this->orderBy as $propertyPath => $direction) {
+            $currentClassMetadata = $classMetadata;
+            $currentDqlAlias = $dqlAlias;
+
             $propertyPath = explode('.', $propertyPath);
-            $dqlAlias = $this->joinAssociations($queryBuilder, $dqlAlias, $classMetadata, $propertyPath);
-            $path = $this->resolveEmbeddedPath($entityManager, $dqlAlias, $classMetadata, $propertyPath);
+            $currentDqlAlias = $this->joinAssociations($queryBuilder, $currentDqlAlias, $currentClassMetadata, $propertyPath);
+            $path = $this->resolveEmbeddedPath($entityManager, $currentDqlAlias, $currentClassMetadata, $propertyPath);
             $databasePlatform = $entityManager->getConnection()->getDatabasePlatform();
 
-            if (count($propertyPath) > 1 && $this->isJsonField($classMetadata, $databasePlatform, $propertyPath[0])) {
+            if (count($propertyPath) > 1 && $this->isJsonField($currentClassMetadata, $databasePlatform, $propertyPath[0])) {
                 $this->orderByJsonField($queryBuilder, $path, $propertyPath, $direction);
-            } elseif (count($propertyPath) === 1 && $classMetadata->hasField($propertyPath[0])) {
+            } elseif (count($propertyPath) === 1 && $currentClassMetadata->hasField($propertyPath[0])) {
                 $queryBuilder->addOrderBy(sprintf('%s.%s', $path, $propertyPath[0]), $direction);
             }
         }
