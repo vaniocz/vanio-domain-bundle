@@ -80,10 +80,8 @@ class OrderBy implements QueryModifier
 
         foreach ($this->orderBy as $propertyPath => $direction) {
             $currentClassMetadata = $classMetadata;
-            $currentDqlAlias = $dqlAlias;
-
             $propertyPath = explode('.', $propertyPath);
-            $currentDqlAlias = $this->joinAssociations($queryBuilder, $currentDqlAlias, $currentClassMetadata, $propertyPath);
+            $currentDqlAlias = $this->joinAssociations($queryBuilder, $dqlAlias, $currentClassMetadata, $propertyPath);
             $path = $this->resolveEmbeddedPath($entityManager, $currentDqlAlias, $currentClassMetadata, $propertyPath);
             $databasePlatform = $entityManager->getConnection()->getDatabasePlatform();
 
