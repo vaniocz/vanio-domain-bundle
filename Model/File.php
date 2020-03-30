@@ -102,7 +102,7 @@ class File
     public function setFile(?SymfonyFile $file): void
     {
         $this->file = $file;
-        $this->uploadedAt = new \DateTimeImmutable;
+        $this->uploadedAt = $this->uploadedAt ?? new \DateTimeImmutable;
     }
 
     public function fileName(): ?string
