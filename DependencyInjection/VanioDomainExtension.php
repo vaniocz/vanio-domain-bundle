@@ -16,6 +16,7 @@ use Vanio\DomainBundle\Doctrine\Functions\CastFunction;
 use Vanio\DomainBundle\Doctrine\Functions\FieldFunction;
 use Vanio\DomainBundle\Doctrine\Functions\AnyOfFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonbArrayElementsTextFunction;
+use Vanio\DomainBundle\Doctrine\Functions\JsonbExistsAnyFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonBuildObjectFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetBooleanFunction;
 use Vanio\DomainBundle\Doctrine\Functions\JsonGetNumberFunction;
@@ -138,6 +139,9 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'JSON_OBJECT_AGG' => JsonObjectAggFunction::class,
                         'JSONB_ARRAY_ELEMENTS_TEXT' => JsonbArrayElementsTextFunction::class,
                         'ANY_OF' => AnyOfFunction::class,
+                    ],
+                    'boolean_functions' => [
+                        'JSONB_EXISTS_ANY' => JsonbExistsAnyFunction::class,
                     ],
                 ],
             ],
