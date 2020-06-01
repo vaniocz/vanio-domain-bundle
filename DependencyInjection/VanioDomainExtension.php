@@ -137,11 +137,9 @@ class VanioDomainExtension extends Extension implements PrependExtensionInterfac
                         'JSON_BUILD_ARRAY' => JsonBuildObjectFunction::class,
                         'JSON_BUILD_OBJECT' => JsonBuildObjectFunction::class,
                         'JSON_OBJECT_AGG' => JsonObjectAggFunction::class,
+                        'JSONB_EXISTS_ANY' => JsonbExistsAnyFunction::class,
                         'JSONB_ARRAY_ELEMENTS_TEXT' => JsonbArrayElementsTextFunction::class,
                         'ANY_OF' => AnyOfFunction::class,
-                    ],
-                    'boolean_functions' => [
-                        'JSONB_EXISTS_ANY' => JsonbExistsAnyFunction::class,
                     ],
                 ],
             ],

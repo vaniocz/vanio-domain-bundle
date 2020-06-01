@@ -33,6 +33,6 @@ class ArrayFunction extends FunctionNode
 
     public function getSql(SqlWalker $sqlWalker): string
     {
-        return sprintf('ARRAY[%s]', implode(', ', array_map([$sqlWalker, 'walkInParameter'], $this->elements)));
+        return sprintf('array[%s]', implode(', ', array_map([$sqlWalker, 'walkInParameter'], $this->elements)));
     }
 }
