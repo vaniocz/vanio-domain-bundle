@@ -1,13 +1,13 @@
 <?php
 namespace Vanio\DomainBundle\UnexpectedResponse;
 
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
 class UnexpectedResponseListener
 {
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
-        $exception = $event->getException();
+        $exception = $event->getThrowable();
 
         if ($exception instanceof UnexpectedResponseException) {
             $event->setResponse($exception->getResponse());

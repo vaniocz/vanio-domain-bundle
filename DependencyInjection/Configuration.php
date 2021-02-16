@@ -9,8 +9,8 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder;
-        $treeBuilder->root('vanio_domain')
+        $treeBuilder = new TreeBuilder('vanio_domain');
+        $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('convert_get_post_parameters')->defaultTrue()->end()
                 ->arrayNode('pagination_default_options')

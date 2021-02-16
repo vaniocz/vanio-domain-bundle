@@ -2,7 +2,7 @@
 namespace Vanio\DomainBundle\Request;
 
 use BeSimple\I18nRoutingBundle\Routing\Loader\AnnotatedRouteControllerLoader;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +21,14 @@ class GetPostParamConverter implements ParamConverterInterface
     /** @var AnnotatedRouteControllerLoader|null */
     private $annotatedRouteControllerLoader;
 
-    /** @var ManagerRegistry|null */
+    /** @var Registry|null */
     private $registry;
 
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         UrlGeneratorInterface $defaultUrlGenerator = null,
         AnnotatedRouteControllerLoader $annotatedRouteControllerLoader = null,
-        ManagerRegistry $registry = null
+        Registry $registry = null
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->configurableUrlGenerator = $this->resolveConfigurableRequirementsUrlGenerator($urlGenerator)

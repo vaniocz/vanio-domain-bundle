@@ -48,4 +48,9 @@ class ValidationExtension extends AbstractTypeExtension implements EventSubscrib
     {
         return FormType::class;
     }
+
+    public static function getExtendedTypes(): iterable
+    {
+        return [FormType::class];
+    }
 }
