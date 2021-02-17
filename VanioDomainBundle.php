@@ -19,10 +19,12 @@ class VanioDomainBundle extends Bundle
 
     public function boot(): void
     {
-        $cloner = $this->container->get('var_dumper.cloner');
-        assert($cloner instanceof ClonerInterface);
-        $cloner->addCasters([UuidInterface::class => function (UuidInterface $uuid) {
-            return ['uuid' => (string) $uuid];
-        }]);
+        if ($this->container->has('var_dumper.cloner')) {
+            $cloner = $this->container->get('var_dumper.cloner');
+            assert($cloner instanceof ClonerInterface);
+            $cloner->addCasters([UuidInterface::class => function (UuidInterface $uuid) {
+                return ['uuid' => (string) $uuid];
+            }]);
+        }
     }
 }
