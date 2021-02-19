@@ -2,8 +2,8 @@
 namespace Vanio\DomainBundle\Doctrine;
 
 use Assert\Assertion;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\AbstractQuery;
@@ -37,12 +37,12 @@ class EntityRepository extends BaseEntityRepository
     private $alias = 'e';
 
     /**
-     * @param ManagerRegistry|EntityManager $doctrine
+     * @param Registry|EntityManager $doctrine
      * @param ClassMetadata|string $class
      */
     public function __construct($doctrine, $class)
     {
-        $entityManager = $doctrine instanceof ManagerRegistry ? $doctrine->getManagerForClass($class) : $doctrine;
+        $entityManager = $doctrine instanceof Registry ? $doctrine->getManagerForClass($class) : $doctrine;
         $classMetadata = is_string($class) ? $entityManager->getClassMetadata($class) : $class;
         parent::__construct($entityManager, $classMetadata);
     }
