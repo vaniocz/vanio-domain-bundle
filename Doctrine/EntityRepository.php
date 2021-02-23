@@ -2,7 +2,6 @@
 namespace Vanio\DomainBundle\Doctrine;
 
 use Assert\Assertion;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\LockMode;
@@ -21,6 +20,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Happyr\DoctrineSpecification\Exception\NonUniqueResultException;
 use Happyr\DoctrineSpecification\Exception\NoResultException;
 use Happyr\DoctrineSpecification\Filter\Filter;
@@ -37,12 +37,12 @@ class EntityRepository extends BaseEntityRepository
     private $alias = 'e';
 
     /**
-     * @param Registry|EntityManager $doctrine
+     * @param ManagerRegistry|EntityManager $doctrine
      * @param ClassMetadata|string $class
      */
     public function __construct($doctrine, $class)
     {
-        $entityManager = $doctrine instanceof Registry ? $doctrine->getManagerForClass($class) : $doctrine;
+        $entityManager = $doctrine instanceof ManagerRegistry ? $doctrine->getManagerForClass($class) : $doctrine;
         $classMetadata = is_string($class) ? $entityManager->getClassMetadata($class) : $class;
         parent::__construct($entityManager, $classMetadata);
     }

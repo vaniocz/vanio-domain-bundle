@@ -1,9 +1,9 @@
 <?php
 namespace Vanio\DomainBundle\Request;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +15,10 @@ class SluggableParamConverter implements ParamConverterInterface
 {
     const DEFAULT_OPTIONS = ['property' => 'slug'];
 
-    /** @var Registry|null */
+    /** @var ManagerRegistry|null */
     private $doctrine;
 
-    public function __construct(Registry $registry = null)
+    public function __construct(ManagerRegistry $registry = null)
     {
         $this->doctrine = $registry;
     }
