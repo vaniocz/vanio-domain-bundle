@@ -3,9 +3,8 @@ namespace Vanio\DomainBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 use Vanio\DomainBundle\Assert\Validation;
 use Vanio\Stdlib\Strings;
 
@@ -132,7 +131,7 @@ class File
         }
 
         if (!isset($this->metaData['format'])) {
-            $this->metaData['format'] = ExtensionGuesser::getInstance()->guess($this->metaData['mimeType']);
+            $this->metaData['format'] = (new MimeTypes)->getExtensions($this->metaData['mimeType'])[0] ?? null;
         }
 
         if (!isset($this->metaData['size'])) {
@@ -157,7 +156,7 @@ class File
 
     private function guessMimeType(string $extension): string
     {
-        $mimeType = MimeTypeGuesser::getInstance()->guess($this->file->getPathname());
+        $mimeType = (new MimeTypes)->guessMimeType($this->file->getPathname());
 
         if (
             $mimeType !== 'application/octet-stream'
